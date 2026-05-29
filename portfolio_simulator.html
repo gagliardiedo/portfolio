@@ -1013,13 +1013,7 @@ function showPane(id,btn){
   if(pane){pane.classList.add('on');pane.style.display='block';}
   if(id==='autopsy'){initApTrades();return;}
   if(id==='live'){
-    // Trova il totale dall'ultimo fetch
-    const totR = liveData.length ? {
-      valore_tr: caps.reduce((s,v)=>s+v,0),
-      pal_eur: 0,
-      var_pct_oggi: 0
-    } : null;
-    renderLivePane(liveData, totR);
+    renderLivePane(liveData, null);
     return;
   }
   refresh();
@@ -1966,8 +1960,21 @@ function parseCSV(text) {
     const cols = splitCSVLine(line);
     const obj = {};
     headers.forEach((h, i) => {
-      let v = (cols[i] || '').replace(/"/g,'').replace(/€/g,'').replace(/\s/g,'').replace(/\./g,'').replace(/,/g,'.');
-      obj[h] = (v !== '' && !isNaN(parseFloat(v))) ? parseFloat(v) : (cols[i]||'').replace(/"/g,'').trim();
+      let raw = (cols[i] || '').replace(/"/g,'').replace(/€/g,'').trim();
+      // Converti formato italiano: 1.234,56 → 1234.56 oppure 0,0105 → 0.0105
+      let v = raw;
+      if (/^-?[\d.,]+$/.test(raw)) {
+        // Se ha sia punto che virgola: 1.234,56 (italiano con migliaia)
+        if (raw.includes('.') && raw.includes(',')) {
+          v = raw.replace(/\./g,'').replace(',','.');
+        }
+        // Solo virgola: 0,0105 → 0.0105
+        else if (raw.includes(',') && !raw.includes('.')) {
+          v = raw.replace(',','.');
+        }
+        // Solo punto: già formato inglese (0.0105) — lascia invariato
+      }
+      obj[h] = (v !== '' && !isNaN(parseFloat(v))) ? parseFloat(v) : raw;
     });
     return obj;
   });
@@ -2109,12 +2116,26 @@ function updateCapitalLive(tot) {
 function renderLivePane(data, tot) {
   if (!data || !data.length) return;
 
-  // KPI principali
-  const vt  = tot ? (parseFloat(tot.valore_tr) || 0) : 0;
-  const pal = tot ? (parseFloat(tot.pal_eur)    || 0) : 0;
-  const vp  = tot ? (parseFloat(tot.var_pct_oggi)|| 0) : 0;
-  const ve  = vt * vp;
-  const palPct = vt > 0 ? pal / (vt - pal) : 0;
+  // Calcola totali aggregando i singoli asset (più affidabile)
+  let vt  = 0, pal = 0, ve = 0, inv = 0;
+  data.forEach(r => {
+    vt  += parseFloat(r.valore_tr)    || 0;
+    pal += parseFloat(r.pal_eur)      || 0;
+    inv += parseFloat(r.investito)    || 0;
+    // var€ oggi = valore_tr × var_pct_oggi
+    const vtr = parseFloat(r.valore_tr)   || 0;
+    const vp2 = parseFloat(r.var_pct_oggi)|| 0;
+    ve += vtr * vp2;
+  });
+
+  // Fallback da riga totale se disponibile
+  if (tot) {
+    if (parseFloat(tot.valore_tr) > 0) vt  = parseFloat(tot.valore_tr);
+    if (parseFloat(tot.pal_eur)   !== 0) pal = parseFloat(tot.pal_eur);
+  }
+
+  const vp     = vt > 0 ? ve / vt : 0;
+  const palPct = inv > 0 ? pal / inv : 0;
 
   const kpiEl = document.getElementById('live-kpis');
   if (kpiEl) {
