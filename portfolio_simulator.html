@@ -1977,6 +1977,7 @@ async function fetchStorico() {
         const text = await res.text();
         console.log('[Storico] CSV raw (prime 3 righe):', text.split('\n').slice(0,3).join(' | '));
         const rows = parseCSV(text);
+        storicoData = rows
           .filter(r => r.data && r.valore && String(r.data) !== 'data')
           .map(r => {
             // Normalizza la data in formato ISO YYYY-MM-DD
