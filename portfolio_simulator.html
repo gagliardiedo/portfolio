@@ -378,8 +378,49 @@ tbody tr:hover td{background:rgba(255,255,255,.015);}
     <button class="nt on" id="bgeo" onclick="setGV('geo',this)">Geografica</button>
     <button class="nt" id="bsec" onclick="setGV('sec',this)">Settoriale</button>
   </div>
-  <div id="vgeo"><div class="card"><p class="sec">Allocazione geografica</p><div id="geo-leg" style="display:flex;flex-wrap:wrap;gap:7px;margin-bottom:10px;font-size:10px;color:var(--t2);"></div><div class="cw" style="height:280px;"><canvas id="c-geo" role="img" aria-label="Allocazione geografica portafoglio">Geo.</canvas></div></div></div>
-  <div id="vsec" style="display:none;"><div class="g2"><div class="card"><p class="sec">Settori</p><div class="cw" style="height:260px;"><canvas id="c-sec" role="img" aria-label="Allocazione settoriale">Settori.</canvas></div></div><div class="card"><p class="sec">Peso settori</p><div id="sec-bars"></div></div></div></div>
+
+  <!-- GEOGRAFICA -->
+  <div id="vgeo">
+    <div class="card" style="margin-bottom:14px;">
+      <p class="sec" style="margin-bottom:6px;">Distribuzione globale</p>
+      <p style="font-size:10px;color:var(--t3);margin-bottom:12px;">Pesi % per area geografica — hover per dettaglio</p>
+      <div style="position:relative;height:380px;">
+        <canvas id="c-geo-radar" role="img" aria-label="Radar geografico portafoglio"></canvas>
+      </div>
+    </div>
+    <div class="card" style="margin-bottom:14px;">
+      <p class="sec" style="margin-bottom:8px;">Peso per area</p>
+      <div id="geo-leg" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px;font-size:9px;color:var(--t2);"></div>
+      <div id="geo-bars-new"></div>
+    </div>
+    <div class="card">
+      <p class="sec" style="margin-bottom:8px;">Stacked view</p>
+      <div style="position:relative;height:70px;">
+        <canvas id="c-geo" role="img" aria-label="Allocazione geografica portafoglio">Geo.</canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- SETTORIALE -->
+  <div id="vsec" style="display:none;">
+    <div class="card" style="margin-bottom:14px;">
+      <p class="sec" style="margin-bottom:6px;">Distribuzione settoriale</p>
+      <p style="font-size:10px;color:var(--t3);margin-bottom:12px;">Pesi % per settore GICS — hover per dettaglio</p>
+      <div style="position:relative;height:380px;">
+        <canvas id="c-sec-radar" role="img" aria-label="Radar settoriale portafoglio"></canvas>
+      </div>
+    </div>
+    <div class="g2">
+      <div class="card">
+        <p class="sec" style="margin-bottom:6px;">Settori</p>
+        <div class="cw" style="height:220px;"><canvas id="c-sec" role="img" aria-label="Allocazione settoriale">Settori.</canvas></div>
+      </div>
+      <div class="card">
+        <p class="sec" style="margin-bottom:8px;">Peso settori</p>
+        <div id="sec-bars"></div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <!-- RETURNS -->
@@ -578,20 +619,26 @@ tbody tr:hover td{background:rgba(255,255,255,.015);}
     </div>
   </div>
 
-  <!-- SINTESI -->
+  <!-- SINTESI CONSENSUS VISIVA -->
   <div class="card" style="border-color:rgba(240,201,110,.2);border-left:3px solid var(--gold2);">
-    <p class="sec" style="margin-bottom:10px;">Sintesi consensus — come si posizionano le istituzioni sui tuoi asset</p>
+    <p class="sec" style="margin-bottom:4px;">Sintesi consensus — posizionamento istituzionale sui tuoi asset</p>
+    <p style="font-size:10px;color:var(--t3);margin-bottom:14px;">Asse X = sentiment (Bearish → Bullish) · Asse Y = orizzonte temporale · Dimensione bolla = peso % nel portafoglio</p>
+    <div style="position:relative;height:340px;margin-bottom:14px;">
+      <canvas id="c-consensus-bubble" role="img" aria-label="Consensus bubble chart"></canvas>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px;" id="consensus-cards"></div>
     <table>
-      <thead><tr><th style="text-align:left;">Asset</th><th>Fonte principale</th><th>Outlook 2026</th><th>Target</th><th>Il tuo peso</th></tr></thead>
+      <thead><tr><th style="text-align:left;">Asset</th><th>Fonte</th><th>Outlook</th><th>Target</th><th>Peso port.</th><th>Raccomandazione</th></tr></thead>
       <tbody>
-        <tr><td style="font-weight:600;color:var(--gold2);">Gold</td><td style="font-size:9px;color:var(--t3);">GS, JPM, BofA</td><td><span class="badge bg">Bullish</span></td><td style="font-family:'JetBrains Mono',monospace;color:var(--teal);">$4.900–$6.000</td><td style="font-family:'JetBrains Mono',monospace;">24% ✅</td></tr>
-        <tr><td style="font-weight:600;color:#CD7F32;">Copper</td><td style="font-size:9px;color:var(--t3);">GS, GSAM</td><td><span class="badge bg">Bullish strutturale</span></td><td style="font-family:'JetBrains Mono',monospace;color:var(--teal);">$11.400/ton</td><td style="font-family:'JetBrains Mono',monospace;">6.7% ⚠️ basso</td></tr>
-        <tr><td style="font-weight:600;color:var(--amber);">Uranium</td><td style="font-size:9px;color:var(--t3);">WNA, Sprott</td><td><span class="badge bg">Bullish LT</span></td><td style="font-family:'JetBrains Mono',monospace;color:var(--teal);">$90–$110/lb</td><td style="font-family:'JetBrains Mono',monospace;">3.3% ⚠️ basso</td></tr>
-        <tr><td style="font-weight:600;color:#C0C0C0;">Silver</td><td style="font-size:9px;color:var(--t3);">Silver Inst., JPM</td><td><span class="badge bg">Bullish</span></td><td style="font-family:'JetBrains Mono',monospace;color:var(--teal);">$36–$42/oz</td><td style="font-family:'JetBrains Mono',monospace;">4.4% ✅</td></tr>
-        <tr><td style="font-weight:600;color:var(--teal);">Grid/Electrification</td><td style="font-size:9px;color:var(--t3);">S&P Global</td><td><span class="badge bg">Bullish LT</span></td><td style="font-family:'JetBrains Mono',monospace;color:var(--teal);">€584B investimenti EU</td><td style="font-family:'JetBrains Mono',monospace;">3.1% ⚠️ basso</td></tr>
-        <tr><td style="font-weight:600;color:var(--teal);">Clean Energy</td><td style="font-size:9px;color:var(--t3);">BlackRock, IEA</td><td><span class="badge ba">Misto breve</span></td><td style="font-family:'JetBrains Mono',monospace;color:var(--amber);">Volatilità alta</td><td style="font-family:'JetBrains Mono',monospace;">12.8% ✅</td></tr>
-        <tr><td style="font-weight:600;color:var(--teal);">Hydrogen</td><td style="font-size:9px;color:var(--t3);">BlackRock, iShares</td><td><span class="badge ba">Early stage</span></td><td style="font-family:'JetBrains Mono',monospace;color:var(--amber);">$11T al 2050</td><td style="font-family:'JetBrains Mono',monospace;">16.2% ⚠️ alto</td></tr>
-        <tr><td style="font-weight:600;color:var(--t2);">MSCI EM</td><td style="font-size:9px;color:var(--t3);">GS, BlackRock</td><td><span class="badge ba">Neutral</span></td><td style="font-family:'JetBrains Mono',monospace;color:var(--amber);">Cina-risk</td><td style="font-family:'JetBrains Mono',monospace;">14% ⚠️ monitorare</td></tr>
+        <tr><td style="font-weight:600;color:var(--gold2);">Gold</td><td style="font-size:9px;color:var(--t3);">GS, JPM, BofA</td><td><span class="badge bg">Bullish</span></td><td style="font-family:'JetBrains Mono',monospace;color:var(--teal);">$4.900–$6.000</td><td style="font-family:'JetBrains Mono',monospace;">24% ✅</td><td style="font-size:9px;color:var(--teal);">Mantieni / Aumenta</td></tr>
+        <tr><td style="font-weight:600;color:#CD7F32;">Copper</td><td style="font-size:9px;color:var(--t3);">GS, GSAM</td><td><span class="badge bg">Bullish strutturale</span></td><td style="font-family:'JetBrains Mono',monospace;color:var(--teal);">$11.400/ton</td><td style="font-family:'JetBrains Mono',monospace;">6.7% <span style="color:var(--amber);">⚠ basso</span></td><td style="font-size:9px;color:var(--amber);">Valuta aumento</td></tr>
+        <tr><td style="font-weight:600;color:var(--amber);">Uranium</td><td style="font-size:9px;color:var(--t3);">WNA, Sprott</td><td><span class="badge bg">Bullish LT</span></td><td style="font-family:'JetBrains Mono',monospace;color:var(--teal);">$90–$110/lb</td><td style="font-family:'JetBrains Mono',monospace;">3.3% <span style="color:var(--amber);">⚠ basso</span></td><td style="font-size:9px;color:var(--amber);">Valuta aumento (paziente)</td></tr>
+        <tr><td style="font-weight:600;color:#C0C0C0;">Silver</td><td style="font-size:9px;color:var(--t3);">Silver Inst., JPM</td><td><span class="badge bg">Bullish</span></td><td style="font-family:'JetBrains Mono',monospace;color:var(--teal);">$36–$42/oz</td><td style="font-family:'JetBrains Mono',monospace;">4.4% ✅</td><td style="font-size:9px;color:var(--teal);">Mantieni</td></tr>
+        <tr><td style="font-weight:600;color:var(--teal);">Grid/Electrification</td><td style="font-size:9px;color:var(--t3);">S&P Global</td><td><span class="badge bg">Bullish LT</span></td><td style="font-family:'JetBrains Mono',monospace;color:var(--teal);">€584B EU</td><td style="font-family:'JetBrains Mono',monospace;">3.1% <span style="color:var(--amber);">⚠ basso</span></td><td style="font-size:9px;color:var(--amber);">Valuta aumento</td></tr>
+        <tr><td style="font-weight:600;color:var(--teal);">Clean Energy</td><td style="font-size:9px;color:var(--t3);">BlackRock, IEA</td><td><span class="badge ba">Misto breve</span></td><td style="font-family:'JetBrains Mono',monospace;color:var(--amber);">Volatilità alta</td><td style="font-family:'JetBrains Mono',monospace;">12.8% ✅</td><td style="font-size:9px;color:var(--t2);">Mantieni, non aumentare ora</td></tr>
+        <tr><td style="font-weight:600;color:var(--teal);">Hydrogen</td><td style="font-size:9px;color:var(--t3);">BlackRock, iShares</td><td><span class="badge ba">Early stage</span></td><td style="font-family:'JetBrains Mono',monospace;color:var(--amber);">$11T al 2050</span></td><td style="font-family:'JetBrains Mono',monospace;">16.2% <span style="color:var(--amber);">⚠ alto</span></td><td style="font-size:9px;color:var(--amber);">Monitorare — peso elevato</td></tr>
+        <tr><td style="font-weight:600;color:var(--t2);">MSCI EM</td><td style="font-size:9px;color:var(--t3);">GS, BlackRock</td><td><span class="badge ba">Neutral</span></td><td style="font-family:'JetBrains Mono',monospace;color:var(--amber);">Cina-risk</td><td style="font-family:'JetBrains Mono',monospace;">14% ⚠️</td><td style="font-size:9px;color:var(--amber);">Monitorare esposizione Cina</td></tr>
+        <tr><td style="font-weight:600;color:var(--t2);">Battery</td><td style="font-size:9px;color:var(--t3);">GS, GSAM</td><td><span class="badge bg">Bullish LT</span></td><td style="font-family:'JetBrains Mono',monospace;color:var(--teal);">EV+storage</td><td style="font-family:'JetBrains Mono',monospace;">6.2% ✅</td><td style="font-size:9px;color:var(--teal);">Mantieni</td></tr>
       </tbody>
     </table>
     <p class="note">Dati da Goldman Sachs Commodity Outlook 2026, JPMorgan Market Outlook, BlackRock Investment Institute, GSAM Market Know-How Q2 2026, S&P Global Energy Horizons 2026, World Nuclear Association Report 2026, Sprott Uranium Outlook 2026. Aggiornato maggio 2026.</p>
@@ -1260,12 +1307,14 @@ function showPane(id,btn){
     renderStorico();
     return;
   }
+  if(id==='scenario'){setTimeout(()=>{renderScenario();},50);return;}
+  if(id==='geo'){setTimeout(()=>{rGeo();},50);return;}
   refresh();
 }
 function refresh(){
   if(curPane==='overview')rOv();
   if(curPane==='volatility')rVol();
-  if(curPane==='geo')rGeo();
+  if(curPane==='geo')setTimeout(()=>{rGeo();},30);
   if(curPane==='scenario')renderScenario();
   if(curPane==='stress')rStress();
   if(curPane==='bench')rBench();
@@ -1277,7 +1326,8 @@ function setGV(v,btn){
   document.getElementById('vgeo').style.display=v==='geo'?'block':'none';
   document.getElementById('vsec').style.display=v==='sec'?'block':'none';
   document.querySelectorAll('#pane-geo .nt').forEach(b=>b.classList.remove('on'));
-  btn.classList.add('on');rGeo();
+  btn.classList.add('on');
+  setTimeout(()=>{rGeo();},50);
 }
 
 // ═══════════════ OVERVIEW ═══════════════
@@ -1314,16 +1364,98 @@ function rVol(){
 // ═══════════════ GEO ═══════════════
 function rGeo(){if(geoV==='geo')rGeoC();else rSecC();}
 function rGeoC(){
-  const gd=cGeo();const leg=document.getElementById('geo-leg');leg.innerHTML='';
-  GL.forEach(l=>{const s=document.createElement('span');s.style.cssText='display:flex;align-items:center;gap:3px;';s.innerHTML=`<span style="width:8px;height:8px;border-radius:2px;background:${GC[l]};flex-shrink:0;"></span>${l}`;leg.appendChild(s);});
-  mk('c-geo',{type:'bar',data:{labels:['Portafoglio'],datasets:GL.map(l=>({label:l,data:[+(gd[l]||0).toFixed(1)],backgroundColor:GC[l],borderWidth:0,borderRadius:2}))},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>ctx.parsed.x>.2?` ${ctx.dataset.label}: ${ctx.parsed.x.toFixed(1)}%`:null,filter:i=>i.parsed.x>.2}}},scales:{x:{stacked:true,max:100,ticks:{callback:v=>v+'%',color:'#3e4452',font:{size:10}},grid:{color:'rgba(255,255,255,.04)'}},y:{stacked:true,ticks:{color:'#3e4452'},grid:{display:false}}}}});
+  const gd=cGeo();
+  // Legenda
+  const leg=document.getElementById('geo-leg');
+  if(leg){leg.innerHTML='';GL.forEach(l=>{const s=document.createElement('span');s.style.cssText='display:flex;align-items:center;gap:4px;';s.innerHTML=`<span style="width:8px;height:8px;border-radius:50%;background:${GC[l]};flex-shrink:0;"></span>${l}`;leg.appendChild(s);});}
+  // Radar geografico grande
+  mk('c-geo-radar',{type:'radar',data:{
+    labels:GL,
+    datasets:[{
+      label:'Portafoglio',
+      data:GL.map(l=>+(gd[l]||0).toFixed(1)),
+      fill:true,
+      backgroundColor:'rgba(240,201,110,0.12)',
+      borderColor:'#f0c96e',
+      borderWidth:2.5,
+      pointBackgroundColor:GL.map(l=>GC[l]),
+      pointBorderColor:'#07080b',
+      pointBorderWidth:2,
+      pointRadius:6,
+    }]
+  },options:{
+    responsive:true,maintainAspectRatio:false,
+    plugins:{
+      legend:{display:false},
+      tooltip:{callbacks:{label:ctx=>` ${ctx.label}: ${ctx.parsed.r.toFixed(1)}%`}}
+    },
+    scales:{r:{
+      angleLines:{color:'rgba(255,255,255,0.08)'},
+      grid:{color:'rgba(255,255,255,0.08)'},
+      pointLabels:{color:'#eef0f4',font:{size:11,weight:'500'}},
+      ticks:{display:true,stepSize:10,color:'rgba(255,255,255,0.25)',backdropColor:'transparent',font:{size:8}},
+      min:0,max:Math.ceil(Math.max(...GL.map(l=>gd[l]||0))/10+1)*10
+    }}
+  }});
+  // Barre geografiche verticali
+  const barsEl=document.getElementById('geo-bars-new');
+  if(barsEl){
+    barsEl.innerHTML='';
+    const sorted=GL.map(l=>({l,v:gd[l]||0})).sort((a,b)=>b.v-a.v).filter(x=>x.v>0.5);
+    const mx=sorted[0]?.v||1;
+    sorted.forEach(({l,v})=>{
+      const d=document.createElement('div');
+      d.style.cssText='display:flex;align-items:center;gap:8px;margin-bottom:9px;font-size:10px;';
+      d.innerHTML=`
+        <span style="width:70px;flex-shrink:0;color:var(--t1);font-family:'JetBrains Mono',monospace;">${l}</span>
+        <div style="flex:1;background:var(--bg4);border-radius:3px;height:12px;overflow:hidden;">
+          <div style="width:${(v/mx*100).toFixed(0)}%;height:100%;background:${GC[l]};border-radius:3px;transition:width .4s;"></div>
+        </div>
+        <span style="width:38px;text-align:right;font-family:'JetBrains Mono',monospace;font-weight:600;color:${GC[l]};">${v.toFixed(1)}%</span>`;
+      barsEl.appendChild(d);
+    });
+  }
+  // Stacked bar
+  mk('c-geo',{type:'bar',data:{labels:['Portafoglio'],datasets:GL.map(l=>({label:l,data:[+(gd[l]||0).toFixed(1)],backgroundColor:GC[l],borderWidth:0,borderRadius:2}))},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>ctx.parsed.x>.2?` ${ctx.dataset.label}: ${ctx.parsed.x.toFixed(1)}%`:null,filter:i=>i.parsed.x>.2}}},scales:{x:{stacked:true,max:100,ticks:{callback:v=>v+'%',color:'#3e4452',font:{size:9}},grid:{color:'rgba(255,255,255,.03)'}},y:{stacked:true,ticks:{color:'#3e4452'},grid:{display:false}}}}});
 }
+
 function rSecC(){
   const sd=cSec();
+  // Radar settoriale
+  mk('c-sec-radar',{type:'radar',data:{
+    labels:SL,
+    datasets:[{
+      label:'Settori',
+      data:SL.map(l=>+(sd[l]||0).toFixed(1)),
+      fill:true,
+      backgroundColor:'rgba(39,201,154,0.10)',
+      borderColor:'var(--teal)',
+      borderWidth:2.5,
+      pointBackgroundColor:SL.map(l=>SC[l]),
+      pointBorderColor:'#07080b',
+      pointBorderWidth:2,
+      pointRadius:5,
+    }]
+  },options:{
+    responsive:true,maintainAspectRatio:false,
+    plugins:{
+      legend:{display:false},
+      tooltip:{callbacks:{label:ctx=>` ${ctx.label}: ${ctx.parsed.r.toFixed(1)}%`}}
+    },
+    scales:{r:{
+      angleLines:{color:'rgba(255,255,255,0.08)'},
+      grid:{color:'rgba(255,255,255,0.08)'},
+      pointLabels:{color:'#eef0f4',font:{size:10,weight:'500'}},
+      ticks:{display:true,stepSize:10,color:'rgba(255,255,255,0.25)',backdropColor:'transparent',font:{size:8}},
+      min:0,
+    }}
+  }});
+  // Donut
   mk('c-sec',{type:'doughnut',data:{labels:SL,datasets:[{data:SL.map(l=>+(sd[l]||0).toFixed(1)),backgroundColor:SL.map(l=>SC[l]),borderWidth:2,borderColor:'transparent'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>` ${ctx.label}: ${ctx.parsed.toFixed(1)}%`}}}}});
+  // Barre settori
   const el=document.getElementById('sec-bars');el.innerHTML='';
-  const sorted=SL.map(l=>({l,v:sd[l]||0})).sort((a,b)=>b.v-a.v);const mx=sorted[0]?.v||1;
-  sorted.forEach(({l,v})=>{if(v<.3)return;const d=document.createElement('div');d.style.cssText='display:flex;align-items:center;gap:7px;margin-bottom:8px;font-size:10.5px;';d.innerHTML=`<span style="width:115px;flex-shrink:0;color:var(--t1);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${l}</span><div style="flex:1;background:var(--bg4);border-radius:2px;height:10px;overflow:hidden;"><div style="width:${(v/mx*100).toFixed(0)}%;height:100%;background:${SC[l]};border-radius:2px;transition:width .3s;"></div></div><span style="width:36px;text-align:right;font-family:'JetBrains Mono',monospace;font-weight:500;color:${SC[l]};">${v.toFixed(1)}%</span>`;el.appendChild(d);});
+  const sorted=SL.map(l=>({l,v:sd[l]||0})).sort((a,b)=>b.v-a.v);const mx2=sorted[0]?.v||1;
+  sorted.forEach(({l,v})=>{if(v<.3)return;const d=document.createElement('div');d.style.cssText='display:flex;align-items:center;gap:7px;margin-bottom:8px;font-size:10px;';d.innerHTML=`<span style="width:115px;flex-shrink:0;color:var(--t1);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${l}</span><div style="flex:1;background:var(--bg4);border-radius:2px;height:10px;overflow:hidden;"><div style="width:${(v/mx2*100).toFixed(0)}%;height:100%;background:${SC[l]};border-radius:2px;transition:width .3s;"></div></div><span style="width:36px;text-align:right;font-family:'JetBrains Mono',monospace;font-weight:500;color:${SC[l]};">${v.toFixed(1)}%</span>`;el.appendChild(d);});
 }
 
 // ═══════════════ RETURNS ═══════════════
@@ -1417,21 +1549,21 @@ function renderScenario(){
   const expectedEur = cap * expectedRet;
 
   // Aggiungi KPI valore atteso sopra il grafico
-  const fcCard = document.querySelector('#c-fc')?.closest('.card');
-  if (fcCard) {
+  const fcParent = document.getElementById('c-fc')?.parentElement?.parentElement;
+  if (fcParent) {
     let expEl = document.getElementById('sc-expected');
     if (!expEl) {
       expEl = document.createElement('div');
       expEl.id = 'sc-expected';
-      expEl.style.cssText = 'display:flex;gap:20px;margin-bottom:12px;font-family:\'JetBrains Mono\',monospace;font-size:10px;flex-wrap:wrap;';
-      fcCard.insertBefore(expEl, document.getElementById('c-fc'));
+      expEl.style.cssText = 'display:flex;gap:16px;margin-bottom:12px;font-family:\'JetBrains Mono\',monospace;font-size:10px;flex-wrap:wrap;align-items:center;';
+      fcParent.insertBefore(expEl, fcParent.firstChild);
     }
     const ec = expectedRet >= 0 ? 'var(--teal)' : 'var(--red)';
     expEl.innerHTML = `
       <span style="color:var(--t3);">Rendimento atteso ponderato</span>
-      <span style="color:${ec};font-weight:700;">${expectedRet>=0?'+':''}${(expectedRet*100).toFixed(1)}%</span>
+      <span style="color:${ec};font-weight:700;font-size:13px;">${expectedRet>=0?'+':''}${(expectedRet*100).toFixed(1)}%</span>
       <span style="color:${ec};font-weight:700;">${expectedEur>=0?'+':''}€${fE(expectedEur)}</span>
-      <span style="color:var(--t3);margin-left:auto;">Bear ${PROB.bear}% · Base ${PROB.base}% · Bull ${PROB.bull}% · Fonte: GS, JPM, BlackRock consensus</span>
+      <span style="color:var(--t3);margin-left:auto;font-size:9px;">Bear ${PROB.bear}% · Base ${PROB.base}% · Bull ${PROB.bull}% · Fonte: GS, JPM, BlackRock</span>
     `;
   }
 
@@ -1463,9 +1595,83 @@ function renderScenario(){
   const expTot = (br*PROB.bear + bs*PROB.base + bu*PROB.bull) / 100;
   tr3.innerHTML=`<td>Portafoglio</td><td>100%</td><td style="color:${br>=0?'var(--teal)':'var(--red)'}">${br>=0?'+':''}${fP(br)}%</td><td style="color:var(--gold)">${bs>=0?'+':''}${fP(bs)}%</td><td style="color:var(--teal)">+${fP(bu)}%</td><td style="color:${tb2>=0?'var(--teal)':'var(--red)'}">${tb2>=0?'+':''}${fP(tb2)}%</td><td style="color:var(--gold);font-weight:700;">${expTot>=0?'+':''}${fP(expTot)}%</td>`;
   tb.appendChild(tr3);
-}
 
-// ═══════════════ STRESS TEST ═══════════════
+  // ── Consensus bubble chart ──
+  const CONSENSUS_DATA = [
+    {label:'Gold',      x:88, y:3.5, peso:24.1, color:'#f0c96e', note:'$4.900–6.000/oz'},
+    {label:'Copper',    x:85, y:4.5, peso:6.7,  color:'#CD7F32', note:'$11.400/ton'},
+    {label:'Uranium',   x:78, y:4.8, peso:3.3,  color:'#d4903a', note:'$90–110/lb'},
+    {label:'Silver',    x:80, y:3.0, peso:4.4,  color:'#C0C0C0', note:'$36–42/oz'},
+    {label:'Grid',      x:82, y:4.2, peso:3.1,  color:'#27c99a', note:'€584B EU'},
+    {label:'Battery',   x:75, y:4.0, peso:6.2,  color:'#8b6fff', note:'EV+Storage'},
+    {label:'Clean E.',  x:58, y:3.5, peso:12.8, color:'#4d9de0', note:'Misto breve'},
+    {label:'Hydrogen',  x:62, y:5.0, peso:16.2, color:'#27c99a', note:'$11T 2050'},
+    {label:'MSCI EM',   x:45, y:2.5, peso:14.0, color:'#BA7517', note:'Neutral/Cina'},
+  ];
+
+  mk('c-consensus-bubble',{
+    type:'bubble',
+    data:{datasets:CONSENSUS_DATA.map(d=>({
+      label:d.label,
+      data:[{x:d.x, y:d.y, r:Math.max(8, d.peso*1.8)}],
+      backgroundColor:d.color+'55',
+      borderColor:d.color,
+      borderWidth:2,
+    }))},
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      plugins:{
+        legend:{display:false},
+        tooltip:{callbacks:{label:ctx=>{const d=CONSENSUS_DATA[ctx.datasetIndex];return [` ${d.label}`,` Peso: ${d.peso}%`,` ${d.note}`];}}}
+      },
+      scales:{
+        x:{min:0,max:100,
+          title:{display:true,text:'← Bearish  ·  Sentiment  ·  Bullish →',color:'#3e4452',font:{size:10}},
+          ticks:{callback:v=>v===0?'Bearish':v===50?'Neutral':v===100?'Bullish':'',color:'#3e4452',font:{size:9}},
+          grid:{color:'rgba(255,255,255,0.04)'}},
+        y:{min:1,max:6,
+          title:{display:true,text:'Orizzonte temporale (anni)',color:'#3e4452',font:{size:10}},
+          ticks:{callback:v=>v+'Y',color:'#3e4452',font:{size:9}},
+          grid:{color:'rgba(255,255,255,0.04)'}}
+      }
+    }
+  });
+
+  // Etichette bolle
+  const bubbleLblPlugin={id:'bblbl_'+Date.now(),afterDatasetsDraw(chart){
+    const c2=chart.ctx;
+    chart.data.datasets.forEach((ds,i)=>{
+      const meta=chart.getDatasetMeta(i);
+      if(meta.data[0]){
+        const pt=meta.data[0];const d=CONSENSUS_DATA[i];
+        c2.save();c2.font='bold 9px monospace';c2.fillStyle=d.color;c2.textAlign='center';
+        c2.fillText(d.label,pt.x,pt.y-pt.options.radius-4);c2.restore();
+      }
+    });
+  }};
+  Chart.register(bubbleLblPlugin);
+  if(charts['c-consensus-bubble'])charts['c-consensus-bubble'].update();
+
+  // Consensus mini-cards
+  const ccEl=document.getElementById('consensus-cards');
+  if(ccEl){
+    const expPct=(br*PROB.bear+bs*PROB.base+bu*PROB.bull)/100;
+    const ec=expPct>=0?'var(--teal)':'var(--red)';
+    ccEl.innerHTML=[
+      {label:'🟢 Bullish (7 asset)',items:'Gold · Copper · Uranium · Silver · Grid · Battery · Hydrogen*',color:'var(--teal)'},
+      {label:'🟡 Misto / Breve',items:'Clean Energy · Hydrogen (early stage)',color:'var(--amber)'},
+      {label:'🟠 Neutral',items:'MSCI EM (rischio Cina 27%)',color:'var(--t3)'},
+    ].map(g=>`<div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:12px;">
+      <div style="font-size:9px;color:${g.color};font-family:'JetBrains Mono',monospace;font-weight:600;margin-bottom:5px;">${g.label}</div>
+      <div style="font-size:10px;color:var(--t1);">${g.items}</div>
+    </div>`).join('')+
+    `<div style="background:var(--bg2);border:1px solid rgba(240,201,110,.3);border-radius:var(--r2);padding:12px;">
+      <div style="font-size:9px;color:var(--gold2);font-family:'JetBrains Mono',monospace;font-weight:600;margin-bottom:5px;">📊 ATTESO PONDERATO</div>
+      <div style="font-size:22px;font-weight:700;color:${ec};">${expPct>=0?'+':''}${(expPct*100).toFixed(1)}%</div>
+      <div style="font-size:9px;color:var(--t3);margin-top:2px;">Bear×25 + Base×50 + Bull×25</div>
+    </div>`;
+  }
+}
 const STRESS_PRESETS={
   '2008':{label:'2008 — Lehman',shocks:[-.25,-.55,-.50,-.60,-.45,-.65,-.20,-.70,-.55,-.80,-.40,-.75]},
   covid:{label:'2020 — Covid crash',shocks:[.10,-.40,-.35,-.45,-.30,-.50,.05,-.45,-.35,-.60,-.25,-.55]},
