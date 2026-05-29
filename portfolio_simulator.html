@@ -1934,7 +1934,16 @@ function initApPatterns(){
 // LIVE FEED — Google Sheets CSV
 // ═══════════════════════════════════════════════════
 const SHEETS_CSV_RAW = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRlk1GW7nXz1YrEw_J7eYgVX2TuA1cb01XfI_OWpjjRJ2B499yw1R1Cx1zTSxOMhhMrk-Odm8Yat7rP/pub?gid=1374147929&single=true&output=csv';
-const SHEETS_CSV = 'https://api.allorigins.win/raw?url=' + encodeURIComponent(SHEETS_CSV_RAW);
+const CORS_PROXIES = [
+  'https://corsproxy.io/?',
+  'https://api.codetabs.com/v1/proxy?quest=',
+  'https://api.allorigins.win/raw?url=',
+];
+let proxyIdx = 0;
+function buildUrl() {
+  const proxy = CORS_PROXIES[proxyIdx % CORS_PROXIES.length];
+  return proxy + encodeURIComponent(SHEETS_CSV_RAW) + '&t=' + Date.now();
+}
 
 let liveData = [];
 let liveLastUpdate = null;
@@ -1979,48 +1988,53 @@ function splitCSVLine(line) {
 
 // ── Fetch principale ──
 async function fetchLiveData() {
-  try {
-    const res = await fetch(SHEETS_CSV + '&t=' + Date.now());
-    if (!res.ok) throw new Error('HTTP ' + res.status);
-    const text = await res.text();
-    const rows = parseCSV(text);
+  let lastErr = null;
+  for (let attempt = 0; attempt < CORS_PROXIES.length; attempt++) {
+    proxyIdx = attempt;
+    try {
+      const url = buildUrl();
+      console.log('[Live] Tentativo proxy', attempt+1, ':', CORS_PROXIES[attempt]);
+      const res = await fetch(url, {cache:'no-store'});
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      const text = await res.text();
+      if (!text || text.length < 20) throw new Error('Risposta vuota');
+      const rows = parseCSV(text);
 
-    // Debug: log headers e prima riga
-    if (rows.length) {
-      console.log('[Live] Headers:', Object.keys(rows[0]));
-      console.log('[Live] Riga 1:', rows[0]);
+      if (rows.length) {
+        console.log('[Live] Headers:', Object.keys(rows[0]));
+        console.log('[Live] Riga 1:', rows[0]);
+      }
+
+      liveData = rows.filter(r => {
+        const a = String(r.asset || '');
+        return a && a.toLowerCase() !== 'totale' && a.toLowerCase() !== 'asset';
+      });
+
+      const totRow = rows.find(r => String(r.asset||'').toLowerCase() === 'totale');
+      liveLastUpdate = new Date();
+
+      const totVal = totRow ? (parseFloat(totRow.valore_tr) || 0) : 0;
+      if (totVal > 0) {
+        liveHistory.push({ t: liveLastUpdate, v: totVal });
+        if (liveHistory.length > liveHistoryMax) liveHistory.shift();
+      }
+
+      updateTickerBar(liveData, totRow);
+      updateSidebarLive(liveData);
+      updateCapitalLive(totRow);
+      if (curPane === 'live') renderLivePane(liveData, totRow);
+
+      console.log('[Live] ✅ OK con proxy', attempt+1, '—', liveLastUpdate.toLocaleTimeString(), '| assets:', liveData.length);
+      return; // successo, esci
+    } catch(e) {
+      lastErr = e;
+      console.warn('[Live] Proxy', attempt+1, 'fallito:', e.message);
     }
-
-    liveData = rows.filter(r => {
-      const a = (r.asset || r['asset'] || '');
-      return typeof a === 'string' && a && a.toLowerCase() !== 'totale' && a.toLowerCase() !== 'asset';
-    });
-
-    const totRow = rows.find(r => {
-      const a = (r.asset || '');
-      return typeof a === 'string' && a.toLowerCase() === 'totale';
-    });
-
-    liveLastUpdate = new Date();
-
-    // Salva punto storico per grafico
-    const totVal = totRow ? (parseFloat(totRow.valore_tr) || parseFloat(totRow['valore_tr']) || 0) : 0;
-    if (totVal > 0) {
-      liveHistory.push({ t: liveLastUpdate, v: totVal });
-      if (liveHistory.length > liveHistoryMax) liveHistory.shift();
-    }
-
-    updateTickerBar(liveData, totRow);
-    updateSidebarLive(liveData);
-    updateCapitalLive(totRow);
-    if (curPane === 'live') renderLivePane(liveData, totRow);
-
-    console.log('[Live] OK —', liveLastUpdate.toLocaleTimeString(), '| assets:', liveData.length);
-  } catch(e) {
-    console.warn('[Live] Errore:', e.message);
-    const tot = document.getElementById('liveTot');
-    if (tot) tot.innerHTML = '<span style="color:var(--amber);font-size:9px;">⚠ aggiornamento fallito</span>';
   }
+  // Tutti i proxy falliti
+  console.error('[Live] Tutti i proxy falliti:', lastErr?.message);
+  const tot = document.getElementById('liveTot');
+  if (tot) tot.innerHTML = '<span style="color:var(--amber);font-size:9px;font-family:monospace;">⚠ aggiornamento fallito — riprovo tra 30s</span>';
 }
 
 // ── Ticker bar scorrevole ──
