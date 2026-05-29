@@ -70,20 +70,20 @@ html,body{height:100%;font-family:'Syne',sans-serif;background:var(--bg);color:v
 .sb-warn.ok{background:var(--teal-dim);color:var(--teal);border:1px solid rgba(39,201,154,.18);display:block;}
 
 /* ── LIVE TICKER BAR ── */
-.live-bar{display:flex;align-items:center;gap:0;background:var(--bg1);border-bottom:1px solid var(--border);flex-shrink:0;overflow:hidden;height:28px;position:relative;}
-.live-bar-inner{display:flex;align-items:center;gap:20px;padding:0 16px;white-space:nowrap;animation:ticker 60s linear infinite;}
+.live-bar{display:flex;align-items:center;background:var(--bg1);border-bottom:1px solid var(--border);flex-shrink:0;height:26px;min-width:0;overflow:hidden;}
+.live-bar-scroll{flex:1;overflow:hidden;min-width:0;}
+.live-bar-inner{display:inline-flex;align-items:center;gap:18px;white-space:nowrap;padding:0 8px;animation:ticker 80s linear infinite;}
 .live-bar-inner:hover{animation-play-state:paused;}
 @keyframes ticker{0%{transform:translateX(0);}100%{transform:translateX(-50%);}}
-.lb-item{display:flex;align-items:center;gap:6px;font-family:'JetBrains Mono',monospace;font-size:9px;}
+.lb-item{display:inline-flex;align-items:center;gap:5px;font-family:'JetBrains Mono',monospace;font-size:9px;flex-shrink:0;}
 .lb-name{color:var(--t2);}
-.lb-pct{font-weight:600;padding:1px 5px;border-radius:3px;}
+.lb-pct{font-weight:600;padding:1px 4px;border-radius:3px;}
 .lb-pct.up{color:var(--teal);background:rgba(39,201,154,.08);}
 .lb-pct.dn{color:var(--red);background:rgba(232,80,74,.08);}
 .lb-pct.neu{color:var(--t3);}
-.live-dot{width:6px;height:6px;border-radius:50%;background:var(--teal);animation:pulse 2s infinite;flex-shrink:0;margin-right:8px;}
-.live-lbl{font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--t3);letter-spacing:.06em;text-transform:uppercase;flex-shrink:0;margin-right:4px;}
-.live-tot{font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:600;color:var(--gold2);flex-shrink:0;margin-left:auto;padding:0 14px;border-left:1px solid var(--border);}
-.live-tot span{font-size:8px;color:var(--t3);font-weight:400;margin-left:4px;}
+.live-dot{width:5px;height:5px;border-radius:50%;background:var(--teal);animation:pulse 2s infinite;flex-shrink:0;margin:0 4px 0 8px;}
+.live-lbl{font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;flex-shrink:0;margin-right:2px;}
+.live-tot{font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:600;color:var(--gold2);flex-shrink:0;padding:0 10px;border-left:1px solid var(--border);white-space:nowrap;overflow:hidden;max-width:400px;}
 
 /* ── MAIN ── */
 .main{display:flex;flex-direction:column;height:100vh;}
@@ -308,8 +308,10 @@ tbody tr:hover td{background:rgba(255,255,255,.015);}
 <div class="live-bar" id="liveBar">
   <div class="live-dot"></div>
   <div class="live-lbl">Live</div>
-  <div class="live-bar-inner" id="liveBarInner">
-    <span class="lb-item"><span class="lb-name">Caricamento dati…</span></span>
+  <div class="live-bar-scroll">
+    <div class="live-bar-inner" id="liveBarInner">
+      <span class="lb-item"><span class="lb-name">Caricamento dati…</span></span>
+    </div>
   </div>
   <div class="live-tot" id="liveTot">—</div>
 </div>
@@ -1939,6 +1941,13 @@ function buildUrl() {
   return proxy + encodeURIComponent(SHEETS_CSV_RAW) + '&t=' + Date.now();
 }
 
+// Helper: normalizza var% da Sheets (potrebbe essere 1.05 o 0.0105 per 1.05%)
+function normPct(v) {
+  const n = parseFloat(v) || 0;
+  // Se assoluto > 1 è già in forma percentuale (es 1.05), dividi per 100
+  return Math.abs(n) > 1 ? n / 100 : n;
+}
+
 let liveData = [];
 let liveLastUpdate = null;
 let liveInterval = null;
@@ -2055,7 +2064,7 @@ function updateTickerBar(data, tot) {
   }
 
   const items = [...data, ...data].map(r => {
-    const pct = parseFloat(r.var_pct_oggi) || 0;
+    const pct = normPct(r.var_pct_oggi);
     const sign = pct >= 0 ? '+' : '';
     const cls = pct > 0.0001 ? 'up' : pct < -0.0001 ? 'dn' : 'neu';
     const name = (String(r.asset||'')).replace(/ USD$/,'').replace(/ ESG$/,'').replace(/ EUR$/,'').replace(/Physical /,'').replace(/ Value-Chain$/,'');
@@ -2124,7 +2133,7 @@ function renderLivePane(data, tot) {
     inv += parseFloat(r.investito)    || 0;
     // var€ oggi = valore_tr × var_pct_oggi
     const vtr = parseFloat(r.valore_tr)   || 0;
-    const vp2 = parseFloat(r.var_pct_oggi)|| 0;
+    const vp2 = normPct(r.var_pct_oggi);
     ve += vtr * vp2;
   });
 
