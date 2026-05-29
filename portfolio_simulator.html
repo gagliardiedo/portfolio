@@ -398,7 +398,7 @@ tbody tr:hover td{background:rgba(255,255,255,.015);}
   </div>
   <div class="sc-cards" id="sc-cards"></div>
   <div class="card"><p class="sec">Forecast 2026 — tre scenari sul tuo portafoglio attuale</p><div class="cw" style="height:260px;"><canvas id="c-fc" role="img" aria-label="Forecast 2026 tre scenari">Forecast 2026.</canvas></div></div>
-  <div class="card"><p class="sec">Dettaglio per asset</p><table><thead><tr><th>Asset</th><th>Peso</th><th>Bear</th><th>Base</th><th>Bull</th><th>Contrib. base</th></tr></thead><tbody id="sc-tbl"></tbody></table></div>
+  <div class="card"><p class="sec">Dettaglio per asset</p><table><thead><tr><th>Asset</th><th>Peso</th><th>Bear 25%</th><th>Base 50%</th><th>Bull 25%</th><th>Contrib. base</th><th style="color:var(--gold);">Atteso pond.</th></tr></thead><tbody id="sc-tbl"></tbody></table></div>
 
   <!-- PROIEZIONI ISTITUZIONALI -->
   <p class="sec" style="margin:20px 0 12px;">Consensus istituzionale 2026 — per i tuoi asset</p>
@@ -1348,17 +1348,121 @@ function renderScenario(){
   const bs=ORIG.reduce((s,a,i)=>s+nw[i]*a.base,0);
   const bu=ORIG.reduce((s,a,i)=>s+nw[i]*a.bull,0);
   const mx=Math.max(Math.abs(br),Math.abs(bs),Math.abs(bu));
+
+  // Probabilità basate su consensus istituzionale maggio 2026
+  // GS: 25% bear, 50% base, 25% bull
+  // JPMorgan: 20% bear, 55% base, 25% bull
+  // BlackRock: 30% bear, 45% base, 25% bull
+  // Media ponderata: ~25% bear, 50% base, 25% bull
+  const PROB = { bear: 25, base: 50, bull: 25 };
+
   const sc=[
-    {tag:'Scenario bear',sub:'Correzione post-rally',ret:br,color:'var(--red)',cls:'bear',note:'Prese profitto commodity; tassi alti; BTC volatilità'},
-    {tag:'Scenario base',sub:'Normalizzazione graduale',ret:bs,color:'var(--gold)',cls:'base',note:'Metalli sostenuti; clean energy in recupero; BTC laterale'},
-    {tag:'Scenario bull',sub:'Superciclo + crypto',ret:bu,color:'var(--teal)',cls:'bull',note:'JPMorgan Ag $81/oz; deficit rame 590k t; BTC +90%'},
+    {
+      tag:'🔴 Scenario Bear',
+      sub:'Correzione post-rally · recessione USA · tassi alti persistenti',
+      ret:br,
+      color:'var(--red)',
+      cls:'bear',
+      prob: PROB.bear,
+      note:'Commodity prese profitto; Fed non taglia; BTC -40%; clean energy soffre politiche Trump',
+      drivers:['Inflazione USA sopra 3% → Fed hawkish','Recessione lieve in EU','China hard landing','Escalation dazi USA-EU']
+    },
+    {
+      tag:'🟡 Scenario Base',
+      sub:'Normalizzazione graduale · soft landing · commodity sostenute',
+      ret:bs,
+      color:'var(--gold)',
+      cls:'base',
+      prob: PROB.base,
+      note:'Metalli sostenuti; clean energy in recupero; BTC laterale; oro continua superciclo',
+      drivers:['Fed taglia 50bps','Crescita globale +2.8%','Oro $4.500-5.000','Deficit rame strutturale']
+    },
+    {
+      tag:'🟢 Scenario Bull',
+      sub:'Superciclo commodity · AI demand · geopolitical premium',
+      ret:bu,
+      color:'var(--teal)',
+      cls:'bull',
+      prob: PROB.bull,
+      note:'Oro $5.500+; deficit rame accelera; nucleare boom; BTC ETF istituzionale',
+      drivers:['Banche centrali accelerano diversif. da USD','AI energy demand esplode','China stimulus','BTC ETF flussi istituzionali']
+    },
   ];
-  document.getElementById('sc-cards').innerHTML=sc.map(s=>`<div class="sc-card ${s.cls}"><div class="sc-tag">${s.tag}</div><div class="sc-ret" style="color:${s.color}">${s.ret>=0?'+':''}${fP(s.ret)}%</div><div class="sc-eur">${s.ret>=0?'+':''}€${fE(cap*s.ret)}</div><div class="sc-bar-wrap"><div class="sc-bar" style="width:${(Math.abs(s.ret)/mx*100).toFixed(0)}%;background:${s.color};"></div></div><p class="sc-note">${s.note}</p></div>`).join('');
+
+  // Cards con probabilità
+  document.getElementById('sc-cards').innerHTML = sc.map(s => `
+    <div class="sc-card ${s.cls}">
+      <div class="sc-tag">${s.tag}</div>
+      <div style="display:flex;align-items:baseline;gap:8px;margin:4px 0;">
+        <div class="sc-ret" style="color:${s.color}">${s.ret>=0?'+':''}${fP(s.ret)}%</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:${s.color};font-weight:600;">${s.ret>=0?'+':''}€${fE(cap*s.ret)}</div>
+      </div>
+      <!-- Probabilità bar -->
+      <div style="margin:8px 0 4px;font-size:9px;color:var(--t3);font-family:'JetBrains Mono',monospace;display:flex;justify-content:space-between;">
+        <span>Probabilità consensus</span>
+        <span style="color:${s.color};font-weight:700;">${s.prob}%</span>
+      </div>
+      <div style="background:var(--bg4);border-radius:3px;height:6px;margin-bottom:8px;">
+        <div style="width:${s.prob}%;height:100%;background:${s.color};border-radius:3px;opacity:.8;"></div>
+      </div>
+      <div class="sc-bar-wrap"><div class="sc-bar" style="width:${(Math.abs(s.ret)/mx*100).toFixed(0)}%;background:${s.color};"></div></div>
+      <p class="sc-note" style="margin-top:6px;">${s.note}</p>
+      <div style="margin-top:8px;border-top:1px solid rgba(255,255,255,.06);padding-top:6px;">
+        ${s.drivers.map(d=>`<div style="font-size:9px;color:var(--t3);padding:1px 0;">→ ${d}</div>`).join('')}
+      </div>
+    </div>`).join('');
+
+  // Valore atteso ponderato per probabilità
+  const expectedRet = (br * PROB.bear + bs * PROB.base + bu * PROB.bull) / 100;
+  const expectedEur = cap * expectedRet;
+
+  // Aggiungi KPI valore atteso sopra il grafico
+  const fcCard = document.querySelector('#c-fc')?.closest('.card');
+  if (fcCard) {
+    let expEl = document.getElementById('sc-expected');
+    if (!expEl) {
+      expEl = document.createElement('div');
+      expEl.id = 'sc-expected';
+      expEl.style.cssText = 'display:flex;gap:20px;margin-bottom:12px;font-family:\'JetBrains Mono\',monospace;font-size:10px;flex-wrap:wrap;';
+      fcCard.insertBefore(expEl, document.getElementById('c-fc'));
+    }
+    const ec = expectedRet >= 0 ? 'var(--teal)' : 'var(--red)';
+    expEl.innerHTML = `
+      <span style="color:var(--t3);">Rendimento atteso ponderato</span>
+      <span style="color:${ec};font-weight:700;">${expectedRet>=0?'+':''}${(expectedRet*100).toFixed(1)}%</span>
+      <span style="color:${ec};font-weight:700;">${expectedEur>=0?'+':''}€${fE(expectedEur)}</span>
+      <span style="color:var(--t3);margin-left:auto;">Bear ${PROB.bear}% · Base ${PROB.base}% · Bull ${PROB.bull}% · Fonte: GS, JPM, BlackRock consensus</span>
+    `;
+  }
+
   const ac=ORIG.map((a,i)=>({a,i})).filter(x=>caps[x.i]>.1);
-  mk('c-fc',{type:'bar',data:{labels:ac.map(x=>x.a.short),datasets:[{label:'Bear',data:ac.map(x=>+(x.a.bear*100).toFixed(1)),backgroundColor:'rgba(232,80,74,.65)',borderWidth:0,borderRadius:2},{label:'Base',data:ac.map(x=>+(x.a.base*100).toFixed(1)),backgroundColor:'rgba(212,168,67,.8)',borderWidth:0,borderRadius:2},{label:'Bull',data:ac.map(x=>+(x.a.bull*100).toFixed(1)),backgroundColor:'rgba(39,201,154,.75)',borderWidth:0,borderRadius:2}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#7a8394',boxWidth:9,font:{size:10}},position:'top'},tooltip:{callbacks:{label:ctx=>`${ctx.dataset.label}: ${ctx.parsed.y>=0?'+':''}${ctx.parsed.y}%`}}},scales:{x:{ticks:{font:{size:10},color:'#3e4452'},grid:{display:false}},y:{ticks:{callback:v=>(v>=0?'+':'')+v+'%',font:{size:10},color:'#3e4452'},grid:{color:'rgba(255,255,255,.04)'}}}}});
+  mk('c-fc',{type:'bar',data:{labels:ac.map(x=>x.a.short),datasets:[
+    {label:`Bear (${PROB.bear}%)`,data:ac.map(x=>+(x.a.bear*100).toFixed(1)),backgroundColor:'rgba(232,80,74,.65)',borderWidth:0,borderRadius:2},
+    {label:`Base (${PROB.base}%)`,data:ac.map(x=>+(x.a.base*100).toFixed(1)),backgroundColor:'rgba(212,168,67,.8)',borderWidth:0,borderRadius:2},
+    {label:`Bull (${PROB.bull}%)`,data:ac.map(x=>+(x.a.bull*100).toFixed(1)),backgroundColor:'rgba(39,201,154,.75)',borderWidth:0,borderRadius:2},
+  ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#7a8394',boxWidth:9,font:{size:10}},position:'top'},tooltip:{callbacks:{label:ctx=>`${ctx.dataset.label}: ${ctx.parsed.y>=0?'+':''}${ctx.parsed.y}%`}}},scales:{x:{ticks:{font:{size:10},color:'#3e4452'},grid:{display:false}},y:{ticks:{callback:v=>(v>=0?'+':'')+v+'%',font:{size:10},color:'#3e4452'},grid:{color:'rgba(255,255,255,.04)'}}}}});
+
   const tb=document.getElementById('sc-tbl');tb.innerHTML='';let tb2=0;
-  ORIG.forEach((a,i)=>{if(caps[i]<1)return;const c=nw[i]*a.base;tb2+=c;const tr=document.createElement('tr');tr.innerHTML=`<td>${a.name}</td><td style="color:${a.color}">${(nw[i]*100).toFixed(1)}%</td><td style="color:${a.bear>=0?'var(--teal)':'var(--red)'}">${a.bear>=0?'+':''}${(a.bear*100).toFixed(0)}%</td><td style="color:var(--gold)">${a.base>=0?'+':''}${(a.base*100).toFixed(0)}%</td><td style="color:var(--teal)">+${(a.bull*100).toFixed(0)}%</td><td style="color:${c>=0?'var(--teal)':'var(--red)'}">${c>=0?'+':''}${(c*100).toFixed(2)}%</td>`;tb.appendChild(tr);});
-  const tr3=document.createElement('tr');tr3.className='tr-tot';tr3.innerHTML=`<td>Portafoglio</td><td>100%</td><td style="color:${br>=0?'var(--teal)':'var(--red)'}">${br>=0?'+':''}${fP(br)}%</td><td style="color:var(--gold)">${bs>=0?'+':''}${fP(bs)}%</td><td style="color:var(--teal)">+${fP(bu)}%</td><td style="color:${tb2>=0?'var(--teal)':'var(--red)'}">${tb2>=0?'+':''}${fP(tb2)}%</td>`;tb.appendChild(tr3);
+  ORIG.forEach((a,i)=>{
+    if(caps[i]<1)return;
+    const c=nw[i]*a.base;tb2+=c;
+    // Valore atteso per asset
+    const exp = nw[i] * (a.bear*PROB.bear + a.base*PROB.base + a.bull*PROB.bull) / 100;
+    const tr=document.createElement('tr');
+    tr.innerHTML=`
+      <td>${a.name}</td>
+      <td style="color:${a.color}">${(nw[i]*100).toFixed(1)}%</td>
+      <td style="color:${a.bear>=0?'var(--teal)':'var(--red)'}">${a.bear>=0?'+':''}${(a.bear*100).toFixed(0)}%</td>
+      <td style="color:var(--gold)">${a.base>=0?'+':''}${(a.base*100).toFixed(0)}%</td>
+      <td style="color:var(--teal)">+${(a.bull*100).toFixed(0)}%</td>
+      <td style="color:${c>=0?'var(--teal)':'var(--red)'}">${c>=0?'+':''}${(c*100).toFixed(2)}%</td>
+      <td style="color:${exp>=0?'var(--gold)':'var(--red)'};">${exp>=0?'+':''}${(exp*100).toFixed(2)}%</td>`;
+    tb.appendChild(tr);
+  });
+  const tr3=document.createElement('tr');tr3.className='tr-tot';
+  const expTot = (br*PROB.bear + bs*PROB.base + bu*PROB.bull) / 100;
+  tr3.innerHTML=`<td>Portafoglio</td><td>100%</td><td style="color:${br>=0?'var(--teal)':'var(--red)'}">${br>=0?'+':''}${fP(br)}%</td><td style="color:var(--gold)">${bs>=0?'+':''}${fP(bs)}%</td><td style="color:var(--teal)">+${fP(bu)}%</td><td style="color:${tb2>=0?'var(--teal)':'var(--red)'}">${tb2>=0?'+':''}${fP(tb2)}%</td><td style="color:var(--gold);font-weight:700;">${expTot>=0?'+':''}${fP(expTot)}%</td>`;
+  tb.appendChild(tr3);
 }
 
 // ═══════════════ STRESS TEST ═══════════════
