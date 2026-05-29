@@ -622,7 +622,7 @@ tbody tr:hover td{background:rgba(255,255,255,.015);}
   <!-- SINTESI CONSENSUS VISIVA -->
   <div class="card" style="border-color:rgba(240,201,110,.2);border-left:3px solid var(--gold2);">
     <p class="sec" style="margin-bottom:4px;">Sintesi consensus — posizionamento istituzionale sui tuoi asset</p>
-    <p style="font-size:10px;color:var(--t3);margin-bottom:14px;">Asse X = sentiment (Bearish → Bullish) · Asse Y = orizzonte temporale · Dimensione bolla = peso % nel portafoglio</p>
+    <p style="font-size:10px;color:var(--t3);margin-bottom:14px;">Asse X = sentiment specifico sull'asset (Bearish → Bullish) · Asse Y = orizzonte temporale · Dimensione bolla = peso % nel portafoglio · <span style="color:var(--gold2);">Probabilità scenari calibrate sul tuo portafoglio: Bear 15% · Base 45% · Bull 40%</span></p>
     <div style="position:relative;height:340px;margin-bottom:14px;">
       <canvas id="c-consensus-bubble" role="img" aria-label="Consensus bubble chart"></canvas>
     </div>
@@ -1307,7 +1307,7 @@ function showPane(id,btn){
     renderStorico();
     return;
   }
-  if(id==='scenario'){setTimeout(()=>{renderScenario();},50);return;}
+  if(id==='scenario'){setTimeout(()=>{renderScenario();},80);return;}
   if(id==='geo'){setTimeout(()=>{rGeo();},50);return;}
   refresh();
 }
@@ -1481,12 +1481,11 @@ function renderScenario(){
   const bu=ORIG.reduce((s,a,i)=>s+nw[i]*a.bull,0);
   const mx=Math.max(Math.abs(br),Math.abs(bs),Math.abs(bu));
 
-  // Probabilità basate su consensus istituzionale maggio 2026
-  // GS: 25% bear, 50% base, 25% bull
-  // JPMorgan: 20% bear, 55% base, 25% bull
-  // BlackRock: 30% bear, 45% base, 25% bull
-  // Media ponderata: ~25% bear, 50% base, 25% bull
-  const PROB = { bear: 25, base: 50, bull: 25 };
+  // Probabilità calibrate sul TUO portafoglio specifico (non macro generico)
+  // Gold 24% unanime bullish · Copper/Silver/Uranium/Grid/Battery bullish strutturale
+  // Solo EM (14%) neutral e Clean/Hydrogen (29%) misto → 65% peso bullish
+  // Fonte: ponderazione consensus per peso % asset
+  const PROB = { bear: 15, base: 45, bull: 40 };
 
   const sc=[
     {
@@ -1501,23 +1500,23 @@ function renderScenario(){
     },
     {
       tag:'🟡 Scenario Base',
-      sub:'Normalizzazione graduale · soft landing · commodity sostenute',
+      sub:'Soft landing · superciclo metalli · transizione energetica',
       ret:bs,
       color:'var(--gold)',
       cls:'base',
       prob: PROB.base,
-      note:'Metalli sostenuti; clean energy in recupero; BTC laterale; oro continua superciclo',
-      drivers:['Fed taglia 50bps','Crescita globale +2.8%','Oro $4.500-5.000','Deficit rame strutturale']
+      note:'Gold $4.500-5.000; rame deficit strutturale; clean energy in recupero; EM misto',
+      drivers:['Fed taglia 50bps nel 2026','Crescita globale +2.8%','Superciclo metalli prosegue','Hydrogen early adoption']
     },
     {
       tag:'🟢 Scenario Bull',
-      sub:'Superciclo commodity · AI demand · geopolitical premium',
+      sub:'Superciclo + AI energy demand + dedollarizzazione',
       ret:bu,
       color:'var(--teal)',
       cls:'bull',
       prob: PROB.bull,
-      note:'Oro $5.500+; deficit rame accelera; nucleare boom; BTC ETF istituzionale',
-      drivers:['Banche centrali accelerano diversif. da USD','AI energy demand esplode','China stimulus','BTC ETF flussi istituzionali']
+      note:'Gold $5.500+; deficit rame accelera; nucleare boom AI; BTC ETF istituzionale',
+      drivers:['Banche centrali accelerano diversif. da USD','AI energy demand esplode → uranio/grid','China stimulus → EM recovery','BTC ETF flussi istituzionali']
     },
   ];
 
@@ -1626,30 +1625,41 @@ function renderScenario(){
       },
       scales:{
         x:{min:0,max:100,
-          title:{display:true,text:'← Bearish  ·  Sentiment  ·  Bullish →',color:'#3e4452',font:{size:10}},
-          ticks:{callback:v=>v===0?'Bearish':v===50?'Neutral':v===100?'Bullish':'',color:'#3e4452',font:{size:9}},
-          grid:{color:'rgba(255,255,255,0.04)'}},
+          title:{display:true,text:'← Bearish  ·  Sentiment  ·  Bullish →',color:'#7a8394',font:{size:10}},
+          ticks:{callback:v=>v===0?'Bearish':v===50?'Neutral':v===100?'Bullish':'',color:'#7a8394',font:{size:10}},stepSize:25,
+          grid:{color:'rgba(255,255,255,0.08)'}},
         y:{min:1,max:6,
-          title:{display:true,text:'Orizzonte temporale (anni)',color:'#3e4452',font:{size:10}},
-          ticks:{callback:v=>v+'Y',color:'#3e4452',font:{size:9}},
-          grid:{color:'rgba(255,255,255,0.04)'}}
+          title:{display:true,text:'Orizzonte temporale (anni)',color:'#7a8394',font:{size:10}},
+          ticks:{callback:v=>v+'Y',color:'#7a8394',font:{size:10}},
+          grid:{color:'rgba(255,255,255,0.08)'}}
       }
     }
   });
 
-  // Etichette bolle
-  const bubbleLblPlugin={id:'bblbl_'+Date.now(),afterDatasetsDraw(chart){
-    const c2=chart.ctx;
-    chart.data.datasets.forEach((ds,i)=>{
-      const meta=chart.getDatasetMeta(i);
-      if(meta.data[0]){
-        const pt=meta.data[0];const d=CONSENSUS_DATA[i];
-        c2.save();c2.font='bold 9px monospace';c2.fillStyle=d.color;c2.textAlign='center';
-        c2.fillText(d.label,pt.x,pt.y-pt.options.radius-4);c2.restore();
-      }
-    });
-  }};
-  Chart.register(bubbleLblPlugin);
+  // Etichette bolle — plugin registrato una volta sola
+  if(!Chart.registry.plugins.get('bubbleLabels')){
+    Chart.register({id:'bubbleLabels',afterDatasetsDraw(chart){
+      if(chart.canvas.id!=='c-consensus-bubble')return;
+      const c2=chart.ctx;
+      chart.data.datasets.forEach((ds,i)=>{
+        const meta=chart.getDatasetMeta(i);
+        if(meta.data[0]){
+          const pt=meta.data[0];
+          const d=CONSENSUS_DATA[i];
+          const r=pt.options?.radius||10;
+          // Shadow per leggibilità
+          c2.save();
+          c2.shadowColor='rgba(0,0,0,0.8)';
+          c2.shadowBlur=4;
+          c2.font='bold 10px "JetBrains Mono",monospace';
+          c2.fillStyle=d.color;
+          c2.textAlign='center';
+          c2.fillText(d.label,pt.x,pt.y-r-5);
+          c2.restore();
+        }
+      });
+    }});
+  }
   if(charts['c-consensus-bubble'])charts['c-consensus-bubble'].update();
 
   // Consensus mini-cards
