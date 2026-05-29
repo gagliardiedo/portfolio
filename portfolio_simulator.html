@@ -1975,11 +1975,28 @@ async function fetchStorico() {
         const res = await fetch(url, {cache:'no-store'});
         if (!res.ok) continue;
         const text = await res.text();
+        console.log('[Storico] CSV raw (prime 3 righe):', text.split('\n').slice(0,3).join(' | '));
         const rows = parseCSV(text);
-        storicoData = rows
           .filter(r => r.data && r.valore && String(r.data) !== 'data')
-          .map(r => ({data: String(r.data), valore: parseFloat(r.valore)||0}))
-          .filter(r => r.valore > 0)
+          .map(r => {
+            // Normalizza la data in formato ISO YYYY-MM-DD
+            let d = String(r.data).trim();
+            // Se è solo l'anno (2024) → salta
+            if (/^\d{4}$/.test(d)) return null;
+            // Se è DD/MM/YYYY → converti
+            if (/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(d)) {
+              const [dd,mm,yyyy] = d.split('/');
+              d = `${yyyy}-${mm.padStart(2,'0')}-${dd.padStart(2,'0')}`;
+            }
+            // Se è MM/DD/YYYY americano
+            if (/^\d{1,2}-\d{1,2}-\d{4}$/.test(d)) {
+              const [mm,dd,yyyy] = d.split('-');
+              d = `${yyyy}-${mm.padStart(2,'0')}-${dd.padStart(2,'0')}`;
+            }
+            const valore = parseFloat(String(r.valore).replace(/[€\s.]/g,'').replace(',','.')) || 0;
+            return valore > 0 ? {data: d, valore} : null;
+          })
+          .filter(r => r !== null && /^\d{4}-\d{2}-\d{2}$/.test(r.data))
           .sort((a,b) => a.data.localeCompare(b.data));
         if (storicoData.length > 0) {
           renderStorico();
@@ -2494,4 +2511,3 @@ setTimeout(fetchStorico, 1200);
 </script>
 </body>
 </html>
-
