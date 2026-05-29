@@ -69,21 +69,6 @@ html,body{height:100%;font-family:'Syne',sans-serif;background:var(--bg);color:v
 .sb-warn.un{background:var(--amber-dim);color:var(--amber);border:1px solid rgba(212,144,58,.2);display:block;}
 .sb-warn.ok{background:var(--teal-dim);color:var(--teal);border:1px solid rgba(39,201,154,.18);display:block;}
 
-/* ── LIVE TICKER BAR ── */
-.live-bar{display:flex;align-items:center;background:var(--bg1);border-bottom:1px solid var(--border);flex-shrink:0;height:26px;overflow:hidden;position:relative;width:100%;}
-.live-bar-scroll{flex:1;overflow:hidden;min-width:0;position:relative;}
-.live-bar-inner{display:inline-flex;align-items:center;gap:18px;white-space:nowrap;padding:0 8px;animation:ticker 80s linear infinite;}
-.live-bar-inner:hover{animation-play-state:paused;}
-@keyframes ticker{0%{transform:translateX(0);}100%{transform:translateX(-50%);}}
-.lb-item{display:inline-flex;align-items:center;gap:5px;font-family:'JetBrains Mono',monospace;font-size:9px;flex-shrink:0;}
-.lb-name{color:var(--t2);}
-.lb-pct{font-weight:600;padding:1px 4px;border-radius:3px;}
-.lb-pct.up{color:var(--teal);background:rgba(39,201,154,.08);}
-.lb-pct.dn{color:var(--red);background:rgba(232,80,74,.08);}
-.lb-pct.neu{color:var(--t3);}
-.live-dot{width:5px;height:5px;border-radius:50%;background:var(--teal);animation:pulse 2s infinite;flex-shrink:0;margin:0 4px 0 8px;}
-.live-lbl{font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;flex-shrink:0;margin-right:2px;}
-.live-tot{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--t1);flex-shrink:0;padding:0 8px;border-left:1px solid var(--border);white-space:nowrap;overflow:hidden;width:300px;min-width:300px;max-width:300px;}
 
 /* ── MAIN ── */
 .main{display:flex;flex-direction:column;height:100vh;}
@@ -304,20 +289,8 @@ tbody tr:hover td{background:rgba(255,255,255,.015);}
 <!-- ══ MAIN ══ -->
 <main class="main">
 
-<!-- LIVE TICKER BAR -->
-<div class="live-bar" id="liveBar">
-  <div class="live-dot"></div>
-  <div class="live-lbl">Live</div>
-  <div class="live-bar-scroll">
-    <div class="live-bar-inner" id="liveBarInner">
-      <span class="lb-item"><span class="lb-name">Caricamento dati…</span></span>
-    </div>
-  </div>
-  <div class="live-tot" id="liveTot">—</div>
-</div>
-
 <div class="nav">
-  <button class="nt" onclick="showPane('live',this)">📡 Live</button>
+  <button class="nt" onclick="showPane('live',this)">📡 Live <span id="live-status-dot" style="display:inline-block;width:5px;height:5px;border-radius:50%;background:var(--t3);margin-left:4px;vertical-align:middle;"></span> <span id="live-status-lbl" style="font-size:8px;color:var(--t3);"></span></button>
   <button class="nt on"  onclick="showPane('overview',this)">Panoramica</button>
   <button class="nt" onclick="showPane('volatility',this)">Volatilità</button>
   <button class="nt" onclick="showPane('geo',this)">Geo / Settore</button>
@@ -2057,40 +2030,20 @@ async function fetchLiveData() {
   }
   // Tutti i proxy falliti
   console.error('[Live] Tutti i proxy falliti:', lastErr?.message);
-  const tot = document.getElementById('liveTot');
-  if (tot) tot.innerHTML = '<span style="color:var(--amber);font-size:9px;font-family:monospace;">⚠ aggiornamento fallito — riprovo tra 30s</span>';
+  const dot = document.getElementById('live-status-dot');
+  if (dot) dot.style.background = 'var(--red)';
 }
 
-// ── Ticker bar scorrevole ──
+// ── Aggiorna stato live (sostituisce ticker bar) ──
 function updateTickerBar(data, tot) {
-  const bar = document.getElementById('liveBarInner');
-  if (!bar) return;
+  // Aggiorna il dot di stato nel nav
+  const dot = document.getElementById('live-status-dot');
+  const lbl = document.getElementById('live-status-lbl');
+  if (dot) dot.style.background = data.length ? 'var(--teal)' : 'var(--amber)';
+  if (lbl && liveLastUpdate) lbl.textContent = liveLastUpdate.toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});
 
-  if (!data.length) {
-    bar.innerHTML = '<span style="color:var(--t3);font-size:9px;font-family:monospace;">Nessun dato — verifica la pubblicazione del foglio Google</span>';
-    return;
-  }
-
-  const items = [...data, ...data].map(r => {
-    const pct = normPct(r.var_pct_oggi);
-    const sign = pct >= 0 ? '+' : '';
-    const cls = pct > 0.0001 ? 'up' : pct < -0.0001 ? 'dn' : 'neu';
-    const name = (String(r.asset||'')).replace(/ USD$/,'').replace(/ ESG$/,'').replace(/ EUR$/,'').replace(/Physical /,'').replace(/ Value-Chain$/,'');
-    return `<span class="lb-item"><span class="lb-name">${name}</span><span class="lb-pct ${cls}">${sign}${(pct*100).toFixed(2)}%</span></span>`;
-  }).join('');
-  bar.innerHTML = items;
-
-  const totEl = document.getElementById('liveTot');
-  if (!totEl) return;
-  if (tot) {
-    const vt  = parseFloat(tot.valore_tr)    || 0;
-    const pal = parseFloat(tot.pal_eur)       || 0;
-    const vp  = parseFloat(tot.var_pct_oggi)  || 0;
-    const ve  = vt * vp;
-    const pc  = pal >= 0 ? 'var(--teal)' : 'var(--red)';
-    const vc  = ve  >= 0 ? 'var(--teal)' : 'var(--red)';
-    totEl.innerHTML = `<span style="color:var(--t3);font-size:8px;">TOT</span> <span style="color:var(--gold2);font-weight:700;">€${fE(vt)}</span> <span style="color:${pc};">${pal>=0?'+':''}€${fE(Math.abs(pal))}</span> <span style="color:var(--t3);">·</span> <span style="color:${vc};">oggi ${ve>=0?'+':''}€${fE(Math.abs(ve))}</span>`;
-  }
+  // Se siamo sul pane live aggiorna il render
+  if (curPane === 'live') renderLivePane(data, tot);
 }
 
 // ── Aggiorna sidebar con valori reali ──
