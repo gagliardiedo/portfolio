@@ -83,7 +83,7 @@ html,body{height:100%;font-family:'Syne',sans-serif;background:var(--bg);color:v
 .lb-pct.neu{color:var(--t3);}
 .live-dot{width:5px;height:5px;border-radius:50%;background:var(--teal);animation:pulse 2s infinite;flex-shrink:0;margin:0 4px 0 8px;}
 .live-lbl{font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;flex-shrink:0;margin-right:2px;}
-.live-tot{font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:600;color:var(--gold2);flex-shrink:0;padding:0 10px;border-left:1px solid var(--border);white-space:nowrap;overflow:hidden;max-width:400px;}
+.live-tot{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--t1);flex-shrink:0;padding:0 8px;border-left:1px solid var(--border);white-space:nowrap;overflow:hidden;width:300px;min-width:300px;max-width:300px;}
 
 /* ── MAIN ── */
 .main{display:flex;flex-direction:column;height:100vh;}
@@ -1941,11 +1941,15 @@ function buildUrl() {
   return proxy + encodeURIComponent(SHEETS_CSV_RAW) + '&t=' + Date.now();
 }
 
-// Helper: normalizza var% da Sheets (potrebbe essere 1.05 o 0.0105 per 1.05%)
+// Helper: normalizza var% da Sheets
+// Sheets esporta sempre le % come decimali (0.0105 = 1.05%)
+// MA se la cella è formattata come "%" può uscire come 1.05 invece di 0.0105
 function normPct(v) {
   const n = parseFloat(v) || 0;
-  // Se assoluto > 1 è già in forma percentuale (es 1.05), dividi per 100
-  return Math.abs(n) > 1 ? n / 100 : n;
+  // Soglia: variazioni giornaliere realistiche sono < 15%
+  // Se il valore assoluto > 0.15 allora è già in % intera → dividi per 100
+  if (Math.abs(n) > 0.15) return n / 100;
+  return n;
 }
 
 let liveData = [];
@@ -2081,14 +2085,7 @@ function updateTickerBar(data, tot) {
     const ve  = vt * vp;
     const pc  = pal >= 0 ? 'var(--teal)' : 'var(--red)';
     const vc  = ve  >= 0 ? 'var(--teal)' : 'var(--red)';
-    totEl.innerHTML = `
-      <span style="color:var(--t3);font-size:8px;font-family:'JetBrains Mono',monospace;">PORTFOLIO</span>
-      <span style="color:var(--gold2);font-size:11px;font-weight:700;margin:0 8px;font-family:'JetBrains Mono',monospace;">€${fE(vt)}</span>
-      <span style="color:${pc};font-size:9px;">${pal>=0?'+':''}€${fE(Math.abs(pal))}</span>
-      <span style="color:var(--t3);margin:0 5px;">·</span>
-      <span style="color:${vc};font-size:9px;">oggi ${ve>=0?'+':''}€${fE(Math.abs(ve))}</span>
-      <span style="color:var(--t3);font-size:8px;margin-left:10px;">${liveLastUpdate.toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'})}</span>
-    `;
+    totEl.innerHTML = `<span style="color:var(--t3);font-size:8px;">TOT</span> <span style="color:var(--gold2);font-weight:700;">€${fE(vt)}</span> <span style="color:${pc};">${pal>=0?'+':''}€${fE(Math.abs(pal))}</span> <span style="color:var(--t3);">·</span> <span style="color:${vc};">oggi ${ve>=0?'+':''}€${fE(Math.abs(ve))}</span>`;
   }
 }
 
