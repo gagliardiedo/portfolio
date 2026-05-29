@@ -70,8 +70,8 @@ html,body{height:100%;font-family:'Syne',sans-serif;background:var(--bg);color:v
 .sb-warn.ok{background:var(--teal-dim);color:var(--teal);border:1px solid rgba(39,201,154,.18);display:block;}
 
 /* ── LIVE TICKER BAR ── */
-.live-bar{display:flex;align-items:center;background:var(--bg1);border-bottom:1px solid var(--border);flex-shrink:0;height:26px;min-width:0;overflow:hidden;}
-.live-bar-scroll{flex:1;overflow:hidden;min-width:0;}
+.live-bar{display:flex;align-items:center;background:var(--bg1);border-bottom:1px solid var(--border);flex-shrink:0;height:26px;overflow:hidden;position:relative;width:100%;}
+.live-bar-scroll{flex:1;overflow:hidden;min-width:0;position:relative;}
 .live-bar-inner{display:inline-flex;align-items:center;gap:18px;white-space:nowrap;padding:0 8px;animation:ticker 80s linear infinite;}
 .live-bar-inner:hover{animation-play-state:paused;}
 @keyframes ticker{0%{transform:translateX(0);}100%{transform:translateX(-50%);}}
@@ -2022,7 +2022,11 @@ async function fetchLiveData() {
 
       if (rows.length) {
         console.log('[Live] Headers:', Object.keys(rows[0]));
-        console.log('[Live] Riga 1:', rows[0]);
+        console.log('[Live] Riga 1 completa:', JSON.stringify(rows[0]));
+        // Log var_pct_oggi raw per i primi 3 asset
+        rows.filter(r=>r.asset&&r.asset!=='asset').slice(0,3).forEach(r=>{
+          console.log(`[Live] ${r.asset} → var_pct_oggi RAW="${rows.find(x=>x===r)?r.var_pct_oggi:''}" parsed=${parseFloat(r.var_pct_oggi)}`);
+        });
       }
 
       liveData = rows.filter(r => {
