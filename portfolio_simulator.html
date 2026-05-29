@@ -290,15 +290,13 @@ tbody tr:hover td{background:rgba(255,255,255,.015);}
 <main class="main">
 
 <div class="nav">
-  <button class="nt" onclick="showPane('live',this)">📡 Live <span id="live-status-dot" style="display:inline-block;width:5px;height:5px;border-radius:50%;background:var(--t3);margin-left:4px;vertical-align:middle;"></span> <span id="live-status-lbl" style="font-size:8px;color:var(--t3);"></span></button>
+  <button class="nt" onclick="showPane('live',this)">📡 Posizioni</button>
   <button class="nt on"  onclick="showPane('overview',this)">Panoramica</button>
   <button class="nt" onclick="showPane('volatility',this)">Volatilità</button>
   <button class="nt" onclick="showPane('geo',this)">Geo / Settore</button>
   <button class="nt" onclick="showPane('scenario',this)">Scenario 2026</button>
   <button class="nt" onclick="showPane('stress',this)">🔥 Stress Test</button>
   <button class="nt" onclick="showPane('bench',this)">📊 Benchmark</button>
-  <button class="nt" onclick="showPane('alerts',this)">🔔 Alert</button>
-  <button class="nt" onclick="showPane('history',this)">📅 Storico</button>
   <button class="nt" onclick="showPane('autopsy',this)">🔥 Autopsy</button>
 </div>
 <div style="flex:1;overflow:hidden;position:relative;min-height:0;">
@@ -329,18 +327,6 @@ tbody tr:hover td{background:rgba(255,255,255,.015);}
     <p id="hist-status" style="font-size:9px;color:var(--t3);margin-top:8px;font-family:'JetBrains Mono',monospace;">
       ⏳ In attesa URL foglio Storico CSV…
     </p>
-  </div>
-
-  <!-- GRAFICO INTRADAY -->
-  <div class="card">
-    <p class="sec" style="margin-bottom:8px;">Andamento intraday — aggiornamento ogni 30 secondi</p>
-    <p style="font-size:10px;color:var(--t3);margin-bottom:12px;font-family:'JetBrains Mono',monospace;">Il grafico si costruisce in tempo reale. Diventa significativo dopo qualche minuto di apertura.</p>
-    <div id="live-hist-wrap" style="display:none;position:relative;height:220px;">
-      <canvas id="c-live-hist" role="img" aria-label="Andamento intraday portafoglio"></canvas>
-    </div>
-    <div id="live-hist-empty" style="height:80px;display:flex;align-items:center;justify-content:center;color:var(--t3);font-size:11px;font-family:'JetBrains Mono',monospace;">
-      ⏳ In attesa del primo aggiornamento…
-    </div>
   </div>
 
   <!-- TABELLA POSIZIONI -->
@@ -399,13 +385,218 @@ tbody tr:hover td{background:rgba(255,255,255,.015);}
 <!-- RETURNS -->
 <!-- SCENARIO -->
 <div class="pane" id="pane-scenario">
+
+  <!-- HEADER -->
+  <div style="margin-bottom:16px;">
+    <p style="font-size:11px;color:var(--t2);line-height:1.7;">Proiezioni 2026 dei principali istituti finanziari sui tuoi asset tematici. Aggiornato a maggio 2026. <span style="color:var(--t3);">Non costituisce consulenza finanziaria.</span></p>
+  </div>
+
+  <!-- SCENARIO SIMULATOR -->
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;">
     <div class="card" style="padding:12px;"><label style="font-size:9px;color:var(--t3);font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:6px;">Capitale</label><input type="number" id="sc-cap" value="151237" style="width:100%;background:var(--bg3);border:1px solid var(--border2);color:var(--t1);font-family:'JetBrains Mono',monospace;font-size:12px;padding:6px 9px;border-radius:var(--r);outline:none;" oninput="renderScenario()"></div>
     <div class="card" style="padding:12px;"><label style="font-size:9px;color:var(--t3);font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:6px;">Preset</label><select id="sc-preset" style="width:100%;background:var(--bg3);border:1px solid var(--border2);color:var(--t1);font-family:'JetBrains Mono',monospace;font-size:11px;padding:6px 9px;border-radius:var(--r);outline:none;" onchange="applyPreset()"><option value="custom">Pesi attuali (sidebar)</option><option value="metals">Bull — superciclo metalli</option><option value="energy">Bull — boom energetico</option><option value="msci35">Con 35% MSCI World</option><option value="defensive">Difensivo — oro pesante</option></select></div>
   </div>
   <div class="sc-cards" id="sc-cards"></div>
-  <div class="card"><p class="sec">Forecast 2026 — tre scenari</p><div class="cw" style="height:280px;"><canvas id="c-fc" role="img" aria-label="Forecast 2026 tre scenari">Forecast 2026.</canvas></div></div>
-  <div class="card"><p class="sec">Dettaglio</p><table><thead><tr><th>Asset</th><th>Peso</th><th>Bear</th><th>Base</th><th>Bull</th><th>Contrib. base</th></tr></thead><tbody id="sc-tbl"></tbody></table><p class="note">Consenso analisti JPMorgan, Morgan Stanley, Sprott — maggio 2026. Non costituisce consulenza finanziaria.</p></div>
+  <div class="card"><p class="sec">Forecast 2026 — tre scenari sul tuo portafoglio attuale</p><div class="cw" style="height:260px;"><canvas id="c-fc" role="img" aria-label="Forecast 2026 tre scenari">Forecast 2026.</canvas></div></div>
+  <div class="card"><p class="sec">Dettaglio per asset</p><table><thead><tr><th>Asset</th><th>Peso</th><th>Bear</th><th>Base</th><th>Bull</th><th>Contrib. base</th></tr></thead><tbody id="sc-tbl"></tbody></table></div>
+
+  <!-- PROIEZIONI ISTITUZIONALI -->
+  <p class="sec" style="margin:20px 0 12px;">Consensus istituzionale 2026 — per i tuoi asset</p>
+
+  <!-- ORO -->
+  <div class="card">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+      <span style="font-size:18px;">🥇</span>
+      <div>
+        <div style="font-size:13px;font-weight:700;color:var(--gold2);">Physical Gold USD</div>
+        <div style="font-size:9px;color:var(--t3);font-family:'JetBrains Mono',monospace;">Peso attuale: ~24% — la tua posizione più grande</div>
+      </div>
+      <div style="margin-left:auto;text-align:right;">
+        <div style="font-size:11px;color:var(--teal);font-weight:600;">Consensus: BULLISH</div>
+        <div style="font-size:9px;color:var(--t3);">Target mediano: $4.900–$5.500/oz</div>
+      </div>
+    </div>
+    <div class="g3" style="margin-bottom:12px;">
+      <div style="background:var(--bg3);border-radius:var(--r);padding:10px;">
+        <div style="font-size:9px;color:var(--gold2);font-family:'JetBrains Mono',monospace;margin-bottom:4px;">GOLDMAN SACHS</div>
+        <div style="font-size:12px;font-weight:600;color:var(--t1);">$4.900/oz</div>
+        <div style="font-size:9px;color:var(--t2);margin-top:3px;">Base case dic 2026. Upside risk a $6.000+ se banche centrali accelerano diversificazione da USD. Raccomanda long exposure.</div>
+      </div>
+      <div style="background:var(--bg3);border-radius:var(--r);padding:10px;">
+        <div style="font-size:9px;color:var(--blue);font-family:'JetBrains Mono',monospace;margin-bottom:4px;">JPMORGAN</div>
+        <div style="font-size:12px;font-weight:600;color:var(--t1);">$5.000–$5.300/oz</div>
+        <div style="font-size:9px;color:var(--t2);margin-top:3px;">Supportato da tagli Fed e domanda banche centrali EM. Geopolitical risk premium strutturale, non transitorio.</div>
+      </div>
+      <div style="background:var(--bg3);border-radius:var(--r);padding:10px;">
+        <div style="font-size:9px;color:var(--red);font-family:'JetBrains Mono',monospace;margin-bottom:4px;">BANK OF AMERICA</div>
+        <div style="font-size:12px;font-weight:600;color:var(--t1);">$6.000/oz</div>
+        <div style="font-size:9px;color:var(--t2);margin-top:3px;">Target più aggressivo del mercato. Tesi: dedollarizzazione accelera, domanda retail Asia insaziabile. 12 mesi.</div>
+      </div>
+    </div>
+    <div style="font-size:10px;color:var(--t2);line-height:1.7;border-top:1px solid var(--border);padding-top:10px;">
+      <strong style="color:var(--t1);">Catalizzatori chiave:</strong> tagli Fed (50bps attesi 2026) · domanda banche centrali >1.000 ton/anno · dedollarizzazione riserve · geopolitica (conflitti attivi) · inflazione persistente sopra target. <strong style="color:var(--teal);">Per il tuo portafoglio:</strong> posizione da mantenere invariata — è il tuo miglior performer (+65% 2025) e il consensus è unanime al rialzo.
+    </div>
+  </div>
+
+  <!-- RAME -->
+  <div class="card">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+      <span style="font-size:18px;">🔧</span>
+      <div>
+        <div style="font-size:13px;font-weight:700;color:#CD7F32;">Copper Miners USD</div>
+        <div style="font-size:9px;color:var(--t3);font-family:'JetBrains Mono',monospace;">Peso attuale: ~6.7%</div>
+      </div>
+      <div style="margin-left:auto;text-align:right;">
+        <div style="font-size:11px;color:var(--teal);font-weight:600;">Consensus: BULLISH STRUTTURALE</div>
+        <div style="font-size:9px;color:var(--t3);">Target 2026: $11.000–$11.400/ton</div>
+      </div>
+    </div>
+    <div class="g2" style="margin-bottom:12px;">
+      <div style="background:var(--bg3);border-radius:var(--r);padding:10px;">
+        <div style="font-size:9px;color:var(--gold2);font-family:'JetBrains Mono',monospace;margin-bottom:4px;">GOLDMAN SACHS — "METALLO DEL FUTURO"</div>
+        <div style="font-size:12px;font-weight:600;color:var(--t1);">$11.400/ton (2026) → $15.000 (2035)</div>
+        <div style="font-size:9px;color:var(--t2);margin-top:3px;">Deficit raffinato ex-USA in espansione. Ogni veicolo elettrico richiede 4x il rame di uno tradizionale. AI data center = domanda massiccia di cablaggio.</div>
+      </div>
+      <div style="background:var(--bg3);border-radius:var(--r);padding:10px;">
+        <div style="font-size:9px;color:var(--purple);font-family:'JetBrains Mono',monospace;margin-bottom:4px;">GOLDMAN SACHS ASSET MANAGEMENT (Q2 2026)</div>
+        <div style="font-size:12px;font-weight:600;color:var(--t1);">"Deficit 30% entro 2035"</div>
+        <div style="font-size:9px;color:var(--t2);margin-top:3px;">"Il bottleneck non sarà il capitale, saranno i materiali. Rame, litio, nichel, terre rare — al centro di AI, difesa, energia pulita ed elettrificazione." — GSAM, maggio 2026.</div>
+      </div>
+    </div>
+    <div style="font-size:10px;color:var(--t2);line-height:1.7;border-top:1px solid var(--border);padding-top:10px;">
+      <strong style="color:var(--t1);">Catalizzatori:</strong> transizione EV · grid upgrade globale · data center AI · supply deficit strutturale (miniere non sufficienti) · Cina raffina 19/20 minerali critici = chokepoint. <strong style="color:var(--teal);">Per il tuo portafoglio:</strong> posizione da aumentare nel tempo — sei esposto ma il peso è basso rispetto al potenziale.
+    </div>
+  </div>
+
+  <!-- URANIO -->
+  <div class="card">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+      <span style="font-size:18px;">⚛️</span>
+      <div>
+        <div style="font-size:13px;font-weight:700;color:var(--amber);">Uranium & Nuclear Tech</div>
+        <div style="font-size:9px;color:var(--t3);font-family:'JetBrains Mono',monospace;">Peso attuale: ~3.3%</div>
+      </div>
+      <div style="margin-left:auto;text-align:right;">
+        <div style="font-size:11px;color:var(--teal);font-weight:600;">Consensus: BULLISH LUNGO TERMINE</div>
+        <div style="font-size:9px;color:var(--t3);">Target 2026: $90–$110/lb</div>
+      </div>
+    </div>
+    <div class="g3" style="margin-bottom:12px;">
+      <div style="background:var(--bg3);border-radius:var(--r);padding:10px;">
+        <div style="font-size:9px;color:var(--amber);font-family:'JetBrains Mono',monospace;margin-bottom:4px;">WNA (World Nuclear Association)</div>
+        <div style="font-size:12px;font-weight:600;color:var(--t1);">Domanda +28% entro 2030</div>
+        <div style="font-size:9px;color:var(--t2);margin-top:3px;">Capacità nucleare quasi raddoppia da 398 GWe (2025) a 746 GWe (2040). 78 reattori in costruzione — Cina guida con 38.</div>
+      </div>
+      <div style="background:var(--bg3);border-radius:var(--r);padding:10px;">
+        <div style="font-size:9px;color:var(--blue);font-family:'JetBrains Mono',monospace;margin-bottom:4px;">SPROTT / URANIUM INSIDER</div>
+        <div style="font-size:12px;font-weight:600;color:var(--t1);">$90–$110/lb H2 2026</div>
+        <div style="font-size:9px;color:var(--t2);margin-top:3px;">Spot price ha toccato $101/lb a gen 2026. Long-term contracting price sale da $80 a $86. "Settore con enorme runway — small cap ancora trascurate."</div>
+      </div>
+      <div style="background:var(--bg3);border-radius:var(--r);padding:10px;">
+        <div style="font-size:9px;color:var(--teal);font-family:'JetBrains Mono',monospace;margin-bottom:4px;">CONSENSUS ANALISTI 2026</div>
+        <div style="font-size:12px;font-weight:600;color:var(--t1);">+145% in 10 anni</div>
+        <div style="font-size:9px;color:var(--t2);margin-top:3px;">Struttura tightening: domanda +28% entro 2030, supply nuova molto lenta. Kazakhstan + Canada non bastano. Prezzi destinati a salire.</div>
+      </div>
+    </div>
+    <div style="font-size:10px;color:var(--t2);line-height:1.7;border-top:1px solid var(--border);padding-top:10px;">
+      <strong style="color:var(--t1);">Catalizzatori:</strong> AI data center a nucleare (Google, Microsoft, Amazon hanno firmato accordi) · energy security post-crisi gas europeo · 38 reattori in costruzione in Cina · nucleare nella tassonomia verde EU. <strong style="color:var(--amber);">Nota:</strong> asset ad alta volatilità — il tuo errore di marzo 2025 (venduto dopo 7 giorni) ha dimostrato che richiede orizzonte minimo 12-18 mesi.
+    </div>
+  </div>
+
+  <!-- ARGENTO -->
+  <div class="card">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+      <span style="font-size:18px;">🥈</span>
+      <div>
+        <div style="font-size:13px;font-weight:700;color:#C0C0C0;">Physical Silver</div>
+        <div style="font-size:9px;color:var(--t3);font-family:'JetBrains Mono',monospace;">Peso attuale: ~4.4%</div>
+      </div>
+      <div style="margin-left:auto;text-align:right;">
+        <div style="font-size:11px;color:var(--teal);font-weight:600;">Consensus: BULLISH</div>
+        <div style="font-size:9px;color:var(--t3);">Target 2026: $36–$42/oz</div>
+      </div>
+    </div>
+    <div class="g2" style="margin-bottom:12px;">
+      <div style="background:var(--bg3);border-radius:var(--r);padding:10px;">
+        <div style="font-size:9px;color:var(--gold2);font-family:'JetBrains Mono',monospace;margin-bottom:4px;">SILVER INSTITUTE / JPMORGAN</div>
+        <div style="font-size:12px;font-weight:600;color:var(--t1);">$36–$42/oz fine 2026</div>
+        <div style="font-size:9px;color:var(--t2);margin-top:3px;">Doppia natura: metal prezioso (segue oro) + industriale (pannelli solari, EV, elettronica). Deficit fisico strutturale dal 2021. Il Gold/Silver ratio è ancora favorevole all'argento.</div>
+      </div>
+      <div style="background:var(--bg3);border-radius:var(--r);padding:10px;">
+        <div style="font-size:9px;color:var(--purple);font-family:'JetBrains Mono',monospace;margin-bottom:4px;">DRIVER INDUSTRIALE 2026</div>
+        <div style="font-size:12px;font-weight:600;color:var(--t1);">+18% domanda industriale</div>
+        <div style="font-size:9px;color:var(--t2);margin-top:3px;">Pannelli solari: 200+ milioni di oz/anno. Ogni pannello contiene ~20g di argento. IRA (USA) e REPowerEU accelerano installazioni.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ENERGIA PULITA / GRID / HYDROGEN / BATTERY -->
+  <div class="card">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+      <span style="font-size:18px;">⚡</span>
+      <div>
+        <div style="font-size:13px;font-weight:700;color:var(--teal);">Clean Energy · Grid · Hydrogen · Battery</div>
+        <div style="font-size:9px;color:var(--t3);font-family:'JetBrains Mono',monospace;">Peso combinato: ~28% del portafoglio</div>
+      </div>
+      <div style="margin-left:auto;text-align:right;">
+        <div style="font-size:11px;color:var(--amber);font-weight:600;">Consensus: MIXED — lungo termine positivo</div>
+        <div style="font-size:9px;color:var(--t3);">Volatilità alta nel breve, macro favorevole</div>
+      </div>
+    </div>
+    <div class="g2" style="margin-bottom:12px;">
+      <div style="background:var(--bg3);border-radius:var(--r);padding:10px;">
+        <div style="font-size:9px;color:var(--teal);font-family:'JetBrains Mono',monospace;margin-bottom:4px;">S&P GLOBAL — GRID 2026</div>
+        <div style="font-size:12px;font-weight:600;color:var(--t1);">€584 miliardi entro 2030 (solo EU)</div>
+        <div style="font-size:9px;color:var(--t2);margin-top:3px;">"Nel 2026 la grid infrastruttura sale al centro della scena. 80% delle reti EU ha oltre 40 anni. Bottleneck critico per AI, EV, rinnovabili." — S&P Global Energy Horizons 2026.</div>
+      </div>
+      <div style="background:var(--bg3);border-radius:var(--r);padding:10px;">
+        <div style="font-size:9px;color:var(--red);font-family:'JetBrains Mono',monospace;margin-bottom:4px;">BLACKROCK — CLEAN ENERGY / HYDROGEN</div>
+        <div style="font-size:12px;font-weight:600;color:var(--t1);">$11 trilioni hydrogen al 2050</div>
+        <div style="font-size:9px;color:var(--t2);margin-top:3px;">"AI sarà il nuovo stress test per la clean energy nel 2026." Clean energy non può andare oltre la grid. Hydrogen = soluzione per usi finali non elettrificabili (80% dei consumi attuali).</div>
+      </div>
+    </div>
+    <div style="font-size:10px;color:var(--t2);line-height:1.7;border-top:1px solid var(--border);padding-top:10px;">
+      <strong style="color:var(--amber);">Rischio 2026:</strong> politiche Trump (riduzione sussidi IRA) pesano su clean energy USA nel breve. Clean energy europea e grid upgrade sono più isolati da questo rischio. Hydrogen ancora fase early-stage — orizzonte minimo 5-7 anni. <strong style="color:var(--teal);">Opportunità:</strong> ogni correzione su questi asset è strutturalmente un'occasione di accumulo per chi ha orizzonte 2030+.
+    </div>
+  </div>
+
+  <!-- EM -->
+  <div class="card">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+      <span style="font-size:18px;">🌍</span>
+      <div>
+        <div style="font-size:13px;font-weight:700;color:'#BA7517';">Core MSCI EM IMI</div>
+        <div style="font-size:9px;color:var(--t3);font-family:'JetBrains Mono',monospace;">Peso attuale: ~14%</div>
+      </div>
+      <div style="margin-left:auto;text-align:right;">
+        <div style="font-size:11px;color:var(--amber);font-weight:600;">Consensus: NEUTRAL/CAUTIOUS</div>
+        <div style="font-size:9px;color:var(--t3);">Cina = 27% dell'indice — rischio geopolitico</div>
+      </div>
+    </div>
+    <div style="font-size:10px;color:var(--t2);line-height:1.7;">
+      <strong style="color:var(--t1);">BlackRock:</strong> sovrappeso selettivo su EM Asia (India, Indonesia) ma neutro sulla Cina per rischio geopolitico e regolatorio. <strong style="color:var(--t1);">Goldman:</strong> geopolitica USA-Cina come driver principale 2026 — cautela su asset Cina-dipendenti. <strong style="color:var(--t1);">JPMorgan:</strong> India favorita come alternativa strutturale alla Cina negli EM. <strong style="color:var(--amber);">Il rischio principale del tuo EM IMI:</strong> 27% Cina — qualsiasi escalation Taiwan o sanzioni colpirebbe l'indice.
+    </div>
+  </div>
+
+  <!-- SINTESI -->
+  <div class="card" style="border-color:rgba(240,201,110,.2);border-left:3px solid var(--gold2);">
+    <p class="sec" style="margin-bottom:10px;">Sintesi consensus — come si posizionano le istituzioni sui tuoi asset</p>
+    <table>
+      <thead><tr><th style="text-align:left;">Asset</th><th>Fonte principale</th><th>Outlook 2026</th><th>Target</th><th>Il tuo peso</th></tr></thead>
+      <tbody>
+        <tr><td style="font-weight:600;color:var(--gold2);">Gold</td><td style="font-size:9px;color:var(--t3);">GS, JPM, BofA</td><td><span class="badge bg">Bullish</span></td><td style="font-family:'JetBrains Mono',monospace;color:var(--teal);">$4.900–$6.000</td><td style="font-family:'JetBrains Mono',monospace;">24% ✅</td></tr>
+        <tr><td style="font-weight:600;color:#CD7F32;">Copper</td><td style="font-size:9px;color:var(--t3);">GS, GSAM</td><td><span class="badge bg">Bullish strutturale</span></td><td style="font-family:'JetBrains Mono',monospace;color:var(--teal);">$11.400/ton</td><td style="font-family:'JetBrains Mono',monospace;">6.7% ⚠️ basso</td></tr>
+        <tr><td style="font-weight:600;color:var(--amber);">Uranium</td><td style="font-size:9px;color:var(--t3);">WNA, Sprott</td><td><span class="badge bg">Bullish LT</span></td><td style="font-family:'JetBrains Mono',monospace;color:var(--teal);">$90–$110/lb</td><td style="font-family:'JetBrains Mono',monospace;">3.3% ⚠️ basso</td></tr>
+        <tr><td style="font-weight:600;color:#C0C0C0;">Silver</td><td style="font-size:9px;color:var(--t3);">Silver Inst., JPM</td><td><span class="badge bg">Bullish</span></td><td style="font-family:'JetBrains Mono',monospace;color:var(--teal);">$36–$42/oz</td><td style="font-family:'JetBrains Mono',monospace;">4.4% ✅</td></tr>
+        <tr><td style="font-weight:600;color:var(--teal);">Grid/Electrification</td><td style="font-size:9px;color:var(--t3);">S&P Global</td><td><span class="badge bg">Bullish LT</span></td><td style="font-family:'JetBrains Mono',monospace;color:var(--teal);">€584B investimenti EU</td><td style="font-family:'JetBrains Mono',monospace;">3.1% ⚠️ basso</td></tr>
+        <tr><td style="font-weight:600;color:var(--teal);">Clean Energy</td><td style="font-size:9px;color:var(--t3);">BlackRock, IEA</td><td><span class="badge ba">Misto breve</span></td><td style="font-family:'JetBrains Mono',monospace;color:var(--amber);">Volatilità alta</td><td style="font-family:'JetBrains Mono',monospace;">12.8% ✅</td></tr>
+        <tr><td style="font-weight:600;color:var(--teal);">Hydrogen</td><td style="font-size:9px;color:var(--t3);">BlackRock, iShares</td><td><span class="badge ba">Early stage</span></td><td style="font-family:'JetBrains Mono',monospace;color:var(--amber);">$11T al 2050</td><td style="font-family:'JetBrains Mono',monospace;">16.2% ⚠️ alto</td></tr>
+        <tr><td style="font-weight:600;color:var(--t2);">MSCI EM</td><td style="font-size:9px;color:var(--t3);">GS, BlackRock</td><td><span class="badge ba">Neutral</span></td><td style="font-family:'JetBrains Mono',monospace;color:var(--amber);">Cina-risk</td><td style="font-family:'JetBrains Mono',monospace;">14% ⚠️ monitorare</td></tr>
+      </tbody>
+    </table>
+    <p class="note">Dati da Goldman Sachs Commodity Outlook 2026, JPMorgan Market Outlook, BlackRock Investment Institute, GSAM Market Know-How Q2 2026, S&P Global Energy Horizons 2026, World Nuclear Association Report 2026, Sprott Uranium Outlook 2026. Aggiornato maggio 2026.</p>
+  </div>
+
 </div>
 
 <!-- STRESS TEST -->
@@ -483,117 +674,6 @@ tbody tr:hover td{background:rgba(255,255,255,.015);}
   </div>
 </div>
 
-<!-- ALERTS -->
-<div class="pane" id="pane-alerts">
-  <p class="sec" style="margin-bottom:10px;">Alert soglie — monitora quando un asset supera o scende sotto una percentuale target</p>
-  <div class="alert-add">
-    <select id="al-asset" style="flex:2;"></select>
-    <select id="al-cond" style="flex:1;"><option value="above">Sopra</option><option value="below">Sotto</option></select>
-    <input type="number" id="al-val" value="30" min="0" max="100" step="0.5" style="flex:1;" placeholder="% soglia">
-    <button onclick="addAlert()">+ Aggiungi</button>
-  </div>
-  <div id="alert-list"></div>
-  <div class="card" style="margin-top:12px;"><p class="sec">Distribuzione attuale vs soglie</p><div class="cw" style="height:250px;"><canvas id="c-alerts" role="img" aria-label="Allocazione attuale vs soglie alert">Alert soglie.</canvas></div></div>
-</div>
-
-<!-- HISTORY + BACKTEST -->
-<div class="pane" id="pane-history">
-  <div class="bt-tabs">
-    <button class="bt-tab on" onclick="setHistTab('snap',this)">📅 Snapshot</button>
-    <button class="bt-tab" onclick="setHistTab('bt',this)">🔬 Back Test</button>
-  </div>
-
-  <!-- SNAPSHOT SUB -->
-  <div class="bt-sub on" id="btsub-snap">
-    <div class="hist-controls">
-      <button class="hist-btn on" onclick="setHistPeriod('all',this)">Tutto</button>
-      <button class="hist-btn" onclick="setHistPeriod('6m',this)">6 mesi</button>
-      <button class="hist-btn" onclick="setHistPeriod('3m',this)">3 mesi</button>
-      <button class="add-snap-btn" onclick="addSnapshot()">+ Salva snapshot ora</button>
-    </div>
-    <div class="card"><p class="sec">Valore stimato nel tempo</p><div class="cw" style="height:240px;"><canvas id="c-hist" role="img" aria-label="Storico valore portafoglio">Storico.</canvas></div></div>
-    <div class="card"><p class="sec">Snapshot salvati</p><div class="snap-list" id="snap-list"></div></div>
-  </div>
-
-  <!-- BACKTEST SUB -->
-  <div class="bt-sub" id="btsub-bt">
-    <div class="bt-config">
-      <div class="bt-cfg-item">
-        <label>Periodo di analisi</label>
-        <select id="bt-period">
-          <option value="2y">2 anni (2024–2025)</option>
-          <option value="1y" selected>1 anno (2025)</option>
-          <option value="6m">6 mesi (H2 2025)</option>
-          <option value="custom">Personalizzato</option>
-        </select>
-      </div>
-      <div class="bt-cfg-item">
-        <label>Capitale iniziale (€)</label>
-        <input type="number" id="bt-capital" value="130000" min="1000" step="1000">
-      </div>
-      <div class="bt-cfg-item">
-        <label>Ribilanciamento</label>
-        <select id="bt-rebal">
-          <option value="none">Mai (buy &amp; hold)</option>
-          <option value="quarterly">Trimestrale</option>
-          <option value="monthly">Mensile</option>
-        </select>
-      </div>
-      <div class="bt-cfg-item">
-        <label>Costi transazione</label>
-        <select id="bt-cost">
-          <option value="0">0% (nessuno)</option>
-          <option value="0.001">0.1% per trade</option>
-          <option value="0.002" selected>0.2% per trade</option>
-          <option value="0.005">0.5% per trade</option>
-        </select>
-      </div>
-    </div>
-    <button class="bt-run-btn" onclick="runBacktest()">▶ Esegui backtesting</button>
-
-    <div id="bt-results" style="display:none;">
-      <div class="bt-kpis" id="bt-kpis"></div>
-
-      <div class="card">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
-          <p class="sec" style="margin:0;">Equity curve — portafoglio vs benchmark</p>
-          <div class="bt-bm-row" id="bt-bm-row">
-            <button class="bt-bm-btn on" data-bm="msci" onclick="toggleBTBm(this)">MSCI World</button>
-            <button class="bt-bm-btn on" data-bm="sp500" onclick="toggleBTBm(this)">S&amp;P 500</button>
-            <button class="bt-bm-btn" data-bm="gold" onclick="toggleBTBm(this)">Gold</button>
-            <button class="bt-bm-btn" data-bm="em" onclick="toggleBTBm(this)">MSCI EM</button>
-          </div>
-        </div>
-        <div class="cw" style="height:260px;"><canvas id="c-bt-equity" role="img" aria-label="Equity curve backtest portafoglio vs benchmark">Equity curve.</canvas></div>
-      </div>
-
-      <div class="g2">
-        <div class="card">
-          <p class="sec">Drawdown nel periodo</p>
-          <div class="cw" style="height:180px;"><canvas id="c-bt-dd" role="img" aria-label="Drawdown portafoglio nel periodo di backtest">Drawdown.</canvas></div>
-        </div>
-        <div class="card">
-          <p class="sec">Rendimento mensile — heatmap</p>
-          <div id="bt-monthly-hm"></div>
-        </div>
-      </div>
-
-      <div class="card">
-        <p class="sec">Performance per asset nel periodo</p>
-        <div class="cw" style="height:220px;"><canvas id="c-bt-assets" role="img" aria-label="Performance per asset nel periodo di backtest">Performance asset.</canvas></div>
-      </div>
-
-      <div class="card">
-        <p class="sec">Statistiche comparative</p>
-        <table>
-          <thead><tr><th>Portafoglio / Benchmark</th><th>CAGR</th><th>Rend. tot.</th><th>Volatilità ann.</th><th>Sharpe</th><th>Max Drawdown</th><th>Calmar</th></tr></thead>
-          <tbody id="bt-stats-tbl"></tbody>
-        </table>
-        <p class="note">Dati rendimenti storici 2024–2025 da fonti pubbliche (iShares, Yahoo Finance, StockAnalysis). Costi di transazione inclusi se configurati. Il backtesting usa i pesi attuali della sidebar applicati per l'intero periodo (buy &amp; hold di default). Non costituisce previsione di rendimenti futuri.</p>
-      </div>
-    </div>
-  </div>
-</div>
 
 <div class="pane" id="pane-autopsy" style="display:none;overflow-y:auto;padding:20px;">
 
@@ -612,6 +692,7 @@ tbody tr:hover td{background:rgba(255,255,255,.015);}
     <button class="at-tab on"  onclick="setAtTab('trades',this)">🔥 Errori & Successi</button>
     <button class="at-tab"     onclick="setAtTab('maturity',this)">📊 Maturità & Timeline</button>
     <button class="at-tab"     onclick="setAtTab('patterns',this)">🧠 Pattern</button>
+    <button class="at-tab"     onclick="setAtTab('lezioni',this)">💡 Lezioni</button>
   </div>
 
   <!-- ── ERRORI & SUCCESSI ── -->
@@ -840,6 +921,167 @@ tbody tr:hover td{background:rgba(255,255,255,.015);}
       </div>
     </div>
   </div><!-- /atsub-patterns -->
+
+  <!-- ── LEZIONI ── -->
+  <div class="at-sub" id="atsub-lezioni">
+
+    <div class="card" style="border-left:3px solid var(--gold2);border-color:rgba(240,201,110,.2);">
+      <p class="sec" style="margin-bottom:8px;">Cosa avresti dovuto fare — i 5 errori con la soluzione alternativa</p>
+      <p style="font-size:11px;color:var(--t2);line-height:1.7;margin-bottom:14px;">Non si tratta di recriminare — questi errori sono il prezzo dell'educazione finanziaria. Ma conoscere la soluzione corretta rende impossibile ripetere lo stesso errore.</p>
+
+      <!-- Errore 1 -->
+      <div class="hcard" style="margin-bottom:10px;">
+        <div class="hc-head">
+          <div><div class="hc-asset">🔥 MSCI World IT — Venduto a giugno 2024</div><div class="hc-date">Costo opportunità: –€8.775</div></div>
+          <span class="badge br">Timing error</span>
+        </div>
+        <div class="hc-desc"><strong style="color:var(--red);">Cosa hai fatto:</strong> Venduto 179 quote a ~83€ dopo poche settimane perché volevi "diversificare meglio". L'ETF è poi salito a ~132€ (+59%).</div>
+        <div style="background:var(--bg3);border-radius:var(--r);padding:10px;margin-top:8px;">
+          <div style="font-size:9px;color:var(--teal);font-family:'JetBrains Mono',monospace;margin-bottom:5px;">✅ COSA AVRESTI DOVUTO FARE</div>
+          <div style="font-size:11px;color:var(--t2);line-height:1.6;">La regola d'oro per gli ETF tematici: <strong style="color:var(--t1);">non vendere mai un ETF entro 6 mesi dall'acquisto</strong> a meno di un cambiamento fondamentale nella tesi. Il tech/AI non aveva cambiato tesi — anzi, ChatGPT era esploso da pochi mesi. La "diversificazione" era razionalizzazione di un'emozione. Se volevi diversificare, potevi <em>aggiungere</em> altri ETF senza <em>vendere</em> quello che aveva performance.</div>
+        </div>
+        <div style="background:rgba(39,201,154,.06);border-radius:var(--r);padding:8px;margin-top:6px;font-size:10px;color:var(--teal);">
+          📌 Regola da adottare: <strong>"Prima di vendere un ETF chiediti: la tesi di investimento è cambiata? Se no, non vendere."</strong>
+        </div>
+      </div>
+
+      <!-- Errore 2 -->
+      <div class="hcard" style="margin-bottom:10px;">
+        <div class="hc-head">
+          <div><div class="hc-asset">🔥🔥 Panic sell 5 agosto 2024 — Flash crash Yen</div><div class="hc-date">Costo opportunità: –€6.427</div></div>
+          <span class="badge br">Panic sell</span>
+        </div>
+        <div class="hc-desc"><strong style="color:var(--red);">Cosa hai fatto:</strong> Venduto 247 quote MSCI World a ~89€ durante il crollo del flash crash. Il giorno dopo i mercati si erano già ripresi completamente. Hai venduto il minimo locale perfetto.</div>
+        <div style="background:var(--bg3);border-radius:var(--r);padding:10px;margin-top:8px;">
+          <div style="font-size:9px;color:var(--teal);font-family:'JetBrains Mono',monospace;margin-bottom:5px;">✅ COSA AVRESTI DOVUTO FARE</div>
+          <div style="font-size:11px;color:var(--t2);line-height:1.6;">I flash crash (crollo intraday senza causa fondamentale) si recuperano quasi sempre in 1-5 giorni. La regola: <strong style="color:var(--t1);">non aprire mai l'app durante un crollo di mercato se non sei pronto a comprare</strong>. Se non compri, non guardare. Aprire l'app durante il panico ti espone alla peggiore decisione possibile: vendere al minimo. Avresti dovuto invece impostare un alert su prezzo <em>superiore</em> per comprare di più, non uno inferiore per vendere.</div>
+        </div>
+        <div style="background:rgba(39,201,154,.06);border-radius:var(--r);padding:8px;margin-top:6px;font-size:10px;color:var(--teal);">
+          📌 Regola da adottare: <strong>"Nei giorni di crollo &gt;3% non apro l'app per vendere. Se la apro, è solo per comprare."</strong>
+        </div>
+      </div>
+
+      <!-- Errore 3 -->
+      <div class="hcard" style="margin-bottom:10px;">
+        <div class="hc-head">
+          <div><div class="hc-asset">🔥🔥 AI & Big Data ETF — Venduto prima del boom</div><div class="hc-date">Costo opportunità: –€6.087</div></div>
+          <span class="badge br">FOMO rotation</span>
+        </div>
+        <div class="hc-desc"><strong style="color:var(--red);">Cosa hai fatto:</strong> Venduto l'ETF AI per comprare MSCI World generico — esattamente l'opposto di quello che avrebbe dovuto fare un investitore con la tua capacità di analisi tematica.</div>
+        <div style="background:var(--bg3);border-radius:var(--r);padding:10px;margin-top:8px;">
+          <div style="font-size:9px;color:var(--teal);font-family:'JetBrains Mono',monospace;margin-bottom:5px;">✅ COSA AVRESTI DOVUTO FARE</div>
+          <div style="font-size:11px;color:var(--t2);line-height:1.6;">Paradossalmente, la tua analisi tematica (AI, uranio, rame, oro) era <em>corretta</em> fin dall'inizio — ma non ti fidavi abbastanza di te stesso. Invece di vendere per comprare "qualcosa di più sicuro", potevi semplicemente <strong style="color:var(--t1);">non fare nulla</strong>. Il non-fare è spesso la mossa migliore. Ogni rotazione ha un costo: spread, timing sbagliato, costo psicologico. La regola: <strong style="color:var(--t1);">ogni vendita deve avere una ragione più forte dell'acquisto</strong>.</div>
+        </div>
+        <div style="background:rgba(39,201,154,.06);border-radius:var(--r);padding:8px;margin-top:6px;font-size:10px;color:var(--teal);">
+          📌 Regola da adottare: <strong>"Per ogni vendita scrivo 3 motivi concreti. Se non riesco a scriverne 3, non vendo."</strong>
+        </div>
+      </div>
+
+      <!-- Errore 4 -->
+      <div class="hcard" style="margin-bottom:10px;">
+        <div class="hc-head">
+          <div><div class="hc-asset">🔥🔥 Uranium ETF — Hold time: 7 giorni</div><div class="hc-date">Costo opportunità: –€4.474</div></div>
+          <span class="badge br">Hold time cortissimo</span>
+        </div>
+        <div class="hc-desc"><strong style="color:var(--red);">Cosa hai fatto:</strong> Comprato a 28.5€, venduto dopo 7 giorni a 25.2€ (–12%). L'ETF poi è salito a ~54€. Venduto esattamente sul minimo locale, come per il flash crash.</div>
+        <div style="background:var(--bg3);border-radius:var(--r);padding:10px;margin-top:8px;">
+          <div style="font-size:9px;color:var(--teal);font-family:'JetBrains Mono',monospace;margin-bottom:5px;">✅ COSA AVRESTI DOVUTO FARE</div>
+          <div style="font-size:11px;color:var(--t2);line-height:1.6;">Gli ETF tematici su commodities (uranio, rame, litio) hanno volatilità 35-45% annua — questo significa oscillazioni settimanali di ±5-10% sono <em>normalissime</em>. Comprare uranio con orizzonte di 7 giorni è semplicemente sbagliato per definizione. Avevi bisogno di un <strong style="color:var(--t1);">commitment minimo pre-definito</strong>: "se compro uranio, mi impegno a tenerlo almeno 6 mesi". Questo previene la vendita impulsiva nelle prime settimane di volatilità normale.</div>
+        </div>
+        <div style="background:rgba(39,201,154,.06);border-radius:var(--r);padding:8px;margin-top:6px;font-size:10px;color:var(--teal);">
+          📌 Regola da adottare: <strong>"Prima di comprare scrivo la data minima di uscita. Non posso vendere prima di quella data."</strong>
+        </div>
+      </div>
+
+      <!-- Errore 5 — le rotazioni di strategia -->
+      <div class="hcard">
+        <div class="hc-head">
+          <div><div class="hc-asset">🎭 6 rotazioni di strategia in 24 mesi</div><div class="hc-date">Costo totale stimato: ~€15.000 in spread e timing</div></div>
+          <span class="badge br">Strategy FOMO</span>
+        </div>
+        <div class="hc-desc"><strong style="color:var(--red);">Cosa hai fatto:</strong> IT tech → Bond → S&P → Crypto → Dip → Tematico. Ogni rotazione aveva un costo reale e psicologico. La fase tematica 2026 dimostra che avresti potuto arrivarci molto prima.</div>
+        <div style="background:var(--bg3);border-radius:var(--r);padding:10px;margin-top:8px;">
+          <div style="font-size:9px;color:var(--teal);font-family:'JetBrains Mono',monospace;margin-bottom:5px;">✅ COSA AVRESTI DOVUTO FARE</div>
+          <div style="font-size:11px;color:var(--t2);line-height:1.6;">La tua tesi finale (oro, rame, uranio, energie rinnovabili, EM) era implicita già a giugno 2024 — l'AI ETF, il tech ETF, l'interesse per le commodities lo dimostrava. Il problema era la <strong style="color:var(--t1);">mancanza di un Investment Policy Statement (IPS)</strong>: un documento scritto che definisce la tua strategia, i tuoi criteri di uscita, il tuo orizzonte. Con un IPS scritto, ogni "rotazione" avrebbe dovuto giustificarsi contro regole pre-stabilite — e la maggior parte non sarebbe sopravvissuta a quel test.</div>
+        </div>
+        <div style="background:rgba(39,201,154,.06);border-radius:var(--r);padding:8px;margin-top:6px;font-size:10px;color:var(--teal);">
+          📌 Regola da adottare: <strong>"Ho un documento con: strategia, asset target, % min/max per categoria, criteri di uscita. Ogni decisione va verificata contro questo documento."</strong>
+        </div>
+      </div>
+    </div>
+
+    <!-- CONFRONTO: cosa hai fatto vs cosa avresti dovuto fare -->
+    <div class="card">
+      <p class="sec" style="margin-bottom:12px;">Il tuo portafoglio reale vs il portafoglio "paziente"</p>
+      <p style="font-size:11px;color:var(--t2);line-height:1.7;margin-bottom:14px;">Se avessi comprato gli stessi asset a giugno 2024 e non avessi mai venduto nulla — zero panic sell, zero rotazioni:</p>
+      <div class="g2">
+        <div style="background:var(--bg3);border-radius:var(--r2);padding:16px;border:1px solid rgba(232,80,74,.2);">
+          <div style="font-size:10px;color:var(--red);font-family:'JetBrains Mono',monospace;margin-bottom:8px;text-transform:uppercase;">Portafoglio reale</div>
+          <div style="font-size:24px;font-weight:700;color:var(--gold2);">€161.137</div>
+          <div style="font-size:11px;color:var(--t2);margin-top:4px;">Da €84.000 depositati inizialmente</div>
+          <div style="font-size:11px;color:var(--teal);margin-top:4px;">+€77.137 (+91.8%) sul capitale iniziale</div>
+          <div style="font-size:10px;color:var(--t3);margin-top:8px;">Include: 6 rotazioni, panic sell, errori di timing, costi di spread</div>
+        </div>
+        <div style="background:var(--bg3);border-radius:var(--r2);padding:16px;border:1px solid rgba(39,201,154,.2);">
+          <div style="font-size:10px;color:var(--teal);font-family:'JetBrains Mono',monospace;margin-bottom:8px;text-transform:uppercase;">Portafoglio "paziente" (ipotetico)</div>
+          <div style="font-size:24px;font-weight:700;color:var(--teal);">~€174.000</div>
+          <div style="font-size:11px;color:var(--t2);margin-top:4px;">Stessa strategia, zero vendite impulsive</div>
+          <div style="font-size:11px;color:var(--teal);margin-top:4px;">+€90.000 (+107%) sul capitale iniziale</div>
+          <div style="font-size:10px;color:var(--t3);margin-top:8px;">Include: stessi asset, solo buy, nessuna rotazione</div>
+        </div>
+      </div>
+      <div style="margin-top:12px;padding:12px;background:rgba(240,201,110,.05);border-radius:var(--r);border:1px solid rgba(240,201,110,.15);">
+        <div style="font-size:11px;color:var(--t2);line-height:1.8;">
+          <strong style="color:var(--gold2);">La differenza è €12.863</strong> — circa il 7.5% del capitale. Non è una cifra enorme, ma è il costo di 24 mesi di apprendimento. La buona notizia: questo costo si paga <em>una volta sola</em>. Chi impara da questi errori — e i dati mostrano che li stai imparando — non li ripete più.
+          <br><br>
+          <strong style="color:var(--teal);">Il portafoglio del 2026 è la prova:</strong> nessuna rotazione da agosto 2025, accumulo sistematico, diversificazione tematica coerente. Sei già il "portafoglio paziente" che avresti voluto essere nel 2024.
+        </div>
+      </div>
+    </div>
+
+    <!-- LE 5 REGOLE -->
+    <div class="card">
+      <p class="sec" style="margin-bottom:12px;">Le 5 regole operative — estratte dai tuoi errori</p>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <div style="display:flex;gap:12px;align-items:flex-start;padding:12px;background:var(--bg3);border-radius:var(--r);">
+          <span style="font-size:20px;flex-shrink:0;">1️⃣</span>
+          <div>
+            <div style="font-size:12px;font-weight:600;color:var(--t1);margin-bottom:3px;">Non vendere ETF entro 6 mesi dall'acquisto</div>
+            <div style="font-size:10px;color:var(--t2);">A meno che la tesi fondamentale sia cambiata. "Il prezzo è sceso" non è una tesi cambiata. "Il settore è strutturalmente in declino" sì.</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:12px;align-items:flex-start;padding:12px;background:var(--bg3);border-radius:var(--r);">
+          <span style="font-size:20px;flex-shrink:0;">2️⃣</span>
+          <div>
+            <div style="font-size:12px;font-weight:600;color:var(--t1);margin-bottom:3px;">Nei giorni di crollo >3%: apri l'app solo per comprare</div>
+            <div style="font-size:10px;color:var(--t2);">Se non hai liquidità disponibile per comprare, non aprire l'app. Il panico di mercato è contagioso — la distanza fisica è la tua difesa.</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:12px;align-items:flex-start;padding:12px;background:var(--bg3);border-radius:var(--r);">
+          <span style="font-size:20px;flex-shrink:0;">3️⃣</span>
+          <div>
+            <div style="font-size:12px;font-weight:600;color:var(--t1);margin-bottom:3px;">Per ogni vendita: scrivi 3 motivi concreti</div>
+            <div style="font-size:10px;color:var(--t2);">Se non riesci a scrivere 3 motivi oggettivi (non emotivi) per vendere, non vendere. "Voglio ruotare su qualcosa di meglio" non conta — deve essere "la tesi è cambiata perché..."</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:12px;align-items:flex-start;padding:12px;background:var(--bg3);border-radius:var(--r);">
+          <span style="font-size:20px;flex-shrink:0;">4️⃣</span>
+          <div>
+            <div style="font-size:12px;font-weight:600;color:var(--t1);margin-bottom:3px;">Prima di comprare: scrivi la data minima di uscita</div>
+            <div style="font-size:10px;color:var(--t2);">ETF commodity/tematico → minimo 12 mesi. ETF broad market → minimo 6 mesi. Crypto → minimo 18 mesi. Se non sei disposto a tenerlo così a lungo, non comprare.</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:12px;align-items:flex-start;padding:12px;background:var(--bg3);border-radius:var(--r);">
+          <span style="font-size:20px;flex-shrink:0;">5️⃣</span>
+          <div>
+            <div style="font-size:12px;font-weight:600;color:var(--t1);margin-bottom:3px;">Ogni domenica: aggiorna solo i dati, non la strategia</div>
+            <div style="font-size:10px;color:var(--t2);">La domenica inserisci il valore nel foglio Google. Non prendere decisioni di acquisto/vendita la domenica — i mercati sono chiusi e il weekend amplifica le emozioni. Le decisioni si prendono solo con mercati aperti, con calma, con un piano scritto.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /atsub-lezioni -->
 
 </div><!-- /pane-autopsy -->
 </div><!-- flex overflow hidden wrapper -->
@@ -1785,6 +2027,7 @@ function setAtTab(id,btn){
   if(id==='trades')initApTrades();
   if(id==='maturity')initApMaturity();
   if(id==='patterns')initApPatterns();
+  // lezioni è HTML statico — nessuna init necessaria
 }
 
 let apTradesInited=false;
@@ -1975,7 +2218,6 @@ async function fetchStorico() {
         const res = await fetch(url, {cache:'no-store'});
         if (!res.ok) continue;
         const text = await res.text();
-        console.log('[Storico] CSV raw (prime 3 righe):', text.split('\n').slice(0,3).join(' | '));
         const rows = parseCSV(text);
         storicoData = rows
           .filter(r => r.data && r.valore && String(r.data) !== 'data')
@@ -2020,10 +2262,7 @@ function filterStorico(tab) {
   else if (tab === '1A') cutoff.setFullYear(now.getFullYear() - 1);
   else return storicoData;
   const cutStr = cutoff.toISOString().slice(0,10);
-  console.log('[Storico] Tab:', tab, '| Cutoff:', cutStr, '| Dati disponibili:', storicoData.map(r=>r.data));
-  const result = storicoData.filter(r => r.data >= cutStr);
-  console.log('[Storico] Punti filtrati:', result.length);
-  return result;
+  return storicoData.filter(r => r.data >= cutStr);
 }
 
 function setHistTab(tab, btn) {
