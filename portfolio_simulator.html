@@ -2016,13 +2016,18 @@ function renderStorico() {
   if (!storicoData.length) return;
   const filtered = filterStorico(storicoTab);
   if (!filtered.length) {
-    document.getElementById('hist-status').textContent = 'Nessun dato per il periodo selezionato. Aggiungi valori nel foglio Storico.';
+    const s = document.getElementById('hist-status');
+    if(s) s.textContent = 'Nessun dato per il periodo selezionato. Aggiungi valori nel foglio Storico.';
     return;
   }
 
+  // ── Labels e valori portafoglio ──
   const labels = filtered.map(r => {
     const d = new Date(r.data);
-    return d.toLocaleDateString('it-IT', {day:'2-digit', month:'short', year: filtered.length > 12 ? '2-digit' : undefined});
+    return d.toLocaleDateString('it-IT', {
+      day:'2-digit', month:'short',
+      year: filtered.length > 14 ? '2-digit' : undefined
+    });
   });
   const vals  = filtered.map(r => r.valore);
   const first = vals[0];
@@ -2031,47 +2036,47 @@ function renderStorico() {
   const diffPct = first > 0 ? (diff/first*100) : 0;
   const isUp  = diff >= 0;
   const lineColor = isUp ? '#27c99a' : '#e8504a';
-  const fillColor = isUp ? 'rgba(39,201,154,0.07)' : 'rgba(232,80,74,0.07)';
+  const fillColor = isUp ? 'rgba(39,201,154,0.08)' : 'rgba(232,80,74,0.08)';
 
-  // ── Benchmark: rendimenti mensili reali (base 100 = giu 2024) ──
-  // Interpolati sulle stesse date del portafoglio
-  // Dati mensili giu2024→mag2026 (25 punti)
-  const BM_MONTHLY = {
-    'MSCI World': {
-      color:'#4d9de0',
-      // rendimento mensile progressivo base 100 = giu 2024
-      vals:[100,102.1,97.4,103.2,106.5,110.2,112.1,115.0,112.8,108.5,112.3,116.8,119.4,122.6,125.8,128.4,124.2,120.8,125.5,123.0,121.2,118.5,115.8,114.2,114.2]
-    },
-    'S&P 500': {
-      color:'#8b6fff',
-      vals:[100,103.4,97.8,105.1,109.3,113.8,116.4,121.5,118.2,114.6,118.9,124.2,128.5,132.1,136.4,140.2,135.8,131.4,137.2,134.6,131.8,127.5,124.2,122.1,122.1]
-    },
-    'Gold': {
-      color:'#d4a843',
-      vals:[100,103.2,103.5,109.8,113.4,116.9,120.8,125.4,129.8,135.2,141.8,148.6,158.4,162.8,168.5,175.2,172.1,178.4,185.8,192.4,199.8,206.5,210.2,215.8,215.8]
-    },
-    'Bitcoin': {
-      color:'#F7931A',
-      vals:[100,118.4,106.2,122.5,101.8,113.2,96.4,134.8,122.6,112.4,143.2,108.5,116.4,131.8,118.6,129.4,144.8,158.4,172.5,178.2,164.8,158.2,151.4,158.6,158.6]
-    },
+  // ── Benchmark: stessi dati di rBench, base 100 = Giu 2024 ──
+  // 24 punti mensili: giu2024(0) → mag2026(23)
+  const BM_DATES = [
+    '2024-06-01','2024-07-01','2024-08-01','2024-09-01','2024-10-01','2024-11-01','2024-12-01',
+    '2025-01-01','2025-02-01','2025-03-01','2025-04-01','2025-05-01',
+    '2025-06-01','2025-07-01','2025-08-01','2025-09-01','2025-10-01','2025-11-01','2025-12-01',
+    '2026-01-01','2026-02-01','2026-03-01','2026-04-01','2026-05-01'
+  ];
+  const BM_IDX = {}; // data → indice mensile
+  BM_DATES.forEach((d,i) => { BM_IDX[d] = i; });
+
+  const BM_SERIES = {
+    'MSCI World': { color:'#4d9de0', idx100:[100,102.1,97.4,103.2,106.5,110.2,112.1,115.0,112.8,108.5,112.3,116.8,119.4,122.6,125.8,128.4,124.2,120.8,125.5,123.0,121.2,118.5,115.8,114.2] },
+    'S&P 500':    { color:'#8b6fff', idx100:[100,103.4,97.8,105.1,109.3,113.8,116.4,121.5,118.2,114.6,118.9,124.2,128.5,132.1,136.4,140.2,135.8,131.4,137.2,134.6,131.8,127.5,124.2,122.1] },
+    'Gold':       { color:'#d4a843', idx100:[100,103.2,103.5,109.8,113.4,116.9,120.8,125.4,129.8,135.2,141.8,148.6,158.4,162.8,168.5,175.2,172.1,178.4,185.8,192.4,199.8,206.5,210.2,215.8] },
+    'Bitcoin':    { color:'#F7931A', idx100:[100,118.4,106.2,122.5,101.8,113.2,96.4,134.8,122.6,112.4,143.2,108.5,116.4,131.8,118.6,129.4,144.8,158.4,172.5,178.2,164.8,158.2,151.4,158.6] },
   };
 
-  // Mesi di riferimento per i benchmark (giu 2024 = indice 0)
-  const BM_START = new Date('2024-06-01');
-
-  // Funzione: dato una data stringa, restituisce il valore del benchmark interpolato
-  function bmValueAt(bmVals, dateStr) {
+  // Per ogni punto del portafoglio trova il valore benchmark interpolato
+  // poi scala in € assoluti usando il valore del portafoglio al primo punto
+  function getBmEur(bmIdx100, dateStr) {
+    // Trova il mese più vicino
     const d = new Date(dateStr);
-    const monthsDiff = (d.getFullYear() - BM_START.getFullYear()) * 12 + (d.getMonth() - BM_START.getMonth());
-    const idx = Math.max(0, Math.min(monthsDiff, bmVals.length - 1));
-    // Interpolazione lineare tra i due mesi
+    const yr = d.getFullYear(), mo = d.getMonth(); // 0-based
+    // indice mensile rispetto a giu 2024
+    const mIdx = (yr - 2024) * 12 + (mo - 5); // giu=5
+    const i0 = Math.max(0, Math.min(mIdx, bmIdx100.length-1));
+    const i1 = Math.min(i0+1, bmIdx100.length-1);
     const frac = d.getDate() / 30;
-    const v1 = bmVals[idx] || bmVals[bmVals.length-1];
-    const v2 = bmVals[Math.min(idx+1, bmVals.length-1)];
-    return v1 + (v2 - v1) * frac;
+    const bmVal = bmIdx100[i0] + (bmIdx100[i1] - bmIdx100[i0]) * frac;
+    return bmVal;
   }
 
-  // Converti benchmark in € assoluti scalati sul primo punto del portafoglio
+  // Valore benchmark al primo punto del portafoglio filtrato
+  const bmFirstVals = {};
+  Object.entries(BM_SERIES).forEach(([name, bm]) => {
+    bmFirstVals[name] = getBmEur(bm.idx100, filtered[0].data);
+  });
+
   const datasets = [
     {
       label: 'Portafoglio',
@@ -2079,7 +2084,7 @@ function renderStorico() {
       borderColor: lineColor,
       backgroundColor: fillColor,
       borderWidth: 2.5,
-      pointRadius: filtered.length <= 10 ? 4 : filtered.length <= 30 ? 2 : 0,
+      pointRadius: filtered.length <= 8 ? 5 : filtered.length <= 20 ? 3 : 0,
       pointBackgroundColor: lineColor,
       tension: 0.35,
       fill: true,
@@ -2087,12 +2092,11 @@ function renderStorico() {
     }
   ];
 
-  // Aggiungi benchmark scalati
-  Object.entries(BM_MONTHLY).forEach(([name, bm]) => {
-    const bmFirst = bmValueAt(bm.vals, filtered[0].data);
+  Object.entries(BM_SERIES).forEach(([name, bm]) => {
     const bmData = filtered.map(r => {
-      const bmV = bmValueAt(bm.vals, r.data);
-      return first > 0 && bmFirst > 0 ? first * (bmV / bmFirst) : null;
+      const bmV = getBmEur(bm.idx100, r.data);
+      const bmF = bmFirstVals[name];
+      return bmF > 0 ? first * (bmV / bmF) : null;
     });
     datasets.push({
       label: name,
@@ -2108,45 +2112,45 @@ function renderStorico() {
     });
   });
 
-  // KPI row
+  // ── KPI row ──
   const kpiEl = document.getElementById('hist-kpi-row');
   if (kpiEl) {
     const pc = isUp ? 'var(--teal)' : 'var(--red)';
-    // Calcola delta vs MSCI World
-    const msciBmFirst = bmValueAt(BM_MONTHLY['MSCI World'].vals, filtered[0].data);
-    const msciBmLast  = bmValueAt(BM_MONTHLY['MSCI World'].vals, filtered[filtered.length-1].data);
-    const msciPct = msciBmFirst > 0 ? ((msciBmLast/msciBmFirst)-1)*100 : 0;
+    const msciF = getBmEur(BM_SERIES['MSCI World'].idx100, filtered[0].data);
+    const msciL = getBmEur(BM_SERIES['MSCI World'].idx100, filtered[filtered.length-1].data);
+    const msciPct = msciF > 0 ? ((msciL/msciF)-1)*100 : 0;
     const alpha = diffPct - msciPct;
     const ac = alpha >= 0 ? 'var(--teal)' : 'var(--red)';
     kpiEl.innerHTML = `
       <span style="color:var(--t3);">Inizio</span>
-      <span style="color:var(--t1);font-weight:600;">€${fE(first)}</span>
-      <span style="color:var(--t3);">→</span>
+      <span style="color:var(--t1);font-weight:600;margin-left:4px;">€${fE(first)}</span>
+      <span style="color:var(--t3);margin:0 4px;">→</span>
       <span style="color:var(--gold2);font-weight:600;">€${fE(last)}</span>
-      <span style="color:${pc};font-weight:600;margin-left:8px;">${diff>=0?'+':''}€${fE(diff)}</span>
-      <span style="color:${pc};">(${diffPct>=0?'+':''}${diffPct.toFixed(2)}%)</span>
+      <span style="color:${pc};font-weight:600;margin-left:10px;">${diff>=0?'+':''}€${fE(diff)}</span>
+      <span style="color:${pc};margin-left:4px;">(${diffPct>=0?'+':''}${diffPct.toFixed(2)}%)</span>
       <span style="color:var(--t3);margin:0 8px;">·</span>
-      <span style="color:var(--t3);">vs MSCI World</span>
-      <span style="color:${ac};font-weight:600;">${alpha>=0?'+':''}${alpha.toFixed(2)}%</span>
+      <span style="color:var(--t3);">Alpha vs MSCI</span>
+      <span style="color:${ac};font-weight:600;margin-left:4px;">${alpha>=0?'+':''}${alpha.toFixed(2)}%</span>
     `;
   }
 
-  // Legenda benchmark
+  // ── Legenda ──
   const legEl = document.getElementById('hist-legend');
   if (legEl) {
     legEl.innerHTML = `
-      <span style="display:inline-flex;align-items:center;gap:4px;">
-        <span style="display:inline-block;width:16px;height:2.5px;background:${lineColor};border-radius:2px;"></span>
+      <span style="display:inline-flex;align-items:center;gap:5px;">
+        <span style="width:18px;height:3px;background:${lineColor};border-radius:2px;display:inline-block;"></span>
         <span style="color:var(--t1);font-weight:600;">Portafoglio</span>
       </span>
-      ${Object.entries(BM_MONTHLY).map(([n,bm])=>`
-        <span style="display:inline-flex;align-items:center;gap:4px;">
-          <span style="display:inline-block;width:16px;height:1.5px;background:${bm.color};border-radius:2px;opacity:.7;"></span>
+      ${Object.entries(BM_SERIES).map(([n,bm])=>`
+        <span style="display:inline-flex;align-items:center;gap:5px;">
+          <span style="width:18px;height:2px;background:${bm.color};border-radius:2px;display:inline-block;opacity:.8;"></span>
           <span style="color:${bm.color};">${n}</span>
         </span>`).join('')}
     `;
   }
 
+  // ── Chart ──
   mk('c-storico', {
     type: 'line',
     data: { labels, datasets },
@@ -2160,14 +2164,14 @@ function renderStorico() {
           callbacks: {
             label: ctx => {
               const v = ctx.parsed.y;
-              if (v === null) return null;
+              if (v === null || v === undefined) return null;
               if (ctx.dataset.label === 'Portafoglio') {
-                const prev = ctx.dataIndex > 0 ? ctx.dataset.data[ctx.dataIndex-1] : v;
-                const d = v - (prev||v);
-                const p = prev > 0 ? (d/prev*100) : 0;
-                return ` ${ctx.dataset.label}: €${fE(v)} (${d>=0?'+':''}${p.toFixed(2)}%)`;
+                const pct = first > 0 ? ((v/first)-1)*100 : 0;
+                return ` Portafoglio: €${fE(v)} (${pct>=0?'+':''}${pct.toFixed(2)}%)`;
               }
-              return ` ${ctx.dataset.label}: €${fE(v)}`;
+              const bmF = first * (getBmEur(BM_SERIES[ctx.dataset.label]?.idx100||[], filtered[0].data) / (bmFirstVals[ctx.dataset.label]||1));
+              const pct = first > 0 ? ((v/first)-1)*100 : 0;
+              return ` ${ctx.dataset.label}: €${fE(v)} (${pct>=0?'+':''}${pct.toFixed(2)}%)`;
             }
           }
         }
@@ -2179,9 +2183,9 @@ function renderStorico() {
     }
   });
 
-  const statusEl = document.getElementById('hist-status');
-  if (statusEl) statusEl.textContent = STORICO_CSV_URL
-    ? `Dati da Google Sheets · aggiungi una riga ogni domenica per aggiornare`
+  const s = document.getElementById('hist-status');
+  if (s) s.textContent = STORICO_CSV_URL
+    ? `Dati da Google Sheets · ogni domenica aggiungi una riga in "Storico" con data e valore da TR`
     : `Dati storici precalcolati — collega il foglio Storico CSV per dati reali`;
 }
 
