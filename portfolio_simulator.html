@@ -290,7 +290,6 @@ tbody tr:hover td{background:rgba(255,255,255,.015);}
 <main class="main">
 
 <div class="nav">
-  <button class="nt" onclick="showPane('live',this)">📡 Posizioni</button>
   <button class="nt on"  onclick="showPane('overview',this)">Panoramica</button>
   <button class="nt" onclick="showPane('volatility',this)">Volatilità</button>
   <button class="nt" onclick="showPane('geo',this)">Geo / Settore</button>
@@ -302,54 +301,6 @@ tbody tr:hover td{background:rgba(255,255,255,.015);}
 <div style="flex:1;overflow:hidden;position:relative;min-height:0;">
 
 <!-- LIVE -->
-<div class="pane" id="pane-live">
-  <div class="kpis" id="live-kpis">
-    <div class="kpi"><div class="kpi-l">Valore portafoglio</div><div class="kpi-v go">—</div><div class="kpi-sub">in attesa dati…</div></div>
-  </div>
-
-  <!-- GRAFICO STORICO -->
-  <div class="card">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
-      <p class="sec" style="margin-bottom:0;">Andamento storico portafoglio</p>
-      <div style="display:flex;gap:4px;" id="hist-tabs">
-        <button class="at-tab" onclick="setHistTab('1S',this)">1S</button>
-        <button class="at-tab" onclick="setHistTab('1M',this)">1M</button>
-        <button class="at-tab" onclick="setHistTab('3M',this)">3M</button>
-        <button class="at-tab" onclick="setHistTab('1A',this)">1A</button>
-        <button class="at-tab on" onclick="setHistTab('MAX',this)">MAX</button>
-      </div>
-    </div>
-    <div id="hist-kpi-row" style="display:flex;gap:20px;margin-bottom:8px;font-family:'JetBrains Mono',monospace;font-size:14px;flex-wrap:wrap;"></div>
-    <div id="hist-legend" style="display:flex;gap:14px;flex-wrap:wrap;margin-bottom:10px;font-family:'JetBrains Mono',monospace;font-size:13px;"></div>
-    <div style="position:relative;height:280px;">
-      <canvas id="c-storico" role="img" aria-label="Andamento storico portafoglio"></canvas>
-    </div>
-    <p id="hist-status" style="font-size:13px;color:var(--t2);margin-top:8px;font-family:'JetBrains Mono',monospace;">
-      ⏳ In attesa URL foglio Storico CSV…
-    </p>
-  </div>
-
-  <!-- TABELLA POSIZIONI -->
-  <div class="card">
-    <p class="sec" style="margin-bottom:10px;">Posizioni — valori reali da Google Sheets</p>
-    <table>
-      <thead>
-        <tr>
-          <th style="text-align:left;">Asset</th>
-          <th>Valore €</th>
-          <th>Peso %</th>
-          <th>Var% oggi</th>
-          <th>P&L €</th>
-          <th>P&L %</th>
-        </tr>
-      </thead>
-      <tbody id="live-tbl-body">
-        <tr><td colspan="6" style="text-align:center;color:var(--t2);padding:20px;">In attesa dati Google Sheets…</td></tr>
-      </tbody>
-    </table>
-    <p class="note">Var% oggi calcolata tramite proxy ETF americani (GOOGLEFINANCE) — attiva durante orari di borsa USA (15:30–22:00 ora italiana). P&L calcolato da prezzi medi di acquisto reali.</p>
-  </div>
-</div>
 
 <!-- OVERVIEW -->
 <div class="pane on" id="pane-overview">
@@ -1959,24 +1910,44 @@ function renderScenario(){
   tr3.innerHTML=`<td>Portafoglio</td><td>100%</td><td style="color:${br>=0?'var(--teal)':'var(--red)'}">${br>=0?'+':''}${fP(br)}%</td><td style="color:var(--gold)">${bs>=0?'+':''}${fP(bs)}%</td><td style="color:var(--teal)">+${fP(bu)}%</td><td style="color:${tb2>=0?'var(--teal)':'var(--red)'}">${tb2>=0?'+':''}${fP(tb2)}%</td><td style="color:var(--gold);font-weight:700;">${expTot>=0?'+':''}${fP(expTot)}%</td>`;
   tb.appendChild(tr3);
 
-  // ── Consensus bubble chart ──
+  // ── Consensus bubble chart — REATTIVO ai pesi sidebar ──
+  const totBubble = totA();
   const CONSENSUS_DATA = [
-    {label:'Gold',      x:88, y:3.5, peso:24.1, color:'#f0c96e', note:'$4.900–6.000/oz'},
-    {label:'Copper',    x:85, y:4.5, peso:6.7,  color:'#CD7F32', note:'$11.400/ton'},
-    {label:'Uranium',   x:78, y:4.8, peso:3.3,  color:'#d4903a', note:'$90–110/lb'},
-    {label:'Silver',    x:80, y:3.0, peso:4.4,  color:'#C0C0C0', note:'$36–42/oz'},
-    {label:'Grid',      x:82, y:4.2, peso:3.1,  color:'#27c99a', note:'€584B EU'},
-    {label:'Battery',   x:75, y:4.0, peso:6.2,  color:'#8b6fff', note:'EV+Storage'},
-    {label:'Clean E.',  x:58, y:3.5, peso:12.8, color:'#4d9de0', note:'Misto breve'},
-    {label:'Hydrogen',  x:62, y:5.0, peso:16.2, color:'#27c99a', note:'$11T 2050'},
-    {label:'MSCI EM',   x:45, y:2.5, peso:14.0, color:'#BA7517', note:'Neutral/Cina'},
-  ];
+    {label:'Gold',     origIdx:0,  x:88, y:3.5, color:'#f0c96e', note:'$4.900–6.000/oz',  sentX:88},
+    {label:'Copper',   origIdx:4,  x:85, y:4.5, color:'#CD7F32', note:'$11.400/ton',       sentX:85},
+    {label:'Uranium',  origIdx:7,  x:78, y:4.8, color:'#d4903a', note:'$90–110/lb',        sentX:78},
+    {label:'Silver',   origIdx:6,  x:80, y:3.0, color:'#C0C0C0', note:'$36–42/oz',         sentX:80},
+    {label:'Grid',     origIdx:8,  x:82, y:4.2, color:'#27c99a', note:'€584B EU',           sentX:82},
+    {label:'Battery',  origIdx:5,  x:75, y:4.0, color:'#8b6fff', note:'EV+Storage',         sentX:75},
+    {label:'Clean E.', origIdx:3,  x:58, y:3.5, color:'#4d9de0', note:'Misto breve',        sentX:58},
+    {label:'Hydrogen', origIdx:1,  x:62, y:5.0, color:'#27c99a', note:'$11T 2050',          sentX:62},
+    {label:'MSCI EM',  origIdx:2,  x:45, y:2.5, color:'#BA7517', note:'Neutral/Cina',       sentX:45},
+  ].map(d => {
+    const peso = totBubble > 0 ? caps[d.origIdx] / totBubble * 100 : 0;
+    return {...d, peso: +peso.toFixed(1)};
+  });
+
+  // Raccomandazioni dinamiche basate sul peso attuale
+  function getRec(sentX, peso) {
+    const isLowWeight  = peso < 5;
+    const isHighWeight = peso > 20;
+    const isBullish    = sentX >= 75;
+    const isMixed      = sentX >= 55 && sentX < 75;
+    const isBearish    = sentX < 55;
+    if (isBullish && isLowWeight)  return {text:'⬆ Valuta aumento',    color:'var(--amber)'};
+    if (isBullish && isHighWeight) return {text:'✅ Mantieni',          color:'var(--teal)'};
+    if (isBullish)                 return {text:'✅ Mantieni / Aumenta',color:'var(--teal)'};
+    if (isMixed  && isHighWeight)  return {text:'⚠ Monitora peso',     color:'var(--amber)'};
+    if (isMixed)                   return {text:'⟷ Mantieni invariato', color:'var(--t2)'};
+    if (isBearish && isHighWeight) return {text:'⬇ Valuta riduzione',  color:'var(--red)'};
+    return {text:'⟷ Neutro',color:'var(--t2)'};
+  }
 
   mk('c-consensus-bubble',{
     type:'bubble',
     data:{datasets:CONSENSUS_DATA.map(d=>({
       label:d.label,
-      data:[{x:d.x, y:d.y, r:Math.max(8, d.peso*1.8)}],
+      data:[{x:d.x, y:d.y, r:Math.max(6, d.peso*1.8)}],
       backgroundColor:d.color+'55',
       borderColor:d.color,
       borderWidth:2,
@@ -1985,7 +1956,11 @@ function renderScenario(){
       responsive:true, maintainAspectRatio:false,
       plugins:{
         legend:{display:false},
-        tooltip:{callbacks:{label:ctx=>{const d=CONSENSUS_DATA[ctx.datasetIndex];return [` ${d.label}`,` Peso: ${d.peso}%`,` ${d.note}`];}}}
+        tooltip:{callbacks:{label:ctx=>{
+          const d=CONSENSUS_DATA[ctx.datasetIndex];
+          const rec=getRec(d.sentX, d.peso);
+          return [` ${d.label}`,` Peso attuale: ${d.peso}%`,` Target: ${d.note}`,` ${rec.text}`];
+        }}}
       },
       scales:{
         x:{min:0,max:100,
@@ -1999,6 +1974,26 @@ function renderScenario(){
       }
     }
   });
+
+  // Aggiorna anche la tabella consensus con i pesi live e raccomandazioni dinamiche
+  const consTbl = document.querySelector('#pane-scenario table:last-of-type tbody');
+  if(consTbl){
+    const rows = consTbl.querySelectorAll('tr');
+    const map = {0:'Gold',1:'Copper',2:'Uranium',3:'Silver',4:'Grid/Electrification',5:'Clean Energy',6:'Hydrogen',7:'MSCI EM',8:'Battery'};
+    CONSENSUS_DATA.forEach((d,i)=>{
+      const tr = rows[i];
+      if(!tr)return;
+      const rec = getRec(d.sentX, d.peso);
+      // Aggiorna cella peso (index 4)
+      const cells = tr.querySelectorAll('td');
+      if(cells[4]){
+        const warn = d.peso < 5 ? ' <span style="color:var(--amber);">⚠ basso</span>' : d.peso > 20 ? ' <span style="color:var(--amber);">⚠ alto</span>' : ' <span style="color:var(--teal);">✅</span>';
+        cells[4].innerHTML = `${d.peso}%${warn}`;
+      }
+      // Aggiorna raccomandazione (index 5)
+      if(cells[5]) cells[5].innerHTML = `<span style="color:${rec.color};font-size:12px;">${rec.text}</span>`;
+    });
+  }
 
   // Etichette bolle — plugin registrato una volta sola
   if(!Chart.registry.plugins.get('bubbleLabels')){
