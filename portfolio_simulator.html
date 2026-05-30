@@ -443,7 +443,7 @@ tbody tr:hover td{background:rgba(255,255,255,.015);}
   <!-- SINTESI CONSENSUS VISIVA -->
   <div class="card" style="border-color:rgba(240,201,110,.2);border-left:3px solid var(--gold2);">
     <p class="sec" style="margin-bottom:4px;">Sintesi consensus — posizionamento istituzionale sui tuoi asset</p>
-    <p style="font-size:14px;color:var(--t2);margin-bottom:14px;">Asse X = sentiment specifico sull'asset (Bearish → Bullish) · Asse Y = orizzonte temporale · Dimensione bolla = peso % nel portafoglio · <span style="color:var(--gold2);">Probabilità scenari calibrate sul tuo portafoglio: Bear 15% · Base 45% · Bull 40%</span></p>
+    <p style="font-size:14px;color:var(--t2);margin-bottom:14px;">Asse X = sentiment specifico sull'asset (Bearish → Bullish) · Asse Y = orizzonte temporale · Dimensione bolla = peso % nel portafoglio · <span style="color:var(--amber);">Probabilità calibrate su macro reale (CPI 3,8% + NFP in calo): Bear 35% · Base 45% · Bull 20%</span></p>
     <div style="position:relative;height:340px;margin-bottom:14px;">
       <canvas id="c-consensus-bubble" role="img" aria-label="Consensus bubble chart"></canvas>
     </div>
@@ -465,7 +465,7 @@ tbody tr:hover td{background:rgba(255,255,255,.015);}
     <p class="note">Dati da Goldman Sachs Commodity Outlook 2026, JPMorgan Market Outlook, BlackRock Investment Institute, GSAM Market Know-How Q2 2026, S&P Global Energy Horizons 2026, World Nuclear Association Report 2026, Sprott Uranium Outlook 2026. Aggiornato maggio 2026.</p>
   </div>
   <div class="card"><p class="sec">Forecast 2026 — tre scenari sul tuo portafoglio attuale</p><div class="cw" style="height:260px;"><canvas id="c-fc" role="img" aria-label="Forecast 2026 tre scenari">Forecast 2026.</canvas></div></div>
-  <div class="card"><p class="sec">Dettaglio per asset</p><table><thead><tr><th>Asset</th><th>Peso</th><th>Bear 25%</th><th>Base 50%</th><th>Bull 25%</th><th>Contrib. base</th><th style="color:var(--gold);">Atteso pond.</th></tr></thead><tbody id="sc-tbl"></tbody></table></div>
+  <div class="card"><p class="sec">Dettaglio per asset</p><table><thead><tr><th>Asset</th><th>Peso</th><th>Bear 35%</th><th>Base 45%</th><th>Bull 20%</th><th>Contrib. base</th><th style="color:var(--gold);">Atteso pond.</th></tr></thead><tbody id="sc-tbl"></tbody></table></div>
 
   <!-- PROIEZIONI ISTITUZIONALI -->
   <p class="sec" style="margin:20px 0 12px;">Consensus istituzionale 2026 — per i tuoi asset</p>
@@ -1839,11 +1839,14 @@ function renderScenario(){
   const bu=ORIG.reduce((s,a,i)=>s+nw[i]*a.bull,0);
   const mx=Math.max(Math.abs(br),Math.abs(bs),Math.abs(bu));
 
-  // Probabilità calibrate sul TUO portafoglio specifico (non macro generico)
-  // Gold 24% unanime bullish · Copper/Silver/Uranium/Grid/Battery bullish strutturale
-  // Solo EM (14%) neutral e Clean/Hydrogen (29%) misto → 65% peso bullish
-  // Fonte: ponderazione consensus per peso % asset
-  const PROB = { bear: 15, base: 45, bull: 40 };
+  // Probabilità calibrate su dati reali maggio 2026:
+  // CPI apr 2026 = 3,8% (trend +0,5% al mese) — Fed bloccata
+  // NFP apr 2026 = +115K — mercato lavoro in raffreddamento ma resiliente
+  // Scenario stagflazionario attivo: inflazione alta + crescita che rallenta
+  // Bull richiede Fed che taglia → impossibile con CPI 3,8% e in salita
+  // Bear parziale già in corso su alcuni asset (clean energy, EM)
+  // Gold e commodity fisiche sono parzialmente immunizzate dallo scenario macro
+  const PROB = { bear: 35, base: 45, bull: 20 };
 
   const sc=[
     {
@@ -2036,7 +2039,7 @@ function renderScenario(){
     `<div style="background:var(--bg2);border:1px solid rgba(240,201,110,.3);border-radius:var(--r2);padding:12px;">
       <div style="font-size:13px;color:var(--gold2);font-family:'JetBrains Mono',monospace;font-weight:600;margin-bottom:5px;">📊 ATTESO PONDERATO</div>
       <div style="font-size:22px;font-weight:700;color:${ec};">${expPct>=0?'+':''}${(expPct*100).toFixed(1)}%</div>
-      <div style="font-size:13px;color:var(--t2);margin-top:2px;">Bear×25 + Base×50 + Bull×25</div>
+      <div style="font-size:13px;color:var(--t2);margin-top:2px;">Bear×35 + Base×45 + Bull×20</div>
     </div>`;
   }
 }
