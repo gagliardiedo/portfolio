@@ -409,7 +409,7 @@ tbody tr:hover td{background:rgba(255,255,255,.015);}
     </div>
     <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px;" id="consensus-cards"></div>
     <table>
-      <thead><tr><th style="text-align:left;">Asset</th><th>Fonte</th><th>Outlook</th><th>Target</th><th>Peso port.</th><th>Bilanciamento</th><th>Raccomandazione</th></tr></thead>
+      <thead><tr><th style="text-align:left;">Asset</th><th>Outlook</th><th>Target</th><th>Peso port.</th><th>Bilanciamento</th><th>Momentum</th><th>Volatilità</th><th>Raccomandazione</th></tr></thead>
       <tbody id="cons-tbl-body"></tbody>
     </table>
     <p class="note">Dati da Goldman Sachs Commodity Outlook 2026, JPMorgan Market Outlook, BlackRock Investment Institute, GSAM Market Know-How Q2 2026, S&P Global Energy Horizons 2026, World Nuclear Association Report 2026, Sprott Uranium Outlook 2026. Aggiornato maggio 2026. Conversioni a USD/EUR 0.8577 (29 mag 2026).</p>
@@ -417,361 +417,6 @@ tbody tr:hover td{background:rgba(255,255,255,.015);}
   <div class="card"><p class="sec">Forecast 2026 — tre scenari sul tuo portafoglio attuale</p><div class="cw" style="height:260px;"><canvas id="c-fc" role="img" aria-label="Forecast 2026 tre scenari">Forecast 2026.</canvas></div></div>
   <div class="card"><p class="sec">Dettaglio per asset</p><table><thead><tr><th>Asset</th><th>Peso</th><th>Bear 35%</th><th>Base 45%</th><th>Bull 20%</th><th>Contrib. base</th><th style="color:var(--gold);">Atteso pond.</th></tr></thead><tbody id="sc-tbl"></tbody></table></div>
 
-  <!-- PROIEZIONI ISTITUZIONALI -->
-  <p class="sec" style="margin:20px 0 12px;">Consensus istituzionale 2026 — per i tuoi asset</p>
-
-  <!-- ORO -->
-  <div class="card">
-    <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
-      <span style="font-size:18px;">🥇</span>
-      <div>
-        <div style="font-size:13px;font-weight:700;color:var(--gold2);">Physical Gold USD</div>
-        <div style="font-size:13px;color:var(--t2);font-family:'JetBrains Mono',monospace;">Peso attuale: ~24% — la tua posizione più grande</div>
-      </div>
-      <div style="margin-left:auto;text-align:right;">
-        <div style="font-size:13px;color:var(--teal);font-weight:600;">Consensus: BULLISH</div>
-        <div style="font-size:13px;color:var(--t2);">Target mediano: $4.900–$5.500/oz</div>
-      </div>
-    </div>
-    <div class="g3" style="margin-bottom:12px;">
-      <div style="background:var(--bg3);border-radius:var(--r);padding:10px;">
-        <div style="font-size:13px;color:var(--gold2);font-family:'JetBrains Mono',monospace;margin-bottom:4px;">GOLDMAN SACHS</div>
-        <div style="font-size:14px;font-weight:600;color:var(--t1);">€135/g</div>
-        <div style="font-size:13px;color:var(--t2);margin-top:3px;">Base case dic 2026. Upside risk a $6.000+ se banche centrali accelerano diversificazione da USD. Raccomanda long exposure.</div>
-      </div>
-      <div style="background:var(--bg3);border-radius:var(--r);padding:10px;">
-        <div style="font-size:13px;color:var(--blue);font-family:'JetBrains Mono',monospace;margin-bottom:4px;">JPMORGAN</div>
-        <div style="font-size:14px;font-weight:600;color:var(--t1);">€139–€147/g</div>
-        <div style="font-size:13px;color:var(--t2);margin-top:3px;">CPI USA 3,8% apr 2026 blocca la Fed → oro come hedge inflazione. Con CPI sopra target, ogni ritardo sui tagli è carburante per l'oro. Banche centrali EM accelerano diversificazione da USD.</div>
-      </div>
-      <div style="background:var(--bg3);border-radius:var(--r);padding:10px;">
-        <div style="font-size:13px;color:var(--red);font-family:'JetBrains Mono',monospace;margin-bottom:4px;">BANK OF AMERICA</div>
-        <div style="font-size:14px;font-weight:600;color:var(--t1);">€165/g</div>
-        <div style="font-size:13px;color:var(--t2);margin-top:3px;">Target più aggressivo del mercato. Tesi: dedollarizzazione accelera, domanda retail Asia insaziabile. 12 mesi.</div>
-      </div>
-    </div>
-    <div style="font-size:14px;color:var(--t2);line-height:1.7;border-top:1px solid var(--border);padding-top:10px;">
-      <strong style="color:var(--t1);">Catalizzatori chiave:</strong> tagli Fed (50bps attesi 2026) · domanda banche centrali >1.000 ton/anno · dedollarizzazione riserve · geopolitica (conflitti attivi) · inflazione persistente sopra target. <strong style="color:var(--teal);">Per il tuo portafoglio:</strong> posizione da mantenere invariata — è il tuo miglior performer (+65% 2025) e il consensus è unanime al rialzo.
-    </div>
-  </div>
-
-  <!-- RAME -->
-  <div class="card">
-    <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
-      <span style="font-size:18px;">🔧</span>
-      <div>
-        <div style="font-size:13px;font-weight:700;color:#CD7F32;">Copper Miners USD</div>
-        <div style="font-size:13px;color:var(--t2);font-family:'JetBrains Mono',monospace;">Peso attuale: ~6.7%</div>
-      </div>
-      <div style="margin-left:auto;text-align:right;">
-        <div style="font-size:13px;color:var(--teal);font-weight:600;">Consensus: BULLISH STRUTTURALE</div>
-        <div style="font-size:13px;color:var(--t2);">Target 2026: $11.000–€9.800/ton</div>
-      </div>
-    </div>
-    <div class="g2" style="margin-bottom:12px;">
-      <div style="background:var(--bg3);border-radius:var(--r);padding:10px;">
-        <div style="font-size:13px;color:var(--gold2);font-family:'JetBrains Mono',monospace;margin-bottom:4px;">GOLDMAN SACHS — "METALLO DEL FUTURO"</div>
-        <div style="font-size:14px;font-weight:600;color:var(--t1);">€9.800/ton (2026) → €12.900 (2035)</div>
-        <div style="font-size:13px;color:var(--t2);margin-top:3px;">Deficit raffinato ex-USA in espansione. Ogni veicolo elettrico richiede 4x il rame di uno tradizionale. AI data center = domanda massiccia di cablaggio.</div>
-      </div>
-      <div style="background:var(--bg3);border-radius:var(--r);padding:10px;">
-        <div style="font-size:13px;color:var(--purple);font-family:'JetBrains Mono',monospace;margin-bottom:4px;">GOLDMAN SACHS ASSET MANAGEMENT (Q2 2026)</div>
-        <div style="font-size:14px;font-weight:600;color:var(--t1);">"Deficit 30% entro 2035"</div>
-        <div style="font-size:13px;color:var(--t2);margin-top:3px;">"Il bottleneck non sarà il capitale, saranno i materiali. Rame, litio, nichel, terre rare — al centro di AI, difesa, energia pulita ed elettrificazione." — GSAM, maggio 2026.</div>
-      </div>
-    </div>
-    <div style="font-size:14px;color:var(--t2);line-height:1.7;border-top:1px solid var(--border);padding-top:10px;">
-      <strong style="color:var(--t1);">Catalizzatori:</strong> transizione EV · grid upgrade globale · data center AI · supply deficit strutturale (miniere non sufficienti) · Cina raffina 19/20 minerali critici = chokepoint. <strong style="color:var(--teal);">Per il tuo portafoglio:</strong> posizione da aumentare nel tempo — sei esposto ma il peso è basso rispetto al potenziale.
-    </div>
-  </div>
-
-  <!-- URANIO -->
-  <div class="card">
-    <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
-      <span style="font-size:18px;">⚛️</span>
-      <div>
-        <div style="font-size:13px;font-weight:700;color:var(--amber);">Uranium & Nuclear Tech</div>
-        <div style="font-size:13px;color:var(--t2);font-family:'JetBrains Mono',monospace;">Peso attuale: ~3.3%</div>
-      </div>
-      <div style="margin-left:auto;text-align:right;">
-        <div style="font-size:13px;color:var(--teal);font-weight:600;">Consensus: BULLISH LUNGO TERMINE</div>
-        <div style="font-size:13px;color:var(--t2);">Target 2026: €170–€208/kg</div>
-      </div>
-    </div>
-    <div class="g3" style="margin-bottom:12px;">
-      <div style="background:var(--bg3);border-radius:var(--r);padding:10px;">
-        <div style="font-size:13px;color:var(--amber);font-family:'JetBrains Mono',monospace;margin-bottom:4px;">WNA (World Nuclear Association)</div>
-        <div style="font-size:14px;font-weight:600;color:var(--t1);">Domanda +28% entro 2030</div>
-        <div style="font-size:13px;color:var(--t2);margin-top:3px;">Capacità nucleare quasi raddoppia da 398 GWe (2025) a 746 GWe (2040). 78 reattori in costruzione — Cina guida con 38.</div>
-      </div>
-      <div style="background:var(--bg3);border-radius:var(--r);padding:10px;">
-        <div style="font-size:13px;color:var(--blue);font-family:'JetBrains Mono',monospace;margin-bottom:4px;">SPROTT / URANIUM INSIDER</div>
-        <div style="font-size:14px;font-weight:600;color:var(--t1);">€170–€208/kg H2 2026</div>
-        <div style="font-size:13px;color:var(--t2);margin-top:3px;">Spot price ha toccato €87/kg a gen 2026. Long-term contracting price sale da €69 a €74/kg. "Settore con enorme runway — small cap ancora trascurate."</div>
-      </div>
-      <div style="background:var(--bg3);border-radius:var(--r);padding:10px;">
-        <div style="font-size:13px;color:var(--teal);font-family:'JetBrains Mono',monospace;margin-bottom:4px;">CONSENSUS ANALISTI 2026</div>
-        <div style="font-size:14px;font-weight:600;color:var(--t1);">+145% in 10 anni</div>
-        <div style="font-size:13px;color:var(--t2);margin-top:3px;">Struttura tightening: domanda +28% entro 2030, supply nuova molto lenta. Kazakhstan + Canada non bastano. Prezzi destinati a salire.</div>
-      </div>
-    </div>
-    <div style="font-size:14px;color:var(--t2);line-height:1.7;border-top:1px solid var(--border);padding-top:10px;">
-      <strong style="color:var(--t1);">Catalizzatori:</strong> AI data center a nucleare (Google, Microsoft, Amazon hanno firmato accordi) · energy security post-crisi gas europeo · 38 reattori in costruzione in Cina · nucleare nella tassonomia verde EU. <strong style="color:var(--amber);">Nota:</strong> asset ad alta volatilità — il tuo errore di marzo 2025 (venduto dopo 7 giorni) ha dimostrato che richiede orizzonte minimo 12-18 mesi.
-    </div>
-  </div>
-
-  <!-- ARGENTO -->
-  <div class="card">
-    <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
-      <span style="font-size:18px;">🥈</span>
-      <div>
-        <div style="font-size:13px;font-weight:700;color:#C0C0C0;">Physical Silver</div>
-        <div style="font-size:13px;color:var(--t2);font-family:'JetBrains Mono',monospace;">Peso attuale: ~4.4%</div>
-      </div>
-      <div style="margin-left:auto;text-align:right;">
-        <div style="font-size:13px;color:var(--teal);font-weight:600;">Consensus: BULLISH</div>
-        <div style="font-size:13px;color:var(--t2);">Target 2026: €1,0–€1,2/g</div>
-      </div>
-    </div>
-    <div class="g2" style="margin-bottom:12px;">
-      <div style="background:var(--bg3);border-radius:var(--r);padding:10px;">
-        <div style="font-size:13px;color:var(--gold2);font-family:'JetBrains Mono',monospace;margin-bottom:4px;">SILVER INSTITUTE / JPMORGAN</div>
-        <div style="font-size:14px;font-weight:600;color:var(--t1);">€1,0–€1,2/g fine 2026</div>
-        <div style="font-size:13px;color:var(--t2);margin-top:3px;">Doppia natura: metal prezioso (segue oro) + industriale (pannelli solari, EV, elettronica). Deficit fisico strutturale dal 2021. Il Gold/Silver ratio è ancora favorevole all'argento.</div>
-      </div>
-      <div style="background:var(--bg3);border-radius:var(--r);padding:10px;">
-        <div style="font-size:13px;color:var(--purple);font-family:'JetBrains Mono',monospace;margin-bottom:4px;">DRIVER INDUSTRIALE 2026</div>
-        <div style="font-size:14px;font-weight:600;color:var(--t1);">+18% domanda industriale</div>
-        <div style="font-size:13px;color:var(--t2);margin-top:3px;">Pannelli solari: 200+ milioni di oz/anno. Ogni pannello contiene ~20g di argento. IRA (USA) e REPowerEU accelerano installazioni.</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ENERGIA PULITA / GRID / HYDROGEN / BATTERY -->
-  <div class="card">
-    <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
-      <span style="font-size:18px;">⚡</span>
-      <div>
-        <div style="font-size:13px;font-weight:700;color:var(--teal);">Clean Energy · Grid · Hydrogen · Battery</div>
-        <div style="font-size:13px;color:var(--t2);font-family:'JetBrains Mono',monospace;">Peso combinato: ~28% del portafoglio</div>
-      </div>
-      <div style="margin-left:auto;text-align:right;">
-        <div style="font-size:13px;color:var(--amber);font-weight:600;">Consensus: MIXED — lungo termine positivo</div>
-        <div style="font-size:13px;color:var(--t2);">Volatilità alta nel breve, macro favorevole</div>
-      </div>
-    </div>
-    <div class="g2" style="margin-bottom:12px;">
-      <div style="background:var(--bg3);border-radius:var(--r);padding:10px;">
-        <div style="font-size:13px;color:var(--teal);font-family:'JetBrains Mono',monospace;margin-bottom:4px;">S&P GLOBAL — GRID 2026</div>
-        <div style="font-size:14px;font-weight:600;color:var(--t1);">€584 miliardi entro 2030 (solo EU)</div>
-        <div style="font-size:13px;color:var(--t2);margin-top:3px;">"Nel 2026 la grid infrastruttura sale al centro della scena. 80% delle reti EU ha oltre 40 anni. Bottleneck critico per AI, EV, rinnovabili." — S&P Global Energy Horizons 2026.</div>
-      </div>
-      <div style="background:var(--bg3);border-radius:var(--r);padding:10px;">
-        <div style="font-size:13px;color:var(--red);font-family:'JetBrains Mono',monospace;margin-bottom:4px;">BLACKROCK — CLEAN ENERGY / HYDROGEN</div>
-        <div style="font-size:14px;font-weight:600;color:var(--t1);">$11 trilioni hydrogen al 2050</div>
-        <div style="font-size:13px;color:var(--t2);margin-top:3px;">"AI sarà il nuovo stress test per la clean energy nel 2026." Clean energy non può andare oltre la grid. Hydrogen = soluzione per usi finali non elettrificabili (80% dei consumi attuali).</div>
-      </div>
-    </div>
-    <div style="font-size:14px;color:var(--t2);line-height:1.7;border-top:1px solid var(--border);padding-top:10px;">
-      <strong style="color:var(--amber);">Rischio 2026:</strong> politiche Trump (riduzione sussidi IRA) pesano su clean energy USA nel breve. Clean energy europea e grid upgrade sono più isolati da questo rischio. Hydrogen ancora fase early-stage — orizzonte minimo 5-7 anni. <strong style="color:var(--teal);">Opportunità:</strong> ogni correzione su questi asset è strutturalmente un'occasione di accumulo per chi ha orizzonte 2030+.
-    </div>
-  </div>
-
-  <!-- EM -->
-  <div class="card">
-    <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
-      <span style="font-size:18px;">🌍</span>
-      <div>
-        <div style="font-size:13px;font-weight:700;color:'#BA7517';">Core MSCI EM IMI</div>
-        <div style="font-size:13px;color:var(--t2);font-family:'JetBrains Mono',monospace;">Peso attuale: ~14%</div>
-      </div>
-      <div style="margin-left:auto;text-align:right;">
-        <div style="font-size:13px;color:var(--amber);font-weight:600;">Consensus: NEUTRAL/CAUTIOUS</div>
-        <div style="font-size:13px;color:var(--t2);">Cina = 27% dell'indice — rischio geopolitico</div>
-      </div>
-    </div>
-    <div style="font-size:14px;color:var(--t2);line-height:1.7;">
-      <strong style="color:var(--t1);">BlackRock:</strong> sovrappeso selettivo su EM Asia (India, Indonesia) ma neutro sulla Cina per rischio geopolitico e regolatorio. <strong style="color:var(--t1);">Goldman:</strong> geopolitica USA-Cina come driver principale 2026 — cautela su asset Cina-dipendenti. <strong style="color:var(--t1);">JPMorgan:</strong> India favorita come alternativa strutturale alla Cina negli EM. <strong style="color:var(--amber);">Il rischio principale del tuo EM IMI:</strong> 27% Cina — qualsiasi escalation Taiwan o sanzioni colpirebbe l'indice.
-    </div>
-  </div>
-
-  <!-- PROIEZIONI ISTITUZIONALI -->
-  <p class="sec" style="margin:20px 0 12px;">Consensus istituzionale 2026 — per i tuoi asset</p>
-
-  <!-- ORO -->
-  <div class="card">
-    <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
-      <span style="font-size:18px;">🥇</span>
-      <div>
-        <div style="font-size:13px;font-weight:700;color:var(--gold2);">Physical Gold USD</div>
-        <div style="font-size:13px;color:var(--t2);font-family:'JetBrains Mono',monospace;">Peso attuale: ~24% — la tua posizione più grande</div>
-      </div>
-      <div style="margin-left:auto;text-align:right;">
-        <div style="font-size:13px;color:var(--teal);font-weight:600;">Consensus: BULLISH</div>
-        <div style="font-size:13px;color:var(--t2);">Target mediano: $4.900–$5.500/oz</div>
-      </div>
-    </div>
-    <div class="g3" style="margin-bottom:12px;">
-      <div style="background:var(--bg3);border-radius:var(--r);padding:10px;">
-        <div style="font-size:13px;color:var(--gold2);font-family:'JetBrains Mono',monospace;margin-bottom:4px;">GOLDMAN SACHS</div>
-        <div style="font-size:14px;font-weight:600;color:var(--t1);">€135/g</div>
-        <div style="font-size:13px;color:var(--t2);margin-top:3px;">Base case dic 2026. Upside risk a $6.000+ se banche centrali accelerano diversificazione da USD. Raccomanda long exposure.</div>
-      </div>
-      <div style="background:var(--bg3);border-radius:var(--r);padding:10px;">
-        <div style="font-size:13px;color:var(--blue);font-family:'JetBrains Mono',monospace;margin-bottom:4px;">JPMORGAN</div>
-        <div style="font-size:14px;font-weight:600;color:var(--t1);">€139–€147/g</div>
-        <div style="font-size:13px;color:var(--t2);margin-top:3px;">Supportato da tagli Fed e domanda banche centrali EM. Geopolitical risk premium strutturale, non transitorio.</div>
-      </div>
-      <div style="background:var(--bg3);border-radius:var(--r);padding:10px;">
-        <div style="font-size:13px;color:var(--red);font-family:'JetBrains Mono',monospace;margin-bottom:4px;">BANK OF AMERICA</div>
-        <div style="font-size:14px;font-weight:600;color:var(--t1);">€165/g</div>
-        <div style="font-size:13px;color:var(--t2);margin-top:3px;">Target più aggressivo del mercato. Tesi: dedollarizzazione accelera, domanda retail Asia insaziabile. 12 mesi.</div>
-      </div>
-    </div>
-    <div style="font-size:14px;color:var(--t2);line-height:1.7;border-top:1px solid var(--border);padding-top:10px;">
-      <strong style="color:var(--t1);">Catalizzatori chiave:</strong> tagli Fed (50bps attesi 2026) · domanda banche centrali >1.000 ton/anno · dedollarizzazione riserve · geopolitica (conflitti attivi) · inflazione persistente sopra target. <strong style="color:var(--teal);">Per il tuo portafoglio:</strong> posizione da mantenere invariata — è il tuo miglior performer (+65% 2025) e il consensus è unanime al rialzo.
-    </div>
-  </div>
-
-  <!-- RAME -->
-  <div class="card">
-    <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
-      <span style="font-size:18px;">🔧</span>
-      <div>
-        <div style="font-size:13px;font-weight:700;color:#CD7F32;">Copper Miners USD</div>
-        <div style="font-size:13px;color:var(--t2);font-family:'JetBrains Mono',monospace;">Peso attuale: ~6.7%</div>
-      </div>
-      <div style="margin-left:auto;text-align:right;">
-        <div style="font-size:13px;color:var(--teal);font-weight:600;">Consensus: BULLISH STRUTTURALE</div>
-        <div style="font-size:13px;color:var(--t2);">Target 2026: $11.000–€9.800/ton</div>
-      </div>
-    </div>
-    <div class="g2" style="margin-bottom:12px;">
-      <div style="background:var(--bg3);border-radius:var(--r);padding:10px;">
-        <div style="font-size:13px;color:var(--gold2);font-family:'JetBrains Mono',monospace;margin-bottom:4px;">GOLDMAN SACHS — "METALLO DEL FUTURO"</div>
-        <div style="font-size:14px;font-weight:600;color:var(--t1);">€9.800/ton (2026) → €12.900 (2035)</div>
-        <div style="font-size:13px;color:var(--t2);margin-top:3px;">Deficit raffinato ex-USA in espansione. Ogni veicolo elettrico richiede 4x il rame di uno tradizionale. AI data center = domanda massiccia di cablaggio.</div>
-      </div>
-      <div style="background:var(--bg3);border-radius:var(--r);padding:10px;">
-        <div style="font-size:13px;color:var(--purple);font-family:'JetBrains Mono',monospace;margin-bottom:4px;">GOLDMAN SACHS ASSET MANAGEMENT (Q2 2026)</div>
-        <div style="font-size:14px;font-weight:600;color:var(--t1);">"Deficit 30% entro 2035"</div>
-        <div style="font-size:13px;color:var(--t2);margin-top:3px;">"Il bottleneck non sarà il capitale, saranno i materiali. Rame, litio, nichel, terre rare — al centro di AI, difesa, energia pulita ed elettrificazione." — GSAM, maggio 2026.</div>
-      </div>
-    </div>
-    <div style="font-size:14px;color:var(--t2);line-height:1.7;border-top:1px solid var(--border);padding-top:10px;">
-      <strong style="color:var(--t1);">Catalizzatori:</strong> transizione EV · grid upgrade globale · data center AI · supply deficit strutturale (miniere non sufficienti) · Cina raffina 19/20 minerali critici = chokepoint. <strong style="color:var(--teal);">Per il tuo portafoglio:</strong> posizione da aumentare nel tempo — sei esposto ma il peso è basso rispetto al potenziale.
-    </div>
-  </div>
-
-  <!-- URANIO -->
-  <div class="card">
-    <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
-      <span style="font-size:18px;">⚛️</span>
-      <div>
-        <div style="font-size:13px;font-weight:700;color:var(--amber);">Uranium & Nuclear Tech</div>
-        <div style="font-size:13px;color:var(--t2);font-family:'JetBrains Mono',monospace;">Peso attuale: ~3.3%</div>
-      </div>
-      <div style="margin-left:auto;text-align:right;">
-        <div style="font-size:13px;color:var(--teal);font-weight:600;">Consensus: BULLISH LUNGO TERMINE</div>
-        <div style="font-size:13px;color:var(--t2);">Target 2026: €170–€208/kg</div>
-      </div>
-    </div>
-    <div class="g3" style="margin-bottom:12px;">
-      <div style="background:var(--bg3);border-radius:var(--r);padding:10px;">
-        <div style="font-size:13px;color:var(--amber);font-family:'JetBrains Mono',monospace;margin-bottom:4px;">WNA (World Nuclear Association)</div>
-        <div style="font-size:14px;font-weight:600;color:var(--t1);">Domanda +28% entro 2030</div>
-        <div style="font-size:13px;color:var(--t2);margin-top:3px;">Capacità nucleare quasi raddoppia da 398 GWe (2025) a 746 GWe (2040). 78 reattori in costruzione — Cina guida con 38.</div>
-      </div>
-      <div style="background:var(--bg3);border-radius:var(--r);padding:10px;">
-        <div style="font-size:13px;color:var(--blue);font-family:'JetBrains Mono',monospace;margin-bottom:4px;">SPROTT / URANIUM INSIDER</div>
-        <div style="font-size:14px;font-weight:600;color:var(--t1);">€170–€208/kg H2 2026</div>
-        <div style="font-size:13px;color:var(--t2);margin-top:3px;">Spot price ha toccato €87/kg a gen 2026. Long-term contracting price sale da €69 a €74/kg. "Settore con enorme runway — small cap ancora trascurate."</div>
-      </div>
-      <div style="background:var(--bg3);border-radius:var(--r);padding:10px;">
-        <div style="font-size:13px;color:var(--teal);font-family:'JetBrains Mono',monospace;margin-bottom:4px;">CONSENSUS ANALISTI 2026</div>
-        <div style="font-size:14px;font-weight:600;color:var(--t1);">+145% in 10 anni</div>
-        <div style="font-size:13px;color:var(--t2);margin-top:3px;">Struttura tightening: domanda +28% entro 2030, supply nuova molto lenta. Kazakhstan + Canada non bastano. Prezzi destinati a salire.</div>
-      </div>
-    </div>
-    <div style="font-size:14px;color:var(--t2);line-height:1.7;border-top:1px solid var(--border);padding-top:10px;">
-      <strong style="color:var(--t1);">Catalizzatori:</strong> AI data center a nucleare (Google, Microsoft, Amazon hanno firmato accordi) · energy security post-crisi gas europeo · 38 reattori in costruzione in Cina · nucleare nella tassonomia verde EU. <strong style="color:var(--amber);">Nota:</strong> asset ad alta volatilità — il tuo errore di marzo 2025 (venduto dopo 7 giorni) ha dimostrato che richiede orizzonte minimo 12-18 mesi.
-    </div>
-  </div>
-
-  <!-- ARGENTO -->
-  <div class="card">
-    <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
-      <span style="font-size:18px;">🥈</span>
-      <div>
-        <div style="font-size:13px;font-weight:700;color:#C0C0C0;">Physical Silver</div>
-        <div style="font-size:13px;color:var(--t2);font-family:'JetBrains Mono',monospace;">Peso attuale: ~4.4%</div>
-      </div>
-      <div style="margin-left:auto;text-align:right;">
-        <div style="font-size:13px;color:var(--teal);font-weight:600;">Consensus: BULLISH</div>
-        <div style="font-size:13px;color:var(--t2);">Target 2026: €1,0–€1,2/g</div>
-      </div>
-    </div>
-    <div class="g2" style="margin-bottom:12px;">
-      <div style="background:var(--bg3);border-radius:var(--r);padding:10px;">
-        <div style="font-size:13px;color:var(--gold2);font-family:'JetBrains Mono',monospace;margin-bottom:4px;">SILVER INSTITUTE / JPMORGAN</div>
-        <div style="font-size:14px;font-weight:600;color:var(--t1);">€1,0–€1,2/g fine 2026</div>
-        <div style="font-size:13px;color:var(--t2);margin-top:3px;">Doppia natura: metal prezioso (segue oro) + industriale (pannelli solari, EV, elettronica). Deficit fisico strutturale dal 2021. Il Gold/Silver ratio è ancora favorevole all'argento.</div>
-      </div>
-      <div style="background:var(--bg3);border-radius:var(--r);padding:10px;">
-        <div style="font-size:13px;color:var(--purple);font-family:'JetBrains Mono',monospace;margin-bottom:4px;">DRIVER INDUSTRIALE 2026</div>
-        <div style="font-size:14px;font-weight:600;color:var(--t1);">+18% domanda industriale</div>
-        <div style="font-size:13px;color:var(--t2);margin-top:3px;">Pannelli solari: 200+ milioni di oz/anno. Ogni pannello contiene ~20g di argento. IRA (USA) e REPowerEU accelerano installazioni.</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ENERGIA PULITA / GRID / HYDROGEN / BATTERY -->
-  <div class="card">
-    <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
-      <span style="font-size:18px;">⚡</span>
-      <div>
-        <div style="font-size:13px;font-weight:700;color:var(--teal);">Clean Energy · Grid · Hydrogen · Battery</div>
-        <div style="font-size:13px;color:var(--t2);font-family:'JetBrains Mono',monospace;">Peso combinato: ~28% del portafoglio</div>
-      </div>
-      <div style="margin-left:auto;text-align:right;">
-        <div style="font-size:13px;color:var(--amber);font-weight:600;">Consensus: MIXED — lungo termine positivo</div>
-        <div style="font-size:13px;color:var(--t2);">Volatilità alta nel breve, macro favorevole</div>
-      </div>
-    </div>
-    <div class="g2" style="margin-bottom:12px;">
-      <div style="background:var(--bg3);border-radius:var(--r);padding:10px;">
-        <div style="font-size:13px;color:var(--teal);font-family:'JetBrains Mono',monospace;margin-bottom:4px;">S&P GLOBAL — GRID 2026</div>
-        <div style="font-size:14px;font-weight:600;color:var(--t1);">€584 miliardi entro 2030 (solo EU)</div>
-        <div style="font-size:13px;color:var(--t2);margin-top:3px;">"Nel 2026 la grid infrastruttura sale al centro della scena. 80% delle reti EU ha oltre 40 anni. Bottleneck critico per AI, EV, rinnovabili." — S&P Global Energy Horizons 2026.</div>
-      </div>
-      <div style="background:var(--bg3);border-radius:var(--r);padding:10px;">
-        <div style="font-size:13px;color:var(--red);font-family:'JetBrains Mono',monospace;margin-bottom:4px;">BLACKROCK — CLEAN ENERGY / HYDROGEN</div>
-        <div style="font-size:14px;font-weight:600;color:var(--t1);">$11 trilioni hydrogen al 2050</div>
-        <div style="font-size:13px;color:var(--t2);margin-top:3px;">"AI sarà il nuovo stress test per la clean energy nel 2026." Clean energy non può andare oltre la grid. Hydrogen = soluzione per usi finali non elettrificabili (80% dei consumi attuali).</div>
-      </div>
-    </div>
-    <div style="font-size:14px;color:var(--t2);line-height:1.7;border-top:1px solid var(--border);padding-top:10px;">
-      <strong style="color:var(--amber);">Rischio 2026:</strong> politiche Trump (riduzione sussidi IRA) pesano su clean energy USA nel breve. Clean energy europea e grid upgrade sono più isolati da questo rischio. Hydrogen ancora fase early-stage — orizzonte minimo 5-7 anni. <strong style="color:var(--teal);">Opportunità:</strong> ogni correzione su questi asset è strutturalmente un'occasione di accumulo per chi ha orizzonte 2030+.
-    </div>
-  </div>
-
-  <!-- EM -->
-  <div class="card">
-    <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
-      <span style="font-size:18px;">🌍</span>
-      <div>
-        <div style="font-size:13px;font-weight:700;color:'#BA7517';">Core MSCI EM IMI</div>
-        <div style="font-size:13px;color:var(--t2);font-family:'JetBrains Mono',monospace;">Peso attuale: ~14%</div>
-      </div>
-      <div style="margin-left:auto;text-align:right;">
-        <div style="font-size:13px;color:var(--amber);font-weight:600;">Consensus: NEUTRAL/CAUTIOUS</div>
-        <div style="font-size:13px;color:var(--t2);">Cina = 27% dell'indice — rischio geopolitico</div>
-      </div>
-    </div>
-    <div style="font-size:14px;color:var(--t2);line-height:1.7;">
-      <strong style="color:var(--t1);">BlackRock:</strong> sovrappeso selettivo su EM Asia (India, Indonesia) ma neutro sulla Cina per rischio geopolitico e regolatorio. <strong style="color:var(--t1);">Goldman:</strong> geopolitica USA-Cina come driver principale 2026 — cautela su asset Cina-dipendenti. <strong style="color:var(--t1);">JPMorgan:</strong> India favorita come alternativa strutturale alla Cina negli EM. <strong style="color:var(--amber);">Il rischio principale del tuo EM IMI:</strong> 27% Cina — qualsiasi escalation Taiwan o sanzioni colpirebbe l'indice.
-    </div>
-  </div>
 
   <!-- PROIEZIONI ISTITUZIONALI -->
   <p class="sec" style="margin:20px 0 12px;">Consensus istituzionale 2026 — per i tuoi asset</p>
@@ -1482,42 +1127,61 @@ let _sup=false;
 let stressShocks=ORIG.map(()=>0);
 
 // ═══════════════ CONSENSUS METADATA ═══════════════
-// Ogni entry mappa sull'indice di ORIG (i)
 // sentX: 0=bearish, 50=neutral, 100=bullish
+// mom1y/mom6m/mom3m: rendimenti reali % (dati maggio 2026)
+// vol: volatilità annualizzata
 // targetPct: peso % ottimale secondo consensus
-// quando si aggiungono nuovi asset basta aggiungere qui
 const CONS_META = [
-  {i:0,  name:'Physical Gold USD',      color:'#f0c96e', fonte:'GS, JPM, BofA',       outlookBadge:'<span class="badge bg">Bullish</span>',         target:'€135–€166/g',  sentX:88, targetPct:26, y:3.5},
-  {i:1,  name:'Global Hydrogen ESG',    color:'#27c99a', fonte:'BlackRock, iShares',   outlookBadge:'<span class="badge ba">Early stage</span>',      target:'$11T al 2050',   sentX:62, targetPct:12, y:5.0},
-  {i:2,  name:'Core MSCI EM IMI',       color:'#BA7517', fonte:'GS, BlackRock',        outlookBadge:'<span class="badge ba">Neutral</span>',          target:'Cina-risk',      sentX:45, targetPct:11, y:2.5},
-  {i:3,  name:'Global Clean Energy',    color:'#4d9de0', fonte:'BlackRock, IEA',       outlookBadge:'<span class="badge ba">Misto breve</span>',      target:'Volatilità alta',sentX:58, targetPct:10, y:3.5},
-  {i:4,  name:'Copper Miners USD',      color:'#CD7F32', fonte:'GS, GSAM',             outlookBadge:'<span class="badge bg">Bullish strutturale</span>',target:'€9.800/ton',  sentX:85, targetPct:10, y:4.5},
-  {i:5,  name:'Battery Value-Chain',    color:'#8b6fff', fonte:'GS, GSAM',             outlookBadge:'<span class="badge bg">Bullish LT</span>',       target:'EV+Storage',     sentX:75, targetPct:8,  y:4.0},
-  {i:6,  name:'Physical Silver',        color:'#C0C0C0', fonte:'Silver Inst., JPM',    outlookBadge:'<span class="badge bg">Bullish</span>',          target:'€1,0–€1,2/g',     sentX:80, targetPct:6,  y:3.0},
-  {i:7,  name:'Uranium & Nuclear',      color:'#d4903a', fonte:'WNA, Sprott',          outlookBadge:'<span class="badge bg">Bullish LT</span>',       target:'€170–€208/kg',    sentX:78, targetPct:6,  y:4.8},
-  {i:8,  name:'Electrification & Grid', color:'#27c99a', fonte:'S&P Global',           outlookBadge:'<span class="badge bg">Bullish LT</span>',       target:'€584B EU',       sentX:82, targetPct:5,  y:4.2},
-  {i:10, name:'Private Equity',         color:'#9e7aff', fonte:'Varia',                outlookBadge:'<span class="badge bb">Neutral</span>',          target:'PE diversif.',   sentX:50, targetPct:3,  y:2.0},
-  {i:11, name:'Bitcoin',                color:'#F7931A', fonte:'Varia',                outlookBadge:'<span class="badge ba">Speculativo</span>',      target:'Volatile',       sentX:55, targetPct:3,  y:1.5},
+  {i:0,  name:'Physical Gold USD',      color:'#f0c96e', fonte:'GS, JPM, BofA',       outlookBadge:'<span class="badge bg">Bullish</span>',            target:'€135–€166/g',  sentX:88, targetPct:26, y:3.5, mom1y:.84, mom6m:.52, mom3m:.25, vol:.16},
+  {i:1,  name:'Global Hydrogen ESG',    color:'#27c99a', fonte:'BlackRock, iShares',   outlookBadge:'<span class="badge ba">Early stage</span>',         target:'$11T al 2050', sentX:62, targetPct:12, y:5.0, mom1y:-.15, mom6m:-.08, mom3m:.02, vol:.35},
+  {i:2,  name:'Core MSCI EM IMI',       color:'#BA7517', fonte:'GS, BlackRock',        outlookBadge:'<span class="badge ba">Neutral</span>',           target:'Cina-risk',     sentX:45, targetPct:11, y:2.5, mom1y:.12, mom6m:.06, mom3m:.03, vol:.22},
+  {i:3,  name:'Global Clean Energy',    color:'#4d9de0', fonte:'BlackRock, IEA',       outlookBadge:'<span class="badge ba">Misto breve</span>',       target:'Volat. alta',   sentX:58, targetPct:10, y:3.5, mom1y:.05, mom6m:-.02, mom3m:.04, vol:.27},
+  {i:4,  name:'Copper Miners USD',      color:'#CD7F32', fonte:'GS, GSAM',             outlookBadge:'<span class="badge bg">Bullish strutturale</span>',target:'€9.800/ton',   sentX:85, targetPct:10, y:4.5, mom1y:.35, mom6m:.18, mom3m:.08, vol:.38},
+  {i:5,  name:'Battery Value-Chain',    color:'#8b6fff', fonte:'GS, GSAM',             outlookBadge:'<span class="badge bg">Bullish LT</span>',        target:'EV+Storage',    sentX:75, targetPct:8,  y:4.0, mom1y:.08, mom6m:.05, mom3m:.04, vol:.40},
+  {i:6,  name:'Physical Silver',        color:'#C0C0C0', fonte:'Silver Inst., JPM',    outlookBadge:'<span class="badge bg">Bullish</span>',           target:'€1,0–€1,2/g',  sentX:80, targetPct:6,  y:3.0, mom1y:.43, mom6m:.22, mom3m:.10, vol:.28},
+  {i:7,  name:'Uranium & Nuclear',      color:'#d4903a', fonte:'WNA, Sprott',          outlookBadge:'<span class="badge bg">Bullish LT</span>',        target:'€170–€208/kg',  sentX:78, targetPct:6,  y:4.8, mom1y:.13, mom6m:.01, mom3m:-.05, vol:.42},
+  {i:8,  name:'Electrification & Grid', color:'#27c99a', fonte:'S&P Global',           outlookBadge:'<span class="badge bg">Bullish LT</span>',        target:'€584B EU',      sentX:82, targetPct:5,  y:4.2, mom1y:.18, mom6m:.08, mom3m:.05, vol:.35},
+  {i:10, name:'Private Equity',         color:'#9e7aff', fonte:'Varia',                outlookBadge:'<span class="badge bb">Neutral</span>',           target:'PE diversif.',  sentX:50, targetPct:3,  y:2.0, mom1y:.07, mom6m:.03, mom3m:.01, vol:.18},
+  {i:11, name:'Bitcoin',                color:'#F7931A', fonte:'Varia',                outlookBadge:'<span class="badge ba">Speculativo</span>',       target:'Volatile',      sentX:55, targetPct:3,  y:1.5, mom1y:.20, mom6m:-.10, mom3m:-.08, vol:.70},
 ];
 
-// Raccomandazione dinamica basata su sentiment + peso attuale vs target
-function getRec(sentX, pesoPct, targetPct){
-  const delta = pesoPct - targetPct;
-  if(Math.abs(delta) <= 1.5) return {text:'✅ Allineato',        color:'var(--teal)'};
-  if(sentX >= 75 && delta < -1.5) return {text:'⬆ Valuta aumento',  color:'var(--amber)'};
-  if(sentX >= 75 && delta > 1.5)  return {text:'⬇ Valuta riduzione',color:'var(--amber)'};
-  if(sentX >= 55 && delta < -1.5) return {text:'⟷ Mantieni',        color:'var(--t2)'};
-  if(sentX >= 55 && delta > 3)    return {text:'⚠ Peso elevato',    color:'var(--amber)'};
-  if(sentX < 55  && delta > 1.5)  return {text:'⬇ Valuta riduzione',color:'var(--red)'};
-  return {text:'⟷ Mantieni',color:'var(--t2)'};
+// ═══════════════ MODELLO A 3 FATTORI ═══════════════
+// Score finale = Consensus 50% + Momentum 25% + Volatilità 25%
+function scoreConsensus(sentX, pesoPct, targetPct){
+  const sentScore  = (sentX - 50) / 50;
+  const deltaScore = (targetPct - pesoPct) / 20;
+  return Math.max(-1, Math.min(1, sentScore * 0.6 + deltaScore * 0.4));
 }
-
+function scoreMomentum(mom1y, mom6m, mom3m){
+  const raw = mom1y * 0.5 + mom6m * 0.3 + mom3m * 0.2;
+  return Math.max(-1, Math.min(1, raw / 0.50));
+}
+function scoreVolatility(vol, pesoPct, targetPct){
+  const delta   = targetPct - pesoPct;
+  const volNorm = (vol - 0.25) / 0.45;
+  if(delta > 0) return Math.max(-1, Math.min(1, 0.3 - volNorm * 0.6));
+  else          return Math.max(-1, Math.min(1, -volNorm * 0.8));
+}
+function getRec(sentX, pesoPct, targetPct, mom1y=0, mom6m=0, mom3m=0, vol=0.3){
+  const sC    = scoreConsensus(sentX, pesoPct, targetPct);
+  const sM    = scoreMomentum(mom1y, mom6m, mom3m);
+  const sV    = scoreVolatility(vol, pesoPct, targetPct);
+  const score = sC * 0.50 + sM * 0.25 + sV * 0.25;
+  if(score >  0.55) return {text:'⬆ Aumenta',          color:'var(--teal)',  score};
+  if(score >  0.25) return {text:'↗ Valuta aumento',   color:'var(--teal)',  score};
+  if(score >  0.05) return {text:'✅ Mantieni',         color:'var(--t2)',   score};
+  if(score > -0.05) return {text:'⟷ Neutro',            color:'var(--t3)',   score};
+  if(score > -0.25) return {text:'⚠ Monitora',         color:'var(--amber)', score};
+  if(score > -0.55) return {text:'↘ Valuta riduzione', color:'var(--amber)', score};
+  return                    {text:'⬇ Riduci',           color:'var(--red)',  score};
+}
 function pesoTag(pesoPct, targetPct){
   const delta = pesoPct - targetPct;
   if(Math.abs(delta) <= 1.5) return `<span style="color:var(--teal);">✅</span>`;
   if(delta < -1.5)           return `<span style="color:var(--amber);">⚠ basso</span>`;
   return                            `<span style="color:var(--amber);">⚠ alto</span>`;
 }
+
 
 function renderConsTable(){
   const tb = document.getElementById('cons-tbl-body');
@@ -1526,26 +1190,61 @@ function renderConsTable(){
   const totCurr = totA();
   tb.innerHTML = '';
   CONS_META.forEach(m => {
-    // Peso attuale dai caps simulati (post-bilancia se applicato)
     const peso     = totCurr > 0 ? caps[m.i] / totCurr * 100 : 0;
-    // Delta sempre rispetto all'originale TR
     const pesoOrig = totOrig > 0 ? ORIG[m.i].origCap / totOrig * 100 : 0;
-    const rec      = getRec(m.sentX, peso, m.targetPct);
+    const rec      = getRec(m.sentX, peso, m.targetPct, m.mom1y||0, m.mom6m||0, m.mom3m||0, m.vol||0.3);
     const tag      = pesoTag(peso, m.targetPct);
     const delta    = m.targetPct - pesoOrig;
-    const deltaStr = Math.abs(delta) < 0.05 ? '=' :
-      (delta > 0 ? '+' : '') + delta.toFixed(1) + '%';
-    const deltaColor = Math.abs(delta) < 0.05 ? 'var(--t3)' :
-      delta > 0 ? 'var(--teal)' : 'var(--red)';
+    const deltaStr = Math.abs(delta) < 0.05 ? '=' : (delta > 0 ? '+' : '') + delta.toFixed(1) + '%';
+    const deltaColor = Math.abs(delta) < 0.05 ? 'var(--t3)' : delta > 0 ? 'var(--teal)' : 'var(--red)';
+
+    // Tre score individuali normalizzati 0-100
+    const sC   = scoreConsensus(m.sentX, peso, m.targetPct);
+    const sM   = scoreMomentum(m.mom1y||0, m.mom6m||0, m.mom3m||0);
+    const sV   = scoreVolatility(m.vol||0.3, peso, m.targetPct);
+    const cPct = Math.round(sC * 50 + 50); // 0-100
+    const mPct = Math.round(sM * 50 + 50);
+    const vPct = Math.round(sV * 50 + 50);
+    const scoreFinale = Math.round((sC*0.5 + sM*0.25 + sV*0.25) * 50 + 50);
+
+    const barC = cPct>=60?'var(--teal)':cPct>=45?'var(--amber)':'var(--red)';
+    const barM = mPct>=60?'var(--teal)':mPct>=45?'var(--amber)':'var(--red)';
+    const barV = vPct>=60?'var(--teal)':vPct>=45?'var(--amber)':'var(--red)';
+
+    // Momentum: mostra rendimenti 1y/6m/3m
+    const m1s = (m.mom1y||0)>=0?'+':''; const m6s=(m.mom6m||0)>=0?'+':''; const m3s=(m.mom3m||0)>=0?'+':'';
+    const momDetail = `${m1s}${((m.mom1y||0)*100).toFixed(0)}% / ${m6s}${((m.mom6m||0)*100).toFixed(0)}% / ${m3s}${((m.mom3m||0)*100).toFixed(0)}%`;
+    const momBar = `
+      <div style="font-size:9px;color:var(--t3);margin-bottom:2px;">${momDetail} <span style="color:${barM};">${mPct}/100</span></div>
+      <div style="background:var(--bg4);border-radius:2px;height:4px;width:90px;">
+        <div style="width:${mPct}%;height:100%;background:${barM};border-radius:2px;"></div>
+      </div>`;
+
+    const volPct = Math.round((m.vol||0.3)*100);
+    const volBar = `
+      <div style="font-size:9px;color:var(--t3);margin-bottom:2px;">vol ${volPct}% <span style="color:${barV};">${vPct}/100</span></div>
+      <div style="background:var(--bg4);border-radius:2px;height:4px;width:90px;">
+        <div style="width:${vPct}%;height:100%;background:${barV};border-radius:2px;"></div>
+      </div>`;
+
+    // Raccomandazione con score finale e breakdown
+    const isBal = Math.abs(peso - m.targetPct) <= 1.5;
+    const recHtml = isBal
+      ? `<span style="color:var(--teal);font-weight:700;font-size:13px;">✅ Bilanciato</span>
+         <div style="font-size:9px;color:var(--t3);margin-top:2px;">C:${cPct} M:${mPct} V:${vPct} → ${scoreFinale}/100</div>`
+      : `<span style="color:${rec.color};font-weight:600;font-size:13px;">${rec.text}</span>
+         <div style="font-size:9px;color:var(--t3);margin-top:2px;">C:${cPct} M:${mPct} V:${vPct} → ${scoreFinale}/100</div>`;
+
     const tr = document.createElement('tr');
     tr.innerHTML = `
       <td style="font-weight:600;color:${m.color};">${m.name}</td>
-      <td style="font-size:13px;color:var(--t2);">${m.fonte}</td>
       <td>${m.outlookBadge}</td>
       <td style="font-family:'JetBrains Mono',monospace;color:var(--teal);">${m.target}</td>
       <td style="font-family:'JetBrains Mono',monospace;">${peso.toFixed(1)}% ${tag}</td>
       <td style="font-family:'JetBrains Mono',monospace;font-weight:600;color:${deltaColor};">${deltaStr}</td>
-      <td style="font-size:13px;color:${rec.color};">${rec.text}</td>`;
+      <td>${momBar}</td>
+      <td>${volBar}</td>
+      <td>${recHtml}</td>`;
     tb.appendChild(tr);
   });
 }
@@ -1760,7 +1459,7 @@ function bilanciaConsensus(){
   _sup = false;
   updSBDisp();
   refresh();
-  renderConsTable();
+  setTimeout(()=>renderConsTable(), 50);
 
   // Mostra nuovo capitale inline nel cap-box
   const ncInline = document.getElementById('sb-nc-inline');
@@ -2124,9 +1823,11 @@ function renderScenario(){
         legend:{display:false},
         tooltip:{callbacks:{label:ctx=>{
           const d=CONSENSUS_DATA[ctx.datasetIndex];
-          const rec=getRec(d.sentX, d.peso, d.targetPct);
-          return [` ${d.name}`,` Peso: ${d.peso}% → target ${d.targetPct}%`,` ${d.target}`,` ${rec.text}`];
-        }}}
+          const rec=getRec(d.sentX,d.peso,d.targetPct,d.mom1y||0,d.mom6m||0,d.mom3m||0,d.vol||0.3);
+          const sC=(scoreConsensus(d.sentX,d.peso,d.targetPct)*50+50).toFixed(0);
+          const sM=(scoreMomentum(d.mom1y||0,d.mom6m||0,d.mom3m||0)*50+50).toFixed(0);
+          return [` ${d.name}`,` Peso: ${d.peso}% → target ${d.targetPct}%`,` ${d.target}`,` ${rec.text}`,` Consensus ${sC}/100 · Mom ${sM}/100`];
+        }}},
       },
       scales:{
         x:{min:0,max:100,
