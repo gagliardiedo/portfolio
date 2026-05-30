@@ -1676,10 +1676,10 @@ function refresh(){
   if(curPane==='overview')rOv();
   if(curPane==='volatility')rVol();
   if(curPane==='geo')setTimeout(()=>{rGeo();},30);
-  if(curPane==='scenario')renderScenario();
+  if(curPane==='scenario')setTimeout(()=>{renderScenario();},30);
   if(curPane==='stress')rStress();
   if(curPane==='bench')rBench();
-  if(curPane==='alerts')rAlerts();
+  if(curPane==='returns')rRet();
   if(curPane==='history')rHistory();
 }
 function setGV(v,btn){
