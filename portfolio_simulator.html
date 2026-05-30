@@ -1604,6 +1604,9 @@ function updSBDisp(){
     if(si&&document.activeElement!==si)si.value=Math.min(pct,60).toFixed(1);
     if(bi)bi.style.width=mx>0?(caps[i]/mx*100).toFixed(0)+'%':'0%';
   });
+  // Aggiorna sc-cap con il totale corrente
+  const scCap=document.getElementById('sc-cap');
+  if(scCap&&document.activeElement!==scCap)scCap.value=Math.round(tot);
   _sup=false;updSBSt();checkAlerts();
 }
 
