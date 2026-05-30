@@ -2008,7 +2008,6 @@ function renderScenario(){
           const pt=meta.data[0];
           const d=CONSENSUS_DATA[i];
           const r=pt.options?.radius||10;
-          // Shadow per leggibilità
           c2.save();
           c2.shadowColor='rgba(0,0,0,0.8)';
           c2.shadowBlur=4;
@@ -2019,6 +2018,27 @@ function renderScenario(){
           c2.restore();
         }
       });
+    }});
+  }
+
+  // Sfumatura rossa→nera→verde sotto la griglia
+  if(!Chart.registry.plugins.get('bubbleGradient')){
+    Chart.register({id:'bubbleGradient',beforeDatasetsDraw(chart){
+      if(chart.canvas.id!=='c-consensus-bubble')return;
+      const ca=chart.chartArea;
+      if(!ca)return;
+      const {ctx}=chart;
+      const {left,right,top,bottom}=ca;
+      const grad=ctx.createLinearGradient(left,0,right,0);
+      grad.addColorStop(0,    'rgba(232,80,74,0.22)');
+      grad.addColorStop(0.30, 'rgba(232,80,74,0.07)');
+      grad.addColorStop(0.50, 'rgba(7,8,11,0.0)');
+      grad.addColorStop(0.70, 'rgba(39,201,154,0.07)');
+      grad.addColorStop(1,    'rgba(39,201,154,0.22)');
+      ctx.save();
+      ctx.fillStyle=grad;
+      ctx.fillRect(left,top,right-left,bottom-top);
+      ctx.restore();
     }});
   }
   if(charts['c-consensus-bubble'])charts['c-consensus-bubble'].update();
