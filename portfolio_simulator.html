@@ -46,21 +46,21 @@ html,body{height:100%;font-family:'Syne',sans-serif;background:var(--bg);color:v
 .sb-search input{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);font-size:13px;font-family:'JetBrains Mono',monospace;color:var(--t2);padding:5px 9px;outline:none;}
 .sb-search input:focus{border-color:var(--blue);color:var(--t1);}
 
-.sb-cols{display:grid;grid-template-columns:1fr 76px 58px 56px;gap:3px;padding:3px 12px 4px;font-size:13px;color:var(--t3);font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:.06em;flex-shrink:0;}
+.sb-cols{display:flex;gap:0;padding:3px 10px 4px;font-size:10px;color:var(--t3);font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:.04em;flex-shrink:0;}
 .sb-cols span{text-align:right;}.sb-cols span:first-child{text-align:left;}
 
 .sb-list{flex:1;overflow-y:auto;padding:0 12px 8px;scrollbar-width:thin;scrollbar-color:var(--bg5) transparent;}
-.hi{margin-bottom:6px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:8px 10px;transition:border-color .15s;}
+.hi{margin-bottom:4px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:6px 8px;transition:border-color .15s;}
 .hi:hover{border-color:var(--border2);}
 .hi.focus{border-color:var(--blue);}
 .hi-r1{display:block;margin-bottom:5px;}
-.hi-r2{display:flex;gap:6px;align-items:center;margin-bottom:5px;}
-.hi-name{font-size:13px;font-weight:700;color:var(--t1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:4px;display:block;}
-.hi-inp{background:var(--bg3);border:1px solid var(--border2);border-radius:3px;font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--t1);padding:3px 5px;outline:none;width:100%;text-align:right;transition:border-color .15s;}
+.hi-r2{display:flex;gap:4px;align-items:center;margin-bottom:4px;}
+.hi-name{font-size:11px;font-weight:700;color:var(--t1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:3px;display:block;}
+.hi-inp{background:var(--bg3);border:1px solid var(--border2);border-radius:3px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--t1);padding:2px 4px;outline:none;width:100%;text-align:right;transition:border-color .15s;}
 .hi-inp:focus{border-color:var(--blue);}
 .hi-inp.c{color:var(--t2);flex:1;}
-.hi-inp.p{color:var(--blue);width:60px;flex:none;}
-.hi-ret{font-size:13px;font-family:'JetBrains Mono',monospace;text-align:right;white-space:nowrap;flex:none;}
+.hi-inp.p{color:var(--blue);width:52px;flex:none;}
+.hi-ret{font-size:11px;font-family:'JetBrains Mono',monospace;text-align:right;white-space:nowrap;flex:none;}
 .hi-sl{flex:1;-webkit-appearance:none;appearance:none;height:2px;border-radius:1px;background:var(--bg5);outline:none;cursor:pointer;width:100%;}
 .hi-sl::-webkit-slider-thumb{-webkit-appearance:none;width:11px;height:11px;border-radius:50%;cursor:pointer;border:2px solid var(--bg2);transition:transform .1s;}
 .hi-sl::-webkit-slider-thumb:hover{transform:scale(1.3);}
@@ -275,7 +275,15 @@ tbody tr:hover td{background:rgba(255,255,255,.015);}
     <div style="font-size:13px;color:var(--t2);font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px;display:flex;justify-content:space-between;"><span>Capitale totale</span><span id="allocSt" style="font-weight:500;color:var(--t2);">100%</span></div>
     <div class="cap-row"><span class="cap-sym">€</span><input class="cap-inp" type="number" id="totInp" value="151237" min="0" step="100" oninput="onTotChange()"></div>
     <div class="cap-meta"><span>Allocato: <span id="allocEur">€151.237</span></span><span id="allocDiff"></span></div>
+    <div id="sb-nc-inline" style="display:none;margin-top:6px;padding-top:6px;border-top:1px solid rgba(39,201,154,.25);">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;">
+        <span style="font-size:11px;color:var(--teal);font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:.06em;">Da allocare</span>
+        <span style="font-size:16px;font-weight:700;color:var(--teal);font-family:'JetBrains Mono',monospace;" id="sb-nc-amount">—</span>
+      </div>
+      <div style="font-size:10px;color:var(--amber);margin-top:3px;" id="sb-nc-sell"></div>
+    </div>
   </div>
+
   <div class="sb-acts">
     <button class="sb-act" onclick="bilanciaConsensus()" style="background:rgba(240,201,110,.12);border-color:rgba(240,201,110,.3);color:var(--gold2);" title="Ribilancia secondo consensus">⚖ bilancia</button>
     <button class="sb-act" onclick="resetOrig()">↺ reset</button>
@@ -401,7 +409,7 @@ tbody tr:hover td{background:rgba(255,255,255,.015);}
     </div>
     <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px;" id="consensus-cards"></div>
     <table>
-      <thead><tr><th style="text-align:left;">Asset</th><th>Fonte</th><th>Outlook</th><th>Target</th><th>Peso port.</th><th>Raccomandazione</th></tr></thead>
+      <thead><tr><th style="text-align:left;">Asset</th><th>Fonte</th><th>Outlook</th><th>Target</th><th>Peso port.</th><th>Bilanciamento</th><th>Raccomandazione</th></tr></thead>
       <tbody id="cons-tbl-body"></tbody>
     </table>
     <p class="note">Dati da Goldman Sachs Commodity Outlook 2026, JPMorgan Market Outlook, BlackRock Investment Institute, GSAM Market Know-How Q2 2026, S&P Global Energy Horizons 2026, World Nuclear Association Report 2026, Sprott Uranium Outlook 2026. Aggiornato maggio 2026. Conversioni a USD/EUR 0.8577 (29 mag 2026).</p>
@@ -1488,8 +1496,8 @@ const CONS_META = [
   {i:6,  name:'Physical Silver',        color:'#C0C0C0', fonte:'Silver Inst., JPM',    outlookBadge:'<span class="badge bg">Bullish</span>',          target:'€1,0–€1,2/g',     sentX:80, targetPct:6,  y:3.0},
   {i:7,  name:'Uranium & Nuclear',      color:'#d4903a', fonte:'WNA, Sprott',          outlookBadge:'<span class="badge bg">Bullish LT</span>',       target:'€170–€208/kg',    sentX:78, targetPct:6,  y:4.8},
   {i:8,  name:'Electrification & Grid', color:'#27c99a', fonte:'S&P Global',           outlookBadge:'<span class="badge bg">Bullish LT</span>',       target:'€584B EU',       sentX:82, targetPct:5,  y:4.2},
-  {i:9,  name:'EQT Private Equity',     color:'#9e7aff', fonte:'Varia',                outlookBadge:'<span class="badge bb">Neutral</span>',          target:'PE diversif.',   sentX:50, targetPct:3,  y:2.0},
-  {i:10, name:'Bitcoin',                color:'#F7931A', fonte:'Varia',                outlookBadge:'<span class="badge ba">Speculativo</span>',      target:'Volatile',       sentX:55, targetPct:3,  y:1.5},
+  {i:10, name:'Private Equity',         color:'#9e7aff', fonte:'Varia',                outlookBadge:'<span class="badge bb">Neutral</span>',          target:'PE diversif.',   sentX:50, targetPct:3,  y:2.0},
+  {i:11, name:'Bitcoin',                color:'#F7931A', fonte:'Varia',                outlookBadge:'<span class="badge ba">Speculativo</span>',      target:'Volatile',       sentX:55, targetPct:3,  y:1.5},
 ];
 
 // Raccomandazione dinamica basata su sentiment + peso attuale vs target
@@ -1514,19 +1522,29 @@ function pesoTag(pesoPct, targetPct){
 function renderConsTable(){
   const tb = document.getElementById('cons-tbl-body');
   if(!tb)return;
-  const tot = totA();
+  const totOrig = ORIG.reduce((s,a) => s + a.origCap, 0);
+  const totCurr = totA();
   tb.innerHTML = '';
   CONS_META.forEach(m => {
-    const peso = tot > 0 ? caps[m.i] / tot * 100 : 0;
-    const rec  = getRec(m.sentX, peso, m.targetPct);
-    const tag  = pesoTag(peso, m.targetPct);
-    const tr   = document.createElement('tr');
+    // Peso attuale dai caps simulati (post-bilancia se applicato)
+    const peso     = totCurr > 0 ? caps[m.i] / totCurr * 100 : 0;
+    // Delta sempre rispetto all'originale TR
+    const pesoOrig = totOrig > 0 ? ORIG[m.i].origCap / totOrig * 100 : 0;
+    const rec      = getRec(m.sentX, peso, m.targetPct);
+    const tag      = pesoTag(peso, m.targetPct);
+    const delta    = m.targetPct - pesoOrig;
+    const deltaStr = Math.abs(delta) < 0.05 ? '=' :
+      (delta > 0 ? '+' : '') + delta.toFixed(1) + '%';
+    const deltaColor = Math.abs(delta) < 0.05 ? 'var(--t3)' :
+      delta > 0 ? 'var(--teal)' : 'var(--red)';
+    const tr = document.createElement('tr');
     tr.innerHTML = `
       <td style="font-weight:600;color:${m.color};">${m.name}</td>
       <td style="font-size:13px;color:var(--t2);">${m.fonte}</td>
       <td>${m.outlookBadge}</td>
       <td style="font-family:'JetBrains Mono',monospace;color:var(--teal);">${m.target}</td>
       <td style="font-family:'JetBrains Mono',monospace;">${peso.toFixed(1)}% ${tag}</td>
+      <td style="font-family:'JetBrains Mono',monospace;font-weight:600;color:${deltaColor};">${deltaStr}</td>
       <td style="font-size:13px;color:${rec.color};">${rec.text}</td>`;
     tb.appendChild(tr);
   });
@@ -1585,7 +1603,7 @@ function buildSB(){
         <input class="hi-inp c" id="ci-${i}" type="number" value="${Math.round(caps[i])}" min="0" step="100" oninput="onCap(${i},this.value)" onfocus="this.closest('.hi').classList.add('focus')" onblur="this.closest('.hi').classList.remove('focus')">
         <div style="display:flex;align-items:center;gap:3px;flex-shrink:0;">
           <input class="hi-inp p" id="pi-${i}" type="number" value="${pct.toFixed(1)}" min="0" max="100" step="0.1" oninput="onPct(${i},this.value)" onfocus="this.closest('.hi').classList.add('focus')" onblur="this.closest('.hi').classList.remove('focus')">
-          <span class="hi-delta" id="hd-${i}" style="font-size:10px;font-family:'JetBrains Mono',monospace;min-width:34px;white-space:nowrap;"></span>
+          <span class="hi-delta" id="hd-${i}" style="font-size:10px;font-family:'JetBrains Mono',monospace;min-width:30px;white-space:nowrap;"></span>
         </div>
         <span class="hi-ret" style="color:${rc}">${a.retAcq>=0?'+':''}${(a.retAcq*100).toFixed(1)}%</span>
       </div>
@@ -1655,28 +1673,114 @@ function resetOrig(){caps=ORIG.map(a=>a.origCap);totalCap=caps.reduce((s,v)=>s+v
 function clearAll(){caps=caps.map(()=>0);updSBDisp();refresh();}
 
 function bilanciaConsensus(){
-  const tot = totA();
-  const oldPcts = caps.map(c => tot>0 ? c/tot*100 : 0);
+  const totOrig = ORIG.reduce((s,a) => s + a.origCap, 0);
 
-  // Usa i targetPct da CONS_META — completamente dinamico
+  // Calcola peso % originale per ogni asset
+  const origPcts = ORIG.map(a => totOrig > 0 ? a.origCap / totOrig * 100 : 0);
+
+  // Soglia sell: se un asset supera il target di più del 5% in peso assoluto
+  const SELL_THRESHOLD = 5.0;
+
+  // Identifica chi va aumentato, chi è ok, chi è troppo alto
+  const toIncrease = []; // asset sotto target → compra
+  const toSell     = []; // asset sopra target di >5% → segnala
+  const toKeep     = []; // asset dentro tolleranza
+
   CONS_META.forEach(m => {
-    const oldPct = oldPcts[m.i];
-    const delta  = m.targetPct - oldPct;
-    caps[m.i]    = tot * m.targetPct / 100;
-
-    const el = document.getElementById('hd-'+m.i);
-    if(el){
-      if(Math.abs(delta) < 0.2){
-        el.textContent = '';
-      } else {
-        el.textContent = (delta>0?'+':'')+delta.toFixed(1)+'%';
-        el.style.color = delta>0 ? 'var(--teal)' : 'var(--red)';
-      }
+    const delta = m.targetPct - origPcts[m.i];
+    if (delta > 0.5) {
+      toIncrease.push({...m, origPct: origPcts[m.i], delta});
+    } else if (delta < -SELL_THRESHOLD) {
+      toSell.push({...m, origPct: origPcts[m.i], delta});
+    } else {
+      toKeep.push({...m, origPct: origPcts[m.i], delta});
     }
   });
 
+  // Logica buy-only:
+  // Il nuovo portafoglio = asset da mantenere al loro valore originale
+  //                      + asset da aumentare portati al loro targetPct
+  // Il capitale totale aumenta di conseguenza
+
+  // Calcola il nuovo totale necessario:
+  // Per ogni asset da aumentare: il suo origCap deve diventare targetPct% del nuovo totale
+  // Risoluzione: newTot = sum(assetsToKeep origCap) + sum(assetsToSellKeep origCap)
+  //                       diviso (1 - sum(targetPct degli asset da aumentare)/100)
+
+  const sumKeepCap    = [...toKeep, ...toSell].reduce((s,m) => s + ORIG[m.i].origCap, 0);
+  const sumTargetInc  = toIncrease.reduce((s,m) => s + m.targetPct, 0);
+
+  let newTotal;
+  if (sumTargetInc >= 100) {
+    newTotal = totOrig; // fallback
+  } else {
+    newTotal = sumKeepCap / (1 - sumTargetInc / 100);
+  }
+
+  const nuovoCapitale = newTotal - totOrig;
+
+  // Applica i nuovi caps
+  CONS_META.forEach(m => {
+    const delta = m.targetPct - origPcts[m.i];
+    if (delta > 0.5) {
+      // Aumenta: porta al targetPct del nuovo totale
+      caps[m.i] = newTotal * m.targetPct / 100;
+    } else {
+      // Mantieni originale (anche chi è troppo alto — non vendiamo)
+      caps[m.i] = ORIG[m.i].origCap;
+    }
+  });
+
+  // Aggiorna capitaleTotale nella sidebar
+  totalCap = newTotal;
+  const totInp = document.getElementById('totInp');
+  if (totInp) totInp.value = Math.round(newTotal);
+
+  // Delta badge per ogni asset
+  CONS_META.forEach(m => {
+    const el = document.getElementById('hd-'+m.i);
+    if (!el) return;
+    const delta = m.targetPct - origPcts[m.i];
+    if (delta > 0.5) {
+      const addEur = caps[m.i] - ORIG[m.i].origCap;
+      el.textContent = '+'+delta.toFixed(1)+'%';
+      el.style.color = 'var(--teal)';
+      el.title = '+€'+fE(addEur);
+    } else if (delta < -SELL_THRESHOLD) {
+      el.textContent = delta.toFixed(1)+'%';
+      el.style.color = 'var(--red)';
+      el.title = 'Valuta vendita';
+    } else {
+      el.textContent = '=';
+      el.style.color = 'var(--t3)';
+    }
+  });
+
+  // Force aggiornamento sidebar
+  _sup = false;
   updSBDisp();
   refresh();
+  renderConsTable();
+
+  // Mostra nuovo capitale inline nel cap-box
+  const ncInline = document.getElementById('sb-nc-inline');
+  const ncAmt    = document.getElementById('sb-nc-amount');
+  const ncSel    = document.getElementById('sb-nc-sell');
+
+  if (ncInline && ncAmt) {
+    ncInline.style.display = nuovoCapitale > 10 ? 'block' : 'none';
+    ncAmt.textContent = '+€' + fE(Math.round(nuovoCapitale));
+
+    // Segnala asset da valutare vendita
+    if (toSell.length > 0) {
+      ncSel.style.display = 'block';
+      ncSel.innerHTML = '⚠ ' + toSell.map(m =>
+        `${m.name.replace(/ USD$/,'').replace(/ ESG$/,'')}: ${m.delta.toFixed(1)}%`
+      ).join(' · ');
+    } else {
+      ncSel.style.display = 'none';
+    }
+  }
 }
 function filterHI(q){document.querySelectorAll('.hi').forEach(el=>el.style.display=el.dataset.name.includes(q.toLowerCase())?'block':'none');}
 
@@ -1995,10 +2099,10 @@ function renderScenario(){
 
   // ── Consensus bubble chart — REATTIVO ai pesi sidebar ──
   // Bubble chart — usa CONS_META globale, pesi live da caps[]
-  const totBubble = totA();
+  const totBubble = ORIG.reduce((s,a) => s + a.origCap, 0);
   const CONSENSUS_DATA = CONS_META.map(m => ({
     ...m,
-    peso: totBubble > 0 ? +(caps[m.i] / totBubble * 100).toFixed(1) : 0,
+    peso: totBubble > 0 ? +(ORIG[m.i].origCap / totBubble * 100).toFixed(1) : 0,
     label: m.name.replace(/ USD$/,'').replace(/ ESG$/,'').replace(/ EUR$/,'')
                  .replace(/Physical /,'').replace(/ Value-Chain$/,'')
                  .replace(/Electrification & /,'').replace(/Core MSCI /,'')
