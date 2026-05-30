@@ -277,12 +277,17 @@ tbody tr:hover td{background:rgba(255,255,255,.015);}
     <div class="cap-meta"><span>Allocato: <span id="allocEur">€151.237</span></span><span id="allocDiff"></span></div>
   </div>
   <div class="sb-acts">
-    <button class="sb-act" onclick="normalizeW()">⇌ normalizza</button>
+    <button class="sb-act" onclick="bilanciaConsensus()" style="background:rgba(240,201,110,.12);border-color:rgba(240,201,110,.3);color:var(--gold2);" title="Ribilancia il portafoglio secondo le raccomandazioni del consensus">⚖ bilancia</button>
     <button class="sb-act" onclick="resetOrig()">↺ reset</button>
     <button class="sb-act warn" onclick="clearAll()">✕ azzera</button>
   </div>
+  <div id="sb-balance-info" style="display:none;margin:6px 10px;padding:8px;background:rgba(240,201,110,.07);border:1px solid rgba(240,201,110,.2);border-radius:var(--r);font-size:11px;font-family:'JetBrains Mono',monospace;">
+    <div style="color:var(--gold2);font-weight:600;margin-bottom:4px;">⚖ Bilancio applicato</div>
+    <div id="sb-balance-detail" style="color:var(--t2);line-height:1.8;"></div>
+    <button onclick="document.getElementById('sb-balance-info').style.display='none'" style="margin-top:6px;font-size:10px;color:var(--t3);background:none;border:none;cursor:pointer;">✕ chiudi</button>
+  </div>
   <div class="sb-search"><input type="text" placeholder="Cerca asset…" oninput="filterHI(this.value)"></div>
-  <div class="sb-cols"><span>Asset</span><span>Capitale €</span><span>Peso %</span><span>Rend.</span></div>
+  <div class="sb-cols"><span>Asset</span><span>Capitale €</span><span>Peso %</span><span>Rend.</span><span style="color:var(--gold2);">Δ</span></div>
   <div class="sb-list" id="sbList"></div>
   <div class="sb-warn" id="sbWarn"></div>
 </aside>
@@ -1536,6 +1541,7 @@ function buildSB(){
         <input class="hi-inp c" id="ci-${i}" type="number" value="${Math.round(caps[i])}" min="0" step="100" oninput="onCap(${i},this.value)" onfocus="this.closest('.hi').classList.add('focus')" onblur="this.closest('.hi').classList.remove('focus')">
         <input class="hi-inp p" id="pi-${i}" type="number" value="${pct.toFixed(1)}" min="0" max="100" step="0.1" oninput="onPct(${i},this.value)" onfocus="this.closest('.hi').classList.add('focus')" onblur="this.closest('.hi').classList.remove('focus')">
         <span class="hi-ret" style="color:${rc}">${a.retAcq>=0?'+':''}${(a.retAcq*100).toFixed(1)}%</span>
+        <span class="hi-delta" id="hd-${i}" style="font-size:11px;font-family:'JetBrains Mono',monospace;min-width:38px;text-align:right;"></span>
       </div>
       <input type="range" class="hi-sl" id="sl-${i}" min="0" max="60" step="0.1" value="${Math.min(pct,60).toFixed(1)}" oninput="onSlider(${i},this.value)" style="accent-color:${a.color}">
       <div class="hi-bar" id="hb-${i}" style="background:${a.color};width:60%;"></div>`;
@@ -1597,6 +1603,83 @@ function onTotChange(){
 function normalizeW(){const r=totalCap/totA();caps=caps.map(c=>c*r);updSBDisp();refresh();}
 function resetOrig(){caps=ORIG.map(a=>a.origCap);totalCap=caps.reduce((s,v)=>s+v,0);document.getElementById('totInp').value=Math.round(totalCap);const sc=document.getElementById('sc-cap');if(sc)sc.value=Math.round(totalCap);updSBDisp();refresh();}
 function clearAll(){caps=caps.map(()=>0);updSBDisp();refresh();}
+
+function bilanciaConsensus(){
+  // Pesi target basati su consensus istituzionale + logica di bilanciamento
+  // Sentimento: x>=75 bullish, x>=55 misto, x<55 neutral/bearish
+  // Peso attuale vs peso ideale per ogni asset
+  const TARGETS = [
+    // [origIdx, sentX, pesoTarget%, note]
+    // Gold 24% → max 28% (bullish unanime, già alto ma superciclo)
+    {i:0,  sent:88, target:26, name:'Physical Gold USD'},
+    // Hydrogen 16% → 12% (early stage, peso troppo alto per il rischio)
+    {i:1,  sent:62, target:12, name:'Global Hydrogen ESG'},
+    // EM IMI 14% → 12% (neutral, rischio Cina)
+    {i:2,  sent:45, target:11, name:'Core MSCI EM IMI'},
+    // Clean Energy 13% → 10% (misto breve, non aumentare ora)
+    {i:3,  sent:58, target:10, name:'Global Clean Energy'},
+    // Copper 7% → 10% (bullish strutturale, sottopesato)
+    {i:4,  sent:85, target:10, name:'Copper Miners USD'},
+    // Battery 6% → 8% (bullish LT, aumentare gradualmente)
+    {i:5,  sent:75, target:8,  name:'Battery Value-Chain'},
+    // Silver 4% → 6% (bullish, legato a oro e industria)
+    {i:6,  sent:80, target:6,  name:'Physical Silver'},
+    // Uranium 3% → 6% (bullish LT, sottopesato per volatilità)
+    {i:7,  sent:78, target:6,  name:'Uranium & Nuclear'},
+    // Grid 3% → 5% (bullish LT, sottopesato)
+    {i:8,  sent:82, target:5,  name:'Electrification & Grid'},
+    // EQT PE 3% → 3% (neutro, mantieni)
+    {i:9,  sent:50, target:3,  name:'EQT Private Equity'},
+    // Bitcoin 6% → 3% (speculativo, ridurre)
+    {i:10, sent:55, target:3,  name:'Bitcoin'},
+  ];
+
+  // Verifica che i target sommino a 100
+  const totTarget = TARGETS.reduce((s,t)=>s+t.target, 0);
+  const tot = totA();
+  const oldPcts = ORIG.map((_,i) => tot>0 ? caps[i]/tot*100 : 0);
+
+  // Applica i nuovi pesi
+  const details = [];
+  TARGETS.forEach(t => {
+    const oldPct = oldPcts[t.i];
+    const delta = t.target - oldPct;
+    const newCap = tot * t.target / 100;
+    caps[t.i] = newCap;
+
+    // Aggiorna delta badge nella sidebar
+    const deltaEl = document.getElementById('hd-'+t.i);
+    if(deltaEl){
+      if(Math.abs(delta) < 0.3){
+        deltaEl.textContent = '=';
+        deltaEl.style.color = 'var(--t3)';
+      } else if(delta > 0){
+        deltaEl.textContent = '+'+delta.toFixed(1)+'%';
+        deltaEl.style.color = 'var(--teal)';
+      } else {
+        deltaEl.textContent = delta.toFixed(1)+'%';
+        deltaEl.style.color = 'var(--red)';
+      }
+    }
+
+    if(Math.abs(delta) >= 0.3){
+      const sign = delta > 0 ? '↑' : '↓';
+      const col = delta > 0 ? '#27c99a' : '#e8504a';
+      details.push(`<span style="color:${col}">${sign} ${t.name}: ${oldPct.toFixed(1)}% → ${t.target}% (${delta>0?'+':''}${delta.toFixed(1)}%)</span>`);
+    }
+  });
+
+  updSBDisp();
+  refresh();
+
+  // Mostra il pannello info
+  const infoEl = document.getElementById('sb-balance-info');
+  const detailEl = document.getElementById('sb-balance-detail');
+  if(infoEl && detailEl){
+    detailEl.innerHTML = details.length ? details.join('<br>') : 'Portafoglio già allineato al consensus.';
+    infoEl.style.display = 'block';
+  }
+}
 function filterHI(q){document.querySelectorAll('.hi').forEach(el=>el.style.display=el.dataset.name.includes(q.toLowerCase())?'block':'none');}
 
 // ═══════════════ PRESETS ═══════════════
