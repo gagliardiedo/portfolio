@@ -50,16 +50,17 @@ html,body{height:100%;font-family:'Syne',sans-serif;background:var(--bg);color:v
 .sb-cols span{text-align:right;}.sb-cols span:first-child{text-align:left;}
 
 .sb-list{flex:1;overflow-y:auto;padding:0 12px 8px;scrollbar-width:thin;scrollbar-color:var(--bg5) transparent;}
-.hi{margin-bottom:5px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:7px 9px;transition:border-color .15s;}
+.hi{margin-bottom:6px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:8px 10px;transition:border-color .15s;}
 .hi:hover{border-color:var(--border2);}
 .hi.focus{border-color:var(--blue);}
-.hi-r1{display:grid;grid-template-columns:1fr 76px 58px 56px;gap:3px;align-items:center;margin-bottom:5px;}
-.hi-name{font-size:12.5px;font-weight:600;color:var(--t1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.hi-inp{background:var(--bg3);border:1px solid var(--border2);border-radius:3px;font-family:'JetBrains Mono',monospace;font-size:14px;color:var(--t1);padding:2px 4px;outline:none;width:100%;text-align:right;transition:border-color .15s;}
+.hi-r1{display:block;margin-bottom:5px;}
+.hi-r2{display:flex;gap:6px;align-items:center;margin-bottom:5px;}
+.hi-name{font-size:13px;font-weight:700;color:var(--t1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:4px;display:block;}
+.hi-inp{background:var(--bg3);border:1px solid var(--border2);border-radius:3px;font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--t1);padding:3px 5px;outline:none;width:100%;text-align:right;transition:border-color .15s;}
 .hi-inp:focus{border-color:var(--blue);}
-.hi-inp.c{color:var(--t2);}
-.hi-inp.p{color:var(--blue);}
-.hi-ret{font-size:13.5px;font-family:'JetBrains Mono',monospace;text-align:right;}
+.hi-inp.c{color:var(--t2);flex:1;}
+.hi-inp.p{color:var(--blue);width:60px;flex:none;}
+.hi-ret{font-size:13px;font-family:'JetBrains Mono',monospace;text-align:right;white-space:nowrap;flex:none;}
 .hi-sl{flex:1;-webkit-appearance:none;appearance:none;height:2px;border-radius:1px;background:var(--bg5);outline:none;cursor:pointer;width:100%;}
 .hi-sl::-webkit-slider-thumb{-webkit-appearance:none;width:11px;height:11px;border-radius:50%;cursor:pointer;border:2px solid var(--bg2);transition:transform .1s;}
 .hi-sl::-webkit-slider-thumb:hover{transform:scale(1.3);}
@@ -1529,14 +1530,15 @@ function buildSB(){
     const pct=caps[i]/totA()*100;
     const rc=a.retAcq>=0?'var(--teal)':'var(--red)';
     const d=document.createElement('div');d.className='hi';d.id='hi-'+i;d.dataset.name=a.name.toLowerCase();
-    d.innerHTML=`<div class="hi-r1">
+    d.innerHTML=`
       <span class="hi-name" title="${a.name}">${a.name}</span>
-      <input class="hi-inp c" id="ci-${i}" type="number" value="${Math.round(caps[i])}" min="0" step="100" oninput="onCap(${i},this.value)" onfocus="this.closest('.hi').classList.add('focus')" onblur="this.closest('.hi').classList.remove('focus')">
-      <input class="hi-inp p" id="pi-${i}" type="number" value="${pct.toFixed(1)}" min="0" max="100" step="0.1" oninput="onPct(${i},this.value)" onfocus="this.closest('.hi').classList.add('focus')" onblur="this.closest('.hi').classList.remove('focus')">
-      <span class="hi-ret" style="color:${rc}">${a.retAcq>=0?'+':''}${(a.retAcq*100).toFixed(1)}%</span>
-    </div>
-    <input type="range" class="hi-sl" id="sl-${i}" min="0" max="60" step="0.1" value="${Math.min(pct,60).toFixed(1)}" oninput="onSlider(${i},this.value)" style="accent-color:${a.color}">
-    <div class="hi-bar" id="hb-${i}" style="background:${a.color};width:60%;"></div>`;
+      <div class="hi-r2">
+        <input class="hi-inp c" id="ci-${i}" type="number" value="${Math.round(caps[i])}" min="0" step="100" oninput="onCap(${i},this.value)" onfocus="this.closest('.hi').classList.add('focus')" onblur="this.closest('.hi').classList.remove('focus')">
+        <input class="hi-inp p" id="pi-${i}" type="number" value="${pct.toFixed(1)}" min="0" max="100" step="0.1" oninput="onPct(${i},this.value)" onfocus="this.closest('.hi').classList.add('focus')" onblur="this.closest('.hi').classList.remove('focus')">
+        <span class="hi-ret" style="color:${rc}">${a.retAcq>=0?'+':''}${(a.retAcq*100).toFixed(1)}%</span>
+      </div>
+      <input type="range" class="hi-sl" id="sl-${i}" min="0" max="60" step="0.1" value="${Math.min(pct,60).toFixed(1)}" oninput="onSlider(${i},this.value)" style="accent-color:${a.color}">
+      <div class="hi-bar" id="hb-${i}" style="background:${a.color};width:60%;"></div>`;
     list.appendChild(d);
     if(sel1){const o=document.createElement('option');o.value=i;o.textContent=a.name;sel1.appendChild(o);}
     if(sel2){const o=document.createElement('option');o.value=i;o.textContent=a.name;sel2.appendChild(o);}
