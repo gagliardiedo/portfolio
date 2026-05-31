@@ -1191,7 +1191,9 @@ const CONS_META = [
 ];
 
 // ═══════════════ MODELLO A 5 FATTORI ═══════════════
-// Consensus 35% · Momentum 25% · Volatilità 20% · NFP 10% · CPI 10%
+// Consensus 20% · Momentum 35% · Volatilità 25% · NFP 10% · CPI 10%
+// Consensus ridotto perché basato su interpretazione qualitativa
+// Momentum e Volatilità aumentati perché basati su dati di mercato reali
 const MACRO_USA = {
   nfp: [
     {m:'Gen 26', v:130,  a:70,   prev:null},
@@ -1231,9 +1233,12 @@ function scoreConsensus(sentX, pesoPct, targetPct){
 function scoreMomentum(mom1y,mom6m,mom3m){
   return Math.max(-1,Math.min(1,(mom1y*0.5+mom6m*0.3+mom3m*0.2)/0.50));
 }
-function scoreVolatility(vol,pesoPct,targetPct){
-  const d=targetPct-pesoPct, vn=(vol-0.25)/0.45;
-  return d>0?Math.max(-1,Math.min(1,0.3-vn*0.6)):Math.max(-1,Math.min(1,-vn*0.8));
+function scoreVolatility(vol){
+  // Score basato solo sulla volatilità di mercato dell'asset
+  // vol bassa (0.10-0.20) = buono = score positivo
+  // vol alta (0.50-0.70) = rischio = score negativo
+  // Normalizzazione: vol 0.16 → +0.7, vol 0.35 → 0, vol 0.70 → -0.7
+  return Math.max(-1, Math.min(1, (0.35 - vol) / 0.35));
 }
 function scoreNFP(nfpScore,cat){
   if(cat==='commodity')    return -nfpScore*0.8;
@@ -1252,11 +1257,11 @@ function scoreCPI(cpiScore,cat){
 function getRec(sentX,pesoPct,targetPct,mom1y=0,mom6m=0,mom3m=0,vol=0.3,cat='equity-theme'){
   const sC=scoreConsensus(sentX,pesoPct,targetPct);
   const sM=scoreMomentum(mom1y,mom6m,mom3m);
-  const sV=scoreVolatility(vol,pesoPct,targetPct);
+  const sV=scoreVolatility(vol);
   const sN=scoreNFP(MACRO_USA.nfpScore,cat);
   const sI=scoreCPI(MACRO_USA.cpiScore,cat);
-  // Pesi: Consensus 35% · Momentum 25% · Volatilità 20% · NFP 10% · CPI 10%
-  const score=sC*0.35+sM*0.25+sV*0.20+sN*0.10+sI*0.10;
+  // Consensus 20% · Momentum 35% · Volatilità 25% · NFP 10% · CPI 10%
+  const score=sC*0.20+sM*0.35+sV*0.25+sN*0.10+sI*0.10;
   if(score> 0.55)return{text:'⬆ Aumenta',         color:'var(--teal)', score,sC,sM,sV,sN,sI};
   if(score> 0.25)return{text:'↗ Valuta aumento',  color:'var(--teal)', score,sC,sM,sV,sN,sI};
   if(score> 0.05)return{text:'✅ Mantieni',        color:'var(--t2)',  score,sC,sM,sV,sN,sI};
@@ -1265,11 +1270,13 @@ function getRec(sentX,pesoPct,targetPct,mom1y=0,mom6m=0,mom3m=0,vol=0.3,cat='equ
   if(score>-0.55)return{text:'↘ Valuta riduzione',color:'var(--amber)',score,sC,sM,sV,sN,sI};
   return              {text:'⬇ Riduci',           color:'var(--red)', score,sC,sM,sV,sN,sI};
 }
-function pesoTag(pesoPct,targetPct){
-  const d=pesoPct-targetPct;
-  if(Math.abs(d)<=1.5)return`<span style="color:var(--teal);">✅</span>`;
-  if(d<-1.5)return`<span style="color:var(--amber);">⚠ basso</span>`;
-  return`<span style="color:var(--amber);">⚠ alto</span>`;
+function pesoTag(pesoPct, effectivePct){
+  // Se siamo in modalità bilanciata, mostra sempre ✅
+  if(_isBalanced) return `<span style="color:var(--teal);">✅</span>`;
+  const delta = pesoPct - effectivePct;
+  if(Math.abs(delta) <= 2.0) return `<span style="color:var(--teal);">✅</span>`;
+  if(delta < -2.0)           return `<span style="color:var(--amber);">⚠ basso</span>`;
+  return                            `<span style="color:var(--amber);">⚠ alto</span>`;
 }
 function rMacroCharts(){
   const nd = MACRO_USA.nfp;
@@ -1311,7 +1318,7 @@ function rMacroCharts(){
 
 function renderConsTable(){
   const tb = document.getElementById('cons-tbl-body');
-  if(!tb)return;
+  if(!tb) return;
   const totOrig = ORIG.reduce((s,a) => s + a.origCap, 0);
   const totCurr = totA();
   tb.innerHTML = '';
@@ -1319,78 +1326,65 @@ function renderConsTable(){
     const peso     = totCurr > 0 ? caps[m.i] / totCurr * 100 : 0;
     const pesoOrig = totOrig > 0 ? ORIG[m.i].origCap / totOrig * 100 : 0;
     const rec = getRec(m.sentX, peso, m.targetPct, m.mom1y||0, m.mom6m||0, m.mom3m||0, m.vol||0.3, m.cat||'equity-theme');
-    // Bilanciamento basato sulla raccomandazione del modello, non su targetPct hardcoded
-    let effectivePct;
-    if      (rec.score >  0.25) effectivePct = Math.max(pesoOrig, m.targetPct); // aumenta
-    else if (rec.score < -0.25) effectivePct = Math.min(pesoOrig, m.targetPct); // riduci (segnala)
-    else                        effectivePct = pesoOrig;                         // mantieni
 
+    // Target effettivo dalla raccomandazione
+    let effectivePct;
+    if      (rec.score >  0.20) effectivePct = Math.max(pesoOrig, m.targetPct);
+    else if (rec.score < -0.10) effectivePct = m.targetPct;
+    else                        effectivePct = pesoOrig;
+
+    // Bilanciamento = delta tra effectivePct e peso originale TR
     const delta      = effectivePct - pesoOrig;
-    const deltaStr   = Math.abs(delta) < 0.05 ? '=' : (delta > 0 ? '+' : '') + delta.toFixed(1) + '%';
-    const deltaColor = Math.abs(delta) < 0.05 ? 'var(--t3)' : delta > 0 ? 'var(--teal)' : 'var(--red)';
+    const isZero     = Math.abs(delta) < 0.05;
+    const deltaStr   = isZero ? '=' : (delta > 0 ? '+' : '') + delta.toFixed(1) + '%';
+    const deltaColor = isZero ? 'var(--t3)' : delta > 0 ? 'var(--teal)' : 'var(--amber)';
     const deltaEur   = Math.round(delta / 100 * totOrig);
     const deltaEurStr = Math.abs(deltaEur) < 50 ? '' :
-      `<div style="font-size:10px;color:${deltaColor};font-family:'JetBrains Mono',monospace;margin-top:1px;">${deltaEur>0?'+':''}€${fE(Math.abs(deltaEur))}</div>`;
-    const tag = pesoTag(peso, effectivePct);
+      `<div style="font-size:10px;color:${deltaColor};font-family:'JetBrains Mono',monospace;margin-top:1px;">${deltaEur>0?'+':''}\u20ac${fE(Math.abs(deltaEur))}</div>`;
+
+    // Badge: dopo bilancia sempre ✅ (peso riflette già il bilanciamento)
+    // Prima del bilancia: confronta peso attuale vs target effettivo
+    const tag = _isBalanced
+      ? `<span style="color:var(--teal);">✅</span>`
+      : (Math.abs(peso - effectivePct) <= 2.0
+          ? `<span style="color:var(--teal);">✅</span>`
+          : (peso < effectivePct - 2
+              ? `<span style="color:var(--amber);">⚠ basso</span>`
+              : `<span style="color:var(--amber);">⚠ alto</span>`));
 
 
-    // Score 0-100
-    const sC   = scoreConsensus(m.sentX, peso, m.targetPct);
-    const sM   = scoreMomentum(m.mom1y||0, m.mom6m||0, m.mom3m||0);
-    const sV   = scoreVolatility(m.vol||0.3, peso, m.targetPct);
-    const cPct = Math.round(sC*50+50);
+    // Momentum
+    const sM = scoreMomentum(m.mom1y||0, m.mom6m||0, m.mom3m||0);
     const mPct = Math.round(sM*50+50);
-    const vPct = Math.round(sV*50+50);
-    const scoreFinale = Math.round((sC*0.35+sM*0.25+sV*0.20)*50+50);
     const barM = mPct>=60?'var(--teal)':mPct>=45?'var(--amber)':'var(--red)';
-    const barV = vPct>=60?'var(--teal)':vPct>=45?'var(--amber)':'var(--red)';
-
-    // Momentum: barra con testo sovrapposto
     const m1s=(m.mom1y||0)>=0?'+':''; const m6s=(m.mom6m||0)>=0?'+':''; const m3s=(m.mom3m||0)>=0?'+':'';
-    const momBar = `<div style="position:relative;width:100%;min-width:120px;">
-        <div style="background:var(--bg4);border-radius:3px;height:18px;">
-          <div style="width:${mPct}%;height:100%;background:${barM};opacity:.25;border-radius:3px;"></div>
-        </div>
-        <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:space-between;padding:0 6px;">
-          <span style="font-size:9px;color:var(--t2);">${m1s}${((m.mom1y||0)*100).toFixed(0)}% · ${m6s}${((m.mom6m||0)*100).toFixed(0)}% · ${m3s}${((m.mom3m||0)*100).toFixed(0)}%</span>
-          <span style="font-size:10px;font-weight:700;color:${barM};">${mPct}</span>
-        </div></div>`;
+    const momBar = `<div style="position:relative;width:100%;min-width:120px;"><div style="background:var(--bg4);border-radius:3px;height:18px;"><div style="width:${mPct}%;height:100%;background:${barM};opacity:.25;border-radius:3px;"></div></div><div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:space-between;padding:0 6px;"><span style="font-size:9px;color:var(--t2);">${m1s}${((m.mom1y||0)*100).toFixed(0)}% · ${m6s}${((m.mom6m||0)*100).toFixed(0)}% · ${m3s}${((m.mom3m||0)*100).toFixed(0)}%</span><span style="font-size:10px;font-weight:700;color:${barM};">${mPct}</span></div></div>`;
 
-    const volPct = Math.round((m.vol||0.3)*100);
-    const volBar = `<div style="position:relative;width:100%;min-width:80px;">
-        <div style="background:var(--bg4);border-radius:3px;height:18px;">
-          <div style="width:${vPct}%;height:100%;background:${barV};opacity:.25;border-radius:3px;"></div>
-        </div>
-        <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:space-between;padding:0 6px;">
-          <span style="font-size:9px;color:var(--t2);">vol ${volPct}%</span>
-          <span style="font-size:10px;font-weight:700;color:${barV};">${vPct}</span>
-        </div></div>`;
+    // Volatilità
+    const sV = scoreVolatility(m.vol||0.3);
+    const vPct = Math.round(sV*50+50);
+    const barV = vPct>=60?'var(--teal)':vPct>=45?'var(--amber)':'var(--red)';
+    const volBar = `<div style="position:relative;width:100%;min-width:80px;"><div style="background:var(--bg4);border-radius:3px;height:18px;"><div style="width:${vPct}%;height:100%;background:${barV};opacity:.25;border-radius:3px;"></div></div><div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:space-between;padding:0 6px;"><span style="font-size:9px;color:var(--t2);">vol ${Math.round((m.vol||0.3)*100)}%</span><span style="font-size:10px;font-weight:700;color:${barV};">${vPct}</span></div></div>`;
+
+    // Score breakdown
+    const sC  = scoreConsensus(m.sentX, peso, m.targetPct);
+    const sN  = scoreNFP(MACRO_USA.nfpScore, m.cat||'equity-theme');
+    const sI  = scoreCPI(MACRO_USA.cpiScore, m.cat||'equity-theme');
+    const cPct = Math.round(sC*50+50), nPct = Math.round(sN*50+50), iPct = Math.round(sI*50+50);
+    const scoreFinale = Math.round(rec.score*50+50);
 
     // Raccomandazione
-    const isBal = _isBalanced && Math.abs(peso - m.targetPct) <= 1.5;
-    const nPct  = Math.round((rec.sN||0)*50+50);
-    const iPct  = Math.round((rec.sI||0)*50+50);
+    const isBal = _isBalanced && Math.abs(peso - effectivePct) <= 2.0;
     const recHtml = isBal
-      ? `<span style="color:var(--teal);font-weight:700;font-size:13px;">✅ Bilanciato</span>
-         <div style="font-size:9px;color:var(--t3);margin-top:2px;">C:${cPct} M:${mPct} V:${vPct} N:${nPct} I:${iPct} → ${scoreFinale}/100</div>`
-      : `<span style="color:${rec.color};font-weight:600;font-size:13px;">${rec.text}</span>
-         <div style="font-size:9px;color:var(--t3);margin-top:2px;">C:${cPct} M:${mPct} V:${vPct} N:${nPct} I:${iPct} → ${scoreFinale}/100</div>`;
+      ? `<span style="color:var(--teal);font-weight:700;">\u2705 Bilanciato</span><div style="font-size:9px;color:var(--t3);margin-top:2px;">C:${cPct} M:${mPct} V:${vPct} N:${nPct} I:${iPct} \u2192 ${scoreFinale}/100</div>`
+      : `<span style="color:${rec.color};font-weight:600;">${rec.text}</span><div style="font-size:9px;color:var(--t3);margin-top:2px;">C:${cPct} M:${mPct} V:${vPct} N:${nPct} I:${iPct} \u2192 ${scoreFinale}/100</div>`;
 
     const tr = document.createElement('tr');
-    tr.innerHTML = `
-      <td style="font-weight:600;color:${m.color};">${m.name}</td>
-      <td>${m.outlookBadge}</td>
-      <td style="font-family:'JetBrains Mono',monospace;color:var(--teal);">${m.target}</td>
-      <td style="font-family:'JetBrains Mono',monospace;">${peso.toFixed(1)}% ${tag}</td>
-      <td style="font-family:'JetBrains Mono',monospace;">
-        <div style="font-weight:600;color:${deltaColor};">${deltaStr}</div>${deltaEurStr}
-      </td>
-      <td style="padding:3px 6px;">${momBar}</td>
-      <td style="padding:3px 6px;">${volBar}</td>
-      <td>${recHtml}</td>`;
+    tr.innerHTML = `<td style="font-weight:600;color:${m.color};">${m.name}</td><td>${m.outlookBadge}</td><td style="font-family:'JetBrains Mono',monospace;color:var(--teal);">${m.target}</td><td style="font-family:'JetBrains Mono',monospace;">${peso.toFixed(1)}% ${tag}</td><td style="font-family:'JetBrains Mono',monospace;"><div style="font-weight:600;color:${deltaColor};">${deltaStr}</div>${deltaEurStr}</td><td style="padding:3px 6px;">${momBar}</td><td style="padding:3px 6px;">${volBar}</td><td>${recHtml}</td>`;
     tb.appendChild(tr);
   });
 }
+
 let alerts=[];
 let snapshots=[
   {date:'2024-01-01',val:100000,note:'Inizio 2024'},
@@ -1525,97 +1519,74 @@ function clearAll(){caps=caps.map(()=>0);_isBalanced=false;_sbMode='reset';updSB
 function bilanciaConsensus(){
   const totOrig  = ORIG.reduce((s,a) => s + a.origCap, 0);
   const origPcts = ORIG.map(a => totOrig > 0 ? a.origCap / totOrig * 100 : 0);
-  const SELL_THRESHOLD = 5.0;
 
-  // Calcola target effettivo per ogni asset in base alla raccomandazione del modello
-  // Se rec dice aumenta → usa targetPct di CONS_META
-  // Se rec dice mantieni/neutro → usa peso attuale (non toccare)
-  // Se rec dice riduci → segnala solo se oltre soglia
-  const effectiveTargets = CONS_META.map(m => {
-    const peso = origPcts[m.i];
-    const rec  = getRec(m.sentX, peso, m.targetPct, m.mom1y||0, m.mom6m||0, m.mom3m||0, m.vol||0.3, m.cat||'equity-theme');
-    let target;
-    if (rec.score >  0.25) target = Math.max(peso, m.targetPct); // aumenta → vai al target o mantieni se già sopra
-    else if (rec.score < -0.25) target = Math.min(peso, m.targetPct); // riduci → ma buy-only, quindi mantieni
-    else target = peso; // mantieni/neutro → peso attuale
-    return {...m, effectivePct: target, origPct: peso, rec};
+  // Per ogni asset: calcola target effettivo dalla raccomandazione
+  const targets = CONS_META.map(m => {
+    const rec = getRec(m.sentX, origPcts[m.i], m.targetPct, m.mom1y||0, m.mom6m||0, m.mom3m||0, m.vol||0.3, m.cat||'equity-theme');
+    let effectivePct;
+    if      (rec.score >  0.20) effectivePct = Math.max(origPcts[m.i], m.targetPct);
+    else if (rec.score < -0.10) effectivePct = m.targetPct; // segnala solo
+    else                        effectivePct = origPcts[m.i];
+    return {...m, effectivePct, origPct: origPcts[m.i], rec};
   });
 
-  const toIncrease = effectiveTargets.filter(m => m.effectivePct - m.origPct > 0.5);
-  const toSell     = effectiveTargets.filter(m => m.origPct - m.effectivePct > SELL_THRESHOLD);
-  const toKeep     = effectiveTargets.filter(m => Math.abs(m.effectivePct - m.origPct) <= 0.5);
+  // Asset da aumentare (buy-only)
+  const toIncrease = targets.filter(t => t.effectivePct - t.origPct > 0.5);
+  const toKeep     = targets.filter(t => t.effectivePct - t.origPct <= 0.5);
+  const toSell     = targets.filter(t => t.origPct - t.effectivePct > 3); // monitora
 
-  // Calcola nuovo totale (buy-only)
-  const sumKeepCap   = [...toKeep, ...toSell].reduce((s,m) => s + ORIG[m.i].origCap, 0);
-  const sumTargetInc = toIncrease.reduce((s,m) => s + m.effectivePct, 0);
-
-  let newTotal;
-  if (sumTargetInc >= 100) {
-    newTotal = totOrig;
-  } else {
-    newTotal = sumKeepCap / (1 - sumTargetInc / 100);
-  }
+  // Calcola nuovo totale necessario
+  const sumKeepCap   = toKeep.reduce((s,t) => s + ORIG[t.i].origCap, 0);
+  const sumTargetInc = toIncrease.reduce((s,t) => s + t.effectivePct, 0);
+  const newTotal     = sumTargetInc < 100 ? sumKeepCap / (1 - sumTargetInc/100) : totOrig;
   const nuovoCapitale = newTotal - totOrig;
 
-  // Applica caps
-  effectiveTargets.forEach(m => {
-    if (m.effectivePct - m.origPct > 0.5) {
-      caps[m.i] = newTotal * m.effectivePct / 100;
-    } else {
-      caps[m.i] = ORIG[m.i].origCap;
-    }
+  // Applica caps: aumenta chi deve aumentare, mantieni gli altri
+  targets.forEach(t => {
+    caps[t.i] = t.effectivePct - t.origPct > 0.5
+      ? newTotal * t.effectivePct / 100
+      : ORIG[t.i].origCap;
+  });
+  // Asset non in CONS_META rimangono invariati
+  ORIG.forEach((a,i) => {
+    if (!CONS_META.find(m => m.i === i)) caps[i] = a.origCap;
   });
 
-  // Aggiorna capitale totale
-  totalCap = newTotal;
+  // Aggiorna totalCap = somma reale
+  totalCap = totA();
   const totInp = document.getElementById('totInp');
-  if (totInp) totInp.value = Math.round(newTotal);
+  if (totInp) totInp.value = Math.round(totalCap);
+  const scCap = document.getElementById('sc-cap');
+  if (scCap) scCap.value = Math.round(totalCap);
 
-  // Delta badge sidebar
-  effectiveTargets.forEach(m => {
-    const el = document.getElementById('hd-'+m.i);
+  // Badge sidebar
+  targets.forEach(t => {
+    const el = document.getElementById('hd-'+t.i);
     if (!el) return;
-    const delta = m.effectivePct - m.origPct;
-    if (delta > 0.5) {
-      el.textContent = '+'+delta.toFixed(1)+'%';
-      el.style.color = 'var(--teal)';
-    } else if (m.origPct - m.effectivePct > SELL_THRESHOLD) {
-      el.textContent = (m.effectivePct - m.origPct).toFixed(1)+'%';
-      el.style.color = 'var(--red)';
-    } else {
-      el.textContent = '=';
-      el.style.color = 'var(--t3)';
-    }
+    const delta = t.effectivePct - t.origPct;
+    if (delta > 0.5)       { el.textContent = '+'+delta.toFixed(1)+'%'; el.style.color = 'var(--teal)'; }
+    else if (delta < -0.5) { el.textContent = delta.toFixed(1)+'% ⚠';  el.style.color = 'var(--amber)'; }
+    else                   { el.textContent = '=';                      el.style.color = 'var(--t3)'; }
   });
 
-  // Force aggiornamento sidebar
-  _sup = false;
-  _isBalanced = true;
-  _sbMode = 'bal';
-  updSBDisp();
-  refresh();
-  setTimeout(()=>renderConsTable(), 50);
-
-  // Mostra nuovo capitale inline nel cap-box
+  // Pannello "Da allocare"
   const ncInline = document.getElementById('sb-nc-inline');
   const ncAmt    = document.getElementById('sb-nc-amount');
   const ncSel    = document.getElementById('sb-nc-sell');
-
   if (ncInline && ncAmt) {
     ncInline.style.display = nuovoCapitale > 10 ? 'block' : 'none';
     ncAmt.textContent = '+€' + fE(Math.round(nuovoCapitale));
-
-    // Segnala asset da valutare vendita
-    if (toSell.length > 0) {
-      ncSel.style.display = 'block';
-      ncSel.innerHTML = '⚠ ' + toSell.map(m =>
-        `${m.name.replace(/ USD$/,'').replace(/ ESG$/,'')}: ${m.delta.toFixed(1)}%`
-      ).join(' · ');
-    } else {
-      ncSel.style.display = 'none';
+    if (ncSel) {
+      ncSel.style.display = toSell.length > 0 ? 'block' : 'none';
+      if (toSell.length > 0)
+        ncSel.innerHTML = '⚠ Valuta vendita: ' + toSell.map(t => t.name.replace(/ USD$/,'').replace(/ ESG$/,'')+' ('+(t.origPct-t.effectivePct).toFixed(1)+'%)').join(' · ');
     }
   }
+
+  _sup = false; _isBalanced = true; _sbMode = 'bal';
+  updSBDisp(); refresh(); setTimeout(()=>renderConsTable(), 50);
 }
+
 function filterHI(q){document.querySelectorAll('.hi').forEach(el=>el.style.display=el.dataset.name.includes(q.toLowerCase())?'block':'none');}
 
 // ═══════════════ PRESETS ═══════════════
