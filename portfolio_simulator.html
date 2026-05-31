@@ -1167,6 +1167,8 @@ let caps=ORIG.map(a=>a.origCap);
 let totalCap=caps.reduce((s,v)=>s+v,0);
 let curPane='overview',geoV='geo',charts={};
 let _sup=false;
+let _isBalanced=false;
+let _sbMode='sim'; // 'sim' | 'bal' | 'reset'
 let stressShocks=ORIG.map(()=>0);
 
 // ═══════════════ CONSENSUS METADATA ═══════════════
@@ -1362,7 +1364,7 @@ function renderConsTable(){
         </div></div>`;
 
     // Raccomandazione
-    const isBal = Math.abs(peso - m.targetPct) <= 1.5;
+    const isBal = _isBalanced && Math.abs(peso - m.targetPct) <= 1.5;
     const nPct  = Math.round((rec.sN||0)*50+50);
     const iPct  = Math.round((rec.sI||0)*50+50);
     const recHtml = isBal
@@ -1476,13 +1478,20 @@ function updSBSt(){
   document.getElementById('allocEur').textContent='€'+fE(tot);
   document.getElementById('allocDiff').textContent=Math.abs(diff)>10?(diff>0?'+':'')+fE(diff)+' €':'';
   const wb=document.getElementById('sbWarn');
-  if(Math.abs(tot-tc)/tc<.005){wb.className='sb-warn ok';wb.textContent='✓ Bilanciato';setTimeout(()=>{if(wb.classList.contains('ok'))wb.className='sb-warn';},1800);}
+  if(Math.abs(tot-tc)/tc<.005){
+    wb.className='sb-warn ok';
+    if(_sbMode==='bal')   wb.textContent='⚖ Bilanciato';
+    else if(_sbMode==='reset') wb.textContent='↺ Reset applicato';
+    else                  wb.textContent='✓ Simulazione';
+    setTimeout(()=>{if(wb.classList.contains('ok'))wb.className='sb-warn';},2000);
+  }
   else if(tot>tc+1){wb.className='sb-warn ov';wb.textContent='Eccede di '+fE(tot-tc)+' €';}
   else if(tot<tc-1){wb.className='sb-warn un';wb.textContent='Mancano '+fE(tc-tot)+' €';}
 }
 
 function onCap(idx,val){
   if(_sup)return;caps[idx]=Math.max(0,parseFloat(val)||0);
+  _isBalanced=false;_sbMode='sim';
   const el=document.getElementById('hd-'+idx);if(el)el.textContent='';
   updSBDisp();refresh();
 }
@@ -1493,6 +1502,7 @@ function onPct(idx,val){
   const ot=caps.reduce((s,c,i)=>i!==idx?s+c:s,0);
   if(ot>0)caps.forEach((c,i)=>{if(i!==idx)caps[i]=Math.max(0,c-delta*(c/ot));});
   caps[idx]=nc;
+  _isBalanced=false;_sbMode='sim';
   const el=document.getElementById('hd-'+idx);if(el)el.textContent='';
   updSBDisp();refresh();
 }
@@ -1506,8 +1516,8 @@ function onTotChange(){
   updSBDisp();refresh();
 }
 function normalizeW(){const r=totalCap/totA();caps=caps.map(c=>c*r);updSBDisp();refresh();}
-function resetOrig(){caps=ORIG.map(a=>a.origCap);totalCap=caps.reduce((s,v)=>s+v,0);document.getElementById('totInp').value=Math.round(totalCap);const sc=document.getElementById('sc-cap');if(sc)sc.value=Math.round(totalCap);updSBDisp();refresh();}
-function clearAll(){caps=caps.map(()=>0);updSBDisp();refresh();}
+function resetOrig(){caps=ORIG.map(a=>a.origCap);totalCap=caps.reduce((s,v)=>s+v,0);_isBalanced=false;_sbMode='reset';document.getElementById('totInp').value=Math.round(totalCap);const sc=document.getElementById('sc-cap');if(sc)sc.value=Math.round(totalCap);const ncInline=document.getElementById('sb-nc-inline');if(ncInline)ncInline.style.display='none';updSBDisp();refresh();}
+function clearAll(){caps=caps.map(()=>0);_isBalanced=false;_sbMode='reset';updSBDisp();refresh();}
 
 function bilanciaConsensus(){
   const totOrig = ORIG.reduce((s,a) => s + a.origCap, 0);
@@ -1595,6 +1605,8 @@ function bilanciaConsensus(){
 
   // Force aggiornamento sidebar
   _sup = false;
+  _isBalanced = true;
+  _sbMode = 'bal';
   updSBDisp();
   refresh();
   setTimeout(()=>renderConsTable(), 50);
