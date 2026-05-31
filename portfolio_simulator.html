@@ -1177,21 +1177,21 @@ let stressShocks=ORIG.map(()=>0);
 // vol: volatilità annualizzata
 // targetPct: peso % ottimale secondo consensus
 const CONS_META = [
-  {i:0,  name:'Physical Gold USD', cat:'commodity',      color:'#f0c96e', fonte:'GS, JPM, BofA',       outlookBadge:'<span class="badge bg">Bullish</span>',            target:'€135–€166/g',  sentX:88, targetPct:26, y:3.5, mom1y:.84, mom6m:.52, mom3m:.25, vol:.16},
-  {i:1,  name:'Global Hydrogen ESG', cat:'equity-theme',    color:'#27c99a', fonte:'BlackRock, iShares',   outlookBadge:'<span class="badge ba">Early stage</span>',         target:'$11T al 2050', sentX:62, targetPct:12, y:5.0, mom1y:-.15, mom6m:-.08, mom3m:.02, vol:.35},
-  {i:2,  name:'Core MSCI EM IMI', cat:'equity-broad',       color:'#BA7517', fonte:'GS, BlackRock',        outlookBadge:'<span class="badge ba">Neutral</span>',           target:'Cina-risk',     sentX:45, targetPct:11, y:2.5, mom1y:.12, mom6m:.06, mom3m:.03, vol:.22},
-  {i:3,  name:'Global Clean Energy', cat:'equity-theme',    color:'#4d9de0', fonte:'BlackRock, IEA',       outlookBadge:'<span class="badge ba">Misto breve</span>',       target:'Volat. alta',   sentX:58, targetPct:10, y:3.5, mom1y:.05, mom6m:-.02, mom3m:.04, vol:.27},
-  {i:4,  name:'Copper Miners USD', cat:'equity-theme',      color:'#CD7F32', fonte:'GS, GSAM',             outlookBadge:'<span class="badge bg">Bullish strutturale</span>',target:'€9.800/ton',   sentX:85, targetPct:10, y:4.5, mom1y:.35, mom6m:.18, mom3m:.08, vol:.38},
-  {i:5,  name:'Battery Value-Chain', cat:'equity-theme',    color:'#8b6fff', fonte:'GS, GSAM',             outlookBadge:'<span class="badge bg">Bullish LT</span>',        target:'EV+Storage',    sentX:75, targetPct:8,  y:4.0, mom1y:.08, mom6m:.05, mom3m:.04, vol:.40},
-  {i:6,  name:'Physical Silver', cat:'commodity',        color:'#C0C0C0', fonte:'Silver Inst., JPM',    outlookBadge:'<span class="badge bg">Bullish</span>',           target:'€1,0–€1,2/g',  sentX:80, targetPct:6,  y:3.0, mom1y:.43, mom6m:.22, mom3m:.10, vol:.28},
-  {i:7,  name:'Uranium & Nuclear', cat:'equity-theme',      color:'#d4903a', fonte:'WNA, Sprott',          outlookBadge:'<span class="badge bg">Bullish LT</span>',        target:'€170–€208/kg',  sentX:78, targetPct:6,  y:4.8, mom1y:.13, mom6m:.01, mom3m:-.05, vol:.42},
-  {i:8,  name:'Electrification & Grid', cat:'equity-theme', color:'#27c99a', fonte:'S&P Global',           outlookBadge:'<span class="badge bg">Bullish LT</span>',        target:'€584B EU',      sentX:82, targetPct:5,  y:4.2, mom1y:.18, mom6m:.08, mom3m:.05, vol:.35},
+  {i:0,  name:'Physical Gold USD', cat:'commodity',      color:'#f0c96e', fonte:'GS, JPM, BofA',       outlookBadge:'<span class="badge bg">Bullish</span>',            target:'€135–€166/g',  sentX:88, targetPct:26, y:3.5, mom1y:.41, mom6m:.11, mom3m:-.095, vol:.16},
+  {i:1,  name:'Global Hydrogen ESG', cat:'equity-theme',    color:'#27c99a', fonte:'BlackRock, iShares',   outlookBadge:'<span class="badge ba">Early stage</span>',         target:'$11T al 2050', sentX:62, targetPct:12, y:5.0, mom1y:.25, mom6m:.40, mom3m:.558, vol:.35},
+  {i:2,  name:'Core MSCI EM IMI', cat:'equity-broad',       color:'#BA7517', fonte:'GS, BlackRock',        outlookBadge:'<span class="badge ba">Neutral</span>',           target:'Cina-risk',     sentX:45, targetPct:11, y:2.5, mom1y:.15, mom6m:.08, mom3m:.05, vol:.22},
+  {i:3,  name:'Global Clean Energy', cat:'equity-theme',    color:'#4d9de0', fonte:'BlackRock, IEA',       outlookBadge:'<span class="badge ba">Misto breve</span>',       target:'Volat. alta',   sentX:58, targetPct:10, y:3.5, mom1y:.5568, mom6m:.3713, mom3m:.0355, vol:.27},
+  {i:4,  name:'Copper Miners USD', cat:'equity-theme',      color:'#CD7F32', fonte:'GS, GSAM',             outlookBadge:'<span class="badge bg">Bullish strutturale</span>',target:'€9.800/ton',   sentX:85, targetPct:10, y:4.5, mom1y:.62, mom6m:.29, mom3m:.10, vol:.38},
+  {i:5,  name:'Battery Value-Chain', cat:'equity-theme',    color:'#8b6fff', fonte:'GS, GSAM',             outlookBadge:'<span class="badge bg">Bullish LT</span>',        target:'EV+Storage',    sentX:75, targetPct:8,  y:4.0, mom1y:.30, mom6m:.15, mom3m:.05, vol:.40},
+  {i:6,  name:'Physical Silver', cat:'commodity',        color:'#C0C0C0', fonte:'Silver Inst., JPM',    outlookBadge:'<span class="badge bg">Bullish</span>',           target:'€1,0–€1,2/g',  sentX:80, targetPct:6,  y:3.0, mom1y:.60, mom6m:.30, mom3m:.12, vol:.28},
+  {i:7,  name:'Uranium & Nuclear', cat:'equity-theme',      color:'#d4903a', fonte:'WNA, Sprott',          outlookBadge:'<span class="badge bg">Bullish LT</span>',        target:'€170–€208/kg',  sentX:78, targetPct:6,  y:4.8, mom1y:.64, mom6m:.20, mom3m:.05, vol:.42},
+  {i:8,  name:'Electrification & Grid', cat:'equity-theme', color:'#27c99a', fonte:'S&P Global',           outlookBadge:'<span class="badge bg">Bullish LT</span>',        target:'€584B EU',      sentX:82, targetPct:5,  y:4.2, mom1y:.45, mom6m:.22, mom3m:.08, vol:.35},
   {i:10, name:'Private Equity', cat:'alternative',         color:'#9e7aff', fonte:'Varia',                outlookBadge:'<span class="badge bb">Neutral</span>',           target:'PE diversif.',  sentX:50, targetPct:3,  y:2.0, mom1y:.07, mom6m:.03, mom3m:.01, vol:.18},
   {i:11, name:'Bitcoin', cat:'crypto',                color:'#F7931A', fonte:'Varia',                outlookBadge:'<span class="badge ba">Speculativo</span>',       target:'Volatile',      sentX:55, targetPct:3,  y:1.5, mom1y:.20, mom6m:-.10, mom3m:-.08, vol:.70},
 ];
 
 // ═══════════════ MODELLO A 5 FATTORI ═══════════════
-// Consensus 30% · Momentum 20% · Volatilità 20% · NFP 10% · CPI 10% · Peso 10%
+// Consensus 35% · Momentum 25% · Volatilità 20% · NFP 10% · CPI 10%
 const MACRO_USA = {
   nfp: [
     {m:'Gen 26', v:130,  a:70,   prev:null},
@@ -1255,8 +1255,8 @@ function getRec(sentX,pesoPct,targetPct,mom1y=0,mom6m=0,mom3m=0,vol=0.3,cat='equ
   const sV=scoreVolatility(vol,pesoPct,targetPct);
   const sN=scoreNFP(MACRO_USA.nfpScore,cat);
   const sI=scoreCPI(MACRO_USA.cpiScore,cat);
-  const sPeso=Math.max(-1,Math.min(1,(targetPct-pesoPct)/15));
-  const score=sC*0.30+sM*0.20+sV*0.20+sN*0.10+sI*0.10+sPeso*0.10;
+  // Pesi: Consensus 35% · Momentum 25% · Volatilità 20% · NFP 10% · CPI 10%
+  const score=sC*0.35+sM*0.25+sV*0.20+sN*0.10+sI*0.10;
   if(score> 0.55)return{text:'⬆ Aumenta',         color:'var(--teal)', score,sC,sM,sV,sN,sI};
   if(score> 0.25)return{text:'↗ Valuta aumento',  color:'var(--teal)', score,sC,sM,sV,sN,sI};
   if(score> 0.05)return{text:'✅ Mantieni',        color:'var(--t2)',  score,sC,sM,sV,sN,sI};
@@ -1319,17 +1319,20 @@ function renderConsTable(){
     const peso     = totCurr > 0 ? caps[m.i] / totCurr * 100 : 0;
     const pesoOrig = totOrig > 0 ? ORIG[m.i].origCap / totOrig * 100 : 0;
     const rec = getRec(m.sentX, peso, m.targetPct, m.mom1y||0, m.mom6m||0, m.mom3m||0, m.vol||0.3, m.cat||'equity-theme');
-    const tag      = pesoTag(peso, m.targetPct);
-    const delta    = m.targetPct - pesoOrig;
-    const deltaStr = Math.abs(delta) < 0.05 ? '=' : (delta > 0 ? '+' : '') + delta.toFixed(1) + '%';
-    const deltaColor = Math.abs(delta) < 0.05 ? 'var(--t3)' : delta > 0 ? 'var(--teal)' : 'var(--red)';
+    // Bilanciamento basato sulla raccomandazione del modello, non su targetPct hardcoded
+    let effectivePct;
+    if      (rec.score >  0.25) effectivePct = Math.max(pesoOrig, m.targetPct); // aumenta
+    else if (rec.score < -0.25) effectivePct = Math.min(pesoOrig, m.targetPct); // riduci (segnala)
+    else                        effectivePct = pesoOrig;                         // mantieni
 
-    // Calcola euro necessari per bilanciamento (sempre su origCap)
-    const totOrig2  = ORIG.reduce((s,a) => s + a.origCap, 0);
-    const pesoOrigE = totOrig2 > 0 ? ORIG[m.i].origCap / totOrig2 * 100 : 0;
-    const deltaEur  = Math.round((m.targetPct - pesoOrigE) / 100 * totOrig2);
+    const delta      = effectivePct - pesoOrig;
+    const deltaStr   = Math.abs(delta) < 0.05 ? '=' : (delta > 0 ? '+' : '') + delta.toFixed(1) + '%';
+    const deltaColor = Math.abs(delta) < 0.05 ? 'var(--t3)' : delta > 0 ? 'var(--teal)' : 'var(--red)';
+    const deltaEur   = Math.round(delta / 100 * totOrig);
     const deltaEurStr = Math.abs(deltaEur) < 50 ? '' :
       `<div style="font-size:10px;color:${deltaColor};font-family:'JetBrains Mono',monospace;margin-top:1px;">${deltaEur>0?'+':''}€${fE(Math.abs(deltaEur))}</div>`;
+    const tag = pesoTag(peso, effectivePct);
+
 
     // Score 0-100
     const sC   = scoreConsensus(m.sentX, peso, m.targetPct);
@@ -1338,7 +1341,7 @@ function renderConsTable(){
     const cPct = Math.round(sC*50+50);
     const mPct = Math.round(sM*50+50);
     const vPct = Math.round(sV*50+50);
-    const scoreFinale = Math.round((sC*0.30+sM*0.20+sV*0.20)*50+50);
+    const scoreFinale = Math.round((sC*0.35+sM*0.25+sV*0.20)*50+50);
     const barM = mPct>=60?'var(--teal)':mPct>=45?'var(--amber)':'var(--red)';
     const barV = vPct>=60?'var(--teal)':vPct>=45?'var(--amber)':'var(--red)';
 
@@ -1520,83 +1523,65 @@ function resetOrig(){caps=ORIG.map(a=>a.origCap);totalCap=caps.reduce((s,v)=>s+v
 function clearAll(){caps=caps.map(()=>0);_isBalanced=false;_sbMode='reset';updSBDisp();refresh();}
 
 function bilanciaConsensus(){
-  const totOrig = ORIG.reduce((s,a) => s + a.origCap, 0);
-
-  // Calcola peso % originale per ogni asset
+  const totOrig  = ORIG.reduce((s,a) => s + a.origCap, 0);
   const origPcts = ORIG.map(a => totOrig > 0 ? a.origCap / totOrig * 100 : 0);
-
-  // Soglia sell: se un asset supera il target di più del 5% in peso assoluto
   const SELL_THRESHOLD = 5.0;
 
-  // Identifica chi va aumentato, chi è ok, chi è troppo alto
-  const toIncrease = []; // asset sotto target → compra
-  const toSell     = []; // asset sopra target di >5% → segnala
-  const toKeep     = []; // asset dentro tolleranza
-
-  CONS_META.forEach(m => {
-    const delta = m.targetPct - origPcts[m.i];
-    if (delta > 0.5) {
-      toIncrease.push({...m, origPct: origPcts[m.i], delta});
-    } else if (delta < -SELL_THRESHOLD) {
-      toSell.push({...m, origPct: origPcts[m.i], delta});
-    } else {
-      toKeep.push({...m, origPct: origPcts[m.i], delta});
-    }
+  // Calcola target effettivo per ogni asset in base alla raccomandazione del modello
+  // Se rec dice aumenta → usa targetPct di CONS_META
+  // Se rec dice mantieni/neutro → usa peso attuale (non toccare)
+  // Se rec dice riduci → segnala solo se oltre soglia
+  const effectiveTargets = CONS_META.map(m => {
+    const peso = origPcts[m.i];
+    const rec  = getRec(m.sentX, peso, m.targetPct, m.mom1y||0, m.mom6m||0, m.mom3m||0, m.vol||0.3, m.cat||'equity-theme');
+    let target;
+    if (rec.score >  0.25) target = Math.max(peso, m.targetPct); // aumenta → vai al target o mantieni se già sopra
+    else if (rec.score < -0.25) target = Math.min(peso, m.targetPct); // riduci → ma buy-only, quindi mantieni
+    else target = peso; // mantieni/neutro → peso attuale
+    return {...m, effectivePct: target, origPct: peso, rec};
   });
 
-  // Logica buy-only:
-  // Il nuovo portafoglio = asset da mantenere al loro valore originale
-  //                      + asset da aumentare portati al loro targetPct
-  // Il capitale totale aumenta di conseguenza
+  const toIncrease = effectiveTargets.filter(m => m.effectivePct - m.origPct > 0.5);
+  const toSell     = effectiveTargets.filter(m => m.origPct - m.effectivePct > SELL_THRESHOLD);
+  const toKeep     = effectiveTargets.filter(m => Math.abs(m.effectivePct - m.origPct) <= 0.5);
 
-  // Calcola il nuovo totale necessario:
-  // Per ogni asset da aumentare: il suo origCap deve diventare targetPct% del nuovo totale
-  // Risoluzione: newTot = sum(assetsToKeep origCap) + sum(assetsToSellKeep origCap)
-  //                       diviso (1 - sum(targetPct degli asset da aumentare)/100)
-
-  const sumKeepCap    = [...toKeep, ...toSell].reduce((s,m) => s + ORIG[m.i].origCap, 0);
-  const sumTargetInc  = toIncrease.reduce((s,m) => s + m.targetPct, 0);
+  // Calcola nuovo totale (buy-only)
+  const sumKeepCap   = [...toKeep, ...toSell].reduce((s,m) => s + ORIG[m.i].origCap, 0);
+  const sumTargetInc = toIncrease.reduce((s,m) => s + m.effectivePct, 0);
 
   let newTotal;
   if (sumTargetInc >= 100) {
-    newTotal = totOrig; // fallback
+    newTotal = totOrig;
   } else {
     newTotal = sumKeepCap / (1 - sumTargetInc / 100);
   }
-
   const nuovoCapitale = newTotal - totOrig;
 
-  // Applica i nuovi caps
-  CONS_META.forEach(m => {
-    const delta = m.targetPct - origPcts[m.i];
-    if (delta > 0.5) {
-      // Aumenta: porta al targetPct del nuovo totale
-      caps[m.i] = newTotal * m.targetPct / 100;
+  // Applica caps
+  effectiveTargets.forEach(m => {
+    if (m.effectivePct - m.origPct > 0.5) {
+      caps[m.i] = newTotal * m.effectivePct / 100;
     } else {
-      // Mantieni originale (anche chi è troppo alto — non vendiamo)
       caps[m.i] = ORIG[m.i].origCap;
     }
   });
 
-  // Aggiorna capitaleTotale nella sidebar
+  // Aggiorna capitale totale
   totalCap = newTotal;
   const totInp = document.getElementById('totInp');
   if (totInp) totInp.value = Math.round(newTotal);
 
-  // Delta badge per ogni asset
-  CONS_META.forEach(m => {
+  // Delta badge sidebar
+  effectiveTargets.forEach(m => {
     const el = document.getElementById('hd-'+m.i);
     if (!el) return;
-    const delta = m.targetPct - origPcts[m.i];
+    const delta = m.effectivePct - m.origPct;
     if (delta > 0.5) {
-      const addEur = caps[m.i] - ORIG[m.i].origCap;
       el.textContent = '+'+delta.toFixed(1)+'%';
       el.style.color = 'var(--teal)';
-      el.title = '+€'+fE(addEur);
-    } else if (delta < -SELL_THRESHOLD) {
-      el.textContent = delta.toFixed(1)+'%';
+    } else if (m.origPct - m.effectivePct > SELL_THRESHOLD) {
+      el.textContent = (m.effectivePct - m.origPct).toFixed(1)+'%';
       el.style.color = 'var(--red)';
-      el.title = 'Valuta vendita';
     } else {
       el.textContent = '=';
       el.style.color = 'var(--t3)';
