@@ -1190,6 +1190,23 @@ const CONS_META = [
   {i:11, name:'Bitcoin', cat:'crypto',                color:'#F7931A', fonte:'Varia',                outlookBadge:'<span class="badge ba">Speculativo</span>',       target:'Volatile',      sentX:55, targetPct:3,  y:1.5, mom1y:.20, mom6m:-.10, mom3m:-.08, vol:.70},
 ];
 
+
+// ═══════════════ PESI OTTIMALI DA SCORE ═══════════════
+// Il portafoglio ottimale è proporzionale agli score CMVNI
+// Chi ha score più alto merita più peso
+function computeOptimalWeights(){
+  const scores = CONS_META.map(m => {
+    const score = getRec(m.sentX, 0, m.targetPct, m.mom1y||0, m.mom6m||0, m.mom3m||0, m.vol||0.3, m.cat||'equity-theme').score;
+    return {i: m.i, score, raw: Math.max(0, score)}; // solo score positivi
+  });
+  const totScore = scores.reduce((s,x) => s + x.raw, 0);
+  const weights = {};
+  scores.forEach(x => {
+    weights[x.i] = totScore > 0 ? x.raw / totScore * 100 : 0;
+  });
+  return weights;
+}
+
 // ═══════════════ MODELLO A 5 FATTORI ═══════════════
 // Momentum 40% · Consensus 25% · Volatilità 10% · NFP 15% · CPI 10%
 // Consensus ridotto perché basato su interpretazione qualitativa
@@ -1318,26 +1335,15 @@ function renderConsTable(){
   if(!tb) return;
   const totOrig = ORIG.reduce((s,a) => s + a.origCap, 0);
   const totCurr = totA();
+  const optWeights = computeOptimalWeights(); // pesi ottimali proporzionali agli score
   tb.innerHTML = '';
   CONS_META.forEach(m => {
     const peso     = totCurr > 0 ? caps[m.i] / totCurr * 100 : 0;
     const pesoOrig = totOrig > 0 ? ORIG[m.i].origCap / totOrig * 100 : 0;
     const rec = getRec(m.sentX, peso, m.targetPct, m.mom1y||0, m.mom6m||0, m.mom3m||0, m.vol||0.3, m.cat||'equity-theme');
 
-    // Bilanciamento: dopo bilancia il target è il peso attuale (caps[] già aggiornati)
-    // Prima del bilancia: target derivato da raccomandazione su pesoOrig
-    let targetOttimale;
-    if (_isBalanced) {
-      targetOttimale = peso; // post-bilancia: ogni asset è già al suo target
-    } else if (rec.score >  0.15) {
-      targetOttimale = Math.max(pesoOrig, m.targetPct);
-    } else if (rec.score < -0.10) {
-      targetOttimale = Math.min(pesoOrig, m.targetPct);
-    } else {
-      targetOttimale = pesoOrig;
-    }
-    // Override pre-bilancia: sovrappeso eccessivo vs target
-    if (!_isBalanced && pesoOrig - m.targetPct > 5) targetOttimale = m.targetPct;
+    // Target ottimale = peso proporzionale allo score (portafoglio perfetto)
+    const targetOttimale = _isBalanced ? peso : optWeights[m.i] || 0;
 
     // Delta bilanciamento = differenza tra target ottimale e peso simulato
     const delta      = targetOttimale - peso;
@@ -1384,16 +1390,18 @@ function renderConsTable(){
     // Raccomandazione
     const isBal = _isBalanced && Math.abs(delta) <= 2.0;
 
-    // Override visivo durante simulazione: basato su delta vs targetOttimale
-    let displayRec = rec;
+    // Sequenza simulazione basata su delta vs targetOttimale
+    let displayRec;
     if (!_isBalanced) {
       const simDelta = peso - targetOttimale;
-      if      (simDelta > 10) displayRec = {text:'⬇ Troppo alto',  color:'var(--red)'};
-      else if (simDelta > 5)  displayRec = {text:'⚠ Riduci',       color:'var(--amber)'};
-      else if (simDelta < -5) displayRec = {text:'⬆ Da aumentare', color:'var(--teal)'};
-      else if (Math.abs(simDelta) <= 1.5 && rec.text.includes('aumento'))
-        // Peso già allineato ma rec dice "aumento" — mostra mantieni
-        displayRec = {text:'✅ Mantieni', color:'var(--t2)'};
+      if      (simDelta >  15) displayRec = {text:'⬇ Riduci',           color:'var(--red)'};
+      else if (simDelta >   5) displayRec = {text:'⚠ Valuta riduzione', color:'var(--amber)'};
+      else if (simDelta >   1.5) displayRec = {text:'⟷ Mantieni',        color:'var(--t2)'};
+      else if (simDelta >= -1.5) displayRec = {text:'✅ Allineato',       color:'var(--teal)'};
+      else if (simDelta >= -5)   displayRec = {text:'⟷ Mantieni',        color:'var(--t2)'};
+      else                       displayRec = {text:'↗ Valuta aumento',  color:'var(--teal)'};
+    } else {
+      displayRec = rec;
     }
     const recHtml = isBal
       ? `<span style="color:var(--teal);font-weight:700;">\u2705 Bilanciato</span><div style="font-size:9px;color:var(--t3);margin-top:2px;">C:${cPct} M:${mPct} V:${vPct} N:${nPct} I:${iPct} \u2192 ${scoreFinale}/100</div>`
@@ -1561,18 +1569,15 @@ function clearAll(){caps=caps.map(()=>0);_isBalanced=false;_sbMode='reset';updSB
 function bilanciaConsensus(){
   const totOrig  = ORIG.reduce((s,a) => s + a.origCap, 0);
   const origPcts = ORIG.map(a => totOrig > 0 ? a.origCap / totOrig * 100 : 0);
+  const optWeights = computeOptimalWeights();
 
-  // Per ogni asset: calcola target effettivo dalla raccomandazione
+  // Target di ogni asset = peso ottimale proporzionale allo score
   const targets = CONS_META.map(m => {
     const rec = getRec(m.sentX, origPcts[m.i], m.targetPct, m.mom1y||0, m.mom6m||0, m.mom3m||0, m.vol||0.3, m.cat||'equity-theme');
-    let effectivePct;
-    if      (rec.score >  0.15) effectivePct = Math.max(origPcts[m.i], m.targetPct);
-    else if (rec.score < -0.10) effectivePct = m.targetPct;
-    else                        effectivePct = origPcts[m.i];
-    // Override: sovrappeso oltre 5% → segnala sempre
-    if (origPcts[m.i] - m.targetPct > 5) effectivePct = m.targetPct;
+    const effectivePct = optWeights[m.i] || 0;
     return {...m, effectivePct, origPct: origPcts[m.i], rec};
   });
+
 
   // Asset da aumentare (buy-only)
   const toIncrease = targets.filter(t => t.effectivePct - t.origPct > 0.5);
