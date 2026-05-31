@@ -1390,18 +1390,20 @@ function renderConsTable(){
     // Raccomandazione
     const isBal = _isBalanced && Math.abs(delta) <= 2.0;
 
-    // Sequenza simulazione basata su delta vs targetOttimale
+    // Progressione raccomandazione basata su delta vs peso ottimale
+    // d > 0 = sottopesato (devi comprare), d < 0 = sovrappesato (dovresti ridurre)
     let displayRec;
     if (!_isBalanced) {
-      const simDelta = peso - targetOttimale;
-      if      (simDelta >  15) displayRec = {text:'⬇ Riduci',           color:'var(--red)'};
-      else if (simDelta >   5) displayRec = {text:'⚠ Valuta riduzione', color:'var(--amber)'};
-      else if (simDelta >   1.5) displayRec = {text:'⟷ Mantieni',        color:'var(--t2)'};
-      else if (simDelta >= -1.5) displayRec = {text:'✅ Allineato',       color:'var(--teal)'};
-      else if (simDelta >= -5)   displayRec = {text:'⟷ Mantieni',        color:'var(--t2)'};
-      else                       displayRec = {text:'↗ Valuta aumento',  color:'var(--teal)'};
+      const d = targetOttimale - peso;
+      if      (d >  10)   displayRec = {text:'⬆ Aumenta',          color:'var(--teal)'};
+      else if (d >   5)   displayRec = {text:'↗ Valuta aumento',   color:'var(--teal)'};
+      else if (d >   1.5) displayRec = {text:'⟷ Mantieni',         color:'var(--t2)'};
+      else if (d >= -1.5) displayRec = {text:'✅ Allineato',        color:'var(--teal)'};
+      else if (d >= -5)   displayRec = {text:'⟷ Mantieni',         color:'var(--t2)'};
+      else if (d >= -10)  displayRec = {text:'⚠ Valuta riduzione', color:'var(--amber)'};
+      else                displayRec = {text:'⬇ Riduci',           color:'var(--red)'};
     } else {
-      displayRec = rec;
+      displayRec = {text:'✅ Bilanciato', color:'var(--teal)'};
     }
     const recHtml = isBal
       ? `<span style="color:var(--teal);font-weight:700;">\u2705 Bilanciato</span><div style="font-size:9px;color:var(--t3);margin-top:2px;">C:${cPct} M:${mPct} V:${vPct} N:${nPct} I:${iPct} \u2192 ${scoreFinale}/100</div>`
@@ -3315,11 +3317,14 @@ function updateSidebarLive(data) {
     const live = liveMap[a.name];
     if (live) {
       const vt = parseFloat(live.valore_tr);
-      if (!isNaN(vt) && vt > 0) caps[i] = vt;
+      // Non sovrascrivere caps durante simulazione o bilancia
+      if (!isNaN(vt) && vt > 0 && !_isBalanced && _sbMode === 'reset') caps[i] = vt;
     }
   });
-  totalCap = caps.reduce((s,v) => s+v, 0);
-  updSBDisp();
+  if (_sbMode === 'reset') {
+    totalCap = caps.reduce((s,v) => s+v, 0);
+    updSBDisp();
+  }
 }
 
 function updateCapitalLive(tot) {
