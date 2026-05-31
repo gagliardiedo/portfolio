@@ -1192,10 +1192,18 @@ const CONS_META = [
 // Consensus 30% · Momentum 20% · Volatilità 20% · NFP 10% · CPI 10% · Peso 10%
 const MACRO_USA = {
   nfp: [
-    {m:'Gen 26', v:130,  a:70},
-    {m:'Feb 26', v:-156, a:65},
-    {m:'Mar 26', v:185,  a:60},
-    {m:'Apr 26', v:115,  a:65},
+    {m:'Gen 26', v:130,  a:70,   prev:null},
+    {m:'Feb 26', v:-156, a:65,   prev:null},
+    {m:'Mar 26', v:185,  a:60,   prev:null},
+    {m:'Apr 26', v:115,  a:65,   prev:null},
+    {m:'Mag 26', v:null, a:null, prev:80},
+    {m:'Giu 26', v:null, a:null, prev:75},
+    {m:'Lug 26', v:null, a:null, prev:70},
+    {m:'Ago 26', v:null, a:null, prev:65},
+    {m:'Set 26', v:null, a:null, prev:60},
+    {m:'Ott 26', v:null, a:null, prev:55},
+    {m:'Nov 26', v:null, a:null, prev:60},
+    {m:'Dic 26', v:null, a:null, prev:65},
   ],
   cpi: [
     {m:'Gen 26', v:2.4, c:2.5, p:null},
@@ -1262,20 +1270,39 @@ function pesoTag(pesoPct,targetPct){
   return`<span style="color:var(--amber);">⚠ alto</span>`;
 }
 function rMacroCharts(){
-  const nfpLabels=MACRO_USA.nfp.map(d=>d.m);
-  const nfpVals=MACRO_USA.nfp.map(d=>d.v);
-  const nfpColors=nfpVals.map(v=>v<0?'rgba(232,80,74,.8)':v>=150?'rgba(39,201,154,.8)':'rgba(240,201,110,.8)');
-  mk('c-nfp',{type:'bar',data:{labels:nfpLabels,datasets:[
-    {label:'NFP (K)',data:nfpVals,backgroundColor:nfpColors,borderWidth:0,borderRadius:3},
-    {label:'Target Fed 150K',data:nfpVals.map(()=>150),type:'line',borderColor:'rgba(255,255,255,.3)',borderDash:[4,4],borderWidth:1.5,pointRadius:0,fill:false},
-    {label:'Atteso',data:MACRO_USA.nfp.map(d=>d.a),type:'line',borderColor:'rgba(100,150,255,.5)',borderDash:[2,3],borderWidth:1,pointRadius:2,fill:false},
-  ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#5a6478',font:{size:9},boxWidth:8}},tooltip:{callbacks:{label:ctx=>`${ctx.dataset.label}: ${ctx.parsed.y}K`}}},scales:{x:{ticks:{color:'#5a6478',font:{size:10}},grid:{display:false}},y:{ticks:{callback:v=>v+'K',color:'#5a6478',font:{size:10}},grid:{color:'rgba(255,255,255,.04)'}}}}});
+  const nd = MACRO_USA.nfp;
+  mk('c-nfp',{type:'bar',data:{labels:nd.map(d=>d.m),datasets:[
+    {label:'NFP reale (K)',      data:nd.map(d=>d.v),
+     backgroundColor:nd.map(d=>d.v==null?'transparent':d.v<0?'rgba(232,80,74,.8)':d.v>=150?'rgba(39,201,154,.8)':'rgba(240,201,110,.8)'),
+     borderWidth:0,borderRadius:3,order:1},
+    {label:'Previsione GS/JPM', data:nd.map(d=>d.prev),
+     backgroundColor:nd.map(()=>'rgba(240,201,110,.25)'),
+     borderColor:nd.map(()=>'rgba(240,201,110,.6)'),
+     borderWidth:1,borderRadius:3,order:2},
+    {label:'Target Fed 150K',   data:nd.map(()=>150),
+     type:'line',borderColor:'rgba(255,255,255,.25)',borderDash:[4,4],borderWidth:1.5,pointRadius:0,fill:false,order:3},
+  ]},options:{responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{labels:{color:'#5a6478',font:{size:9},boxWidth:8}},
+      tooltip:{callbacks:{label:ctx=>ctx.parsed.y!=null?`${ctx.dataset.label}: ${ctx.parsed.y}K`:null}}},
+    scales:{
+      x:{stacked:false,ticks:{color:'#5a6478',font:{size:9},maxRotation:30},grid:{display:false}},
+      y:{ticks:{callback:v=>v+'K',color:'#5a6478',font:{size:9}},grid:{color:'rgba(255,255,255,.04)'},
+         title:{display:true,text:'migliaia di posti',color:'#5a6478',font:{size:9}}}
+    }
+  }});
   const ca=MACRO_USA.cpi;
   mk('c-cpi',{type:'line',data:{labels:ca.map(d=>d.m),datasets:[
-    {label:'CPI reale',data:ca.map(d=>d.v),borderColor:'#e8504a',backgroundColor:'rgba(232,80,74,.08)',borderWidth:2.5,pointRadius:4,pointBackgroundColor:'#e8504a',tension:.35,fill:true,spanGaps:false},
-    {label:'Previsione GS',data:ca.map(d=>d.p),borderColor:'rgba(240,201,110,.7)',borderDash:[5,4],borderWidth:2,pointRadius:3,tension:.35,fill:false,spanGaps:false},
-    {label:'Target Fed 2%',data:ca.map(()=>2),borderColor:'rgba(39,201,154,.4)',borderDash:[3,4],borderWidth:1.5,pointRadius:0,fill:false},
-  ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#5a6478',font:{size:9},boxWidth:8}},tooltip:{callbacks:{label:ctx=>ctx.parsed.y!=null?`${ctx.dataset.label}: ${ctx.parsed.y}%`:null}}},scales:{x:{ticks:{color:'#5a6478',font:{size:10},maxRotation:30},grid:{display:false}},y:{min:1,max:5,ticks:{callback:v=>v+'%',color:'#5a6478',font:{size:10}},grid:{color:'rgba(255,255,255,.04)'}}}}});
+    {label:'CPI reale',      data:ca.map(d=>d.v),borderColor:'#e8504a',backgroundColor:'rgba(232,80,74,.08)',borderWidth:2.5,pointRadius:4,pointBackgroundColor:'#e8504a',tension:.35,fill:true,spanGaps:false},
+    {label:'Previsione GS',  data:ca.map(d=>d.p),borderColor:'rgba(240,201,110,.7)',borderDash:[5,4],borderWidth:2,pointRadius:3,tension:.35,fill:false,spanGaps:false},
+    {label:'Target Fed 2%',  data:ca.map(()=>2),borderColor:'rgba(39,201,154,.4)',borderDash:[3,4],borderWidth:1.5,pointRadius:0,fill:false},
+  ]},options:{responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{labels:{color:'#5a6478',font:{size:9},boxWidth:8}},
+      tooltip:{callbacks:{label:ctx=>ctx.parsed.y!=null?`${ctx.dataset.label}: ${ctx.parsed.y}%`:null}}},
+    scales:{
+      x:{ticks:{color:'#5a6478',font:{size:9},maxRotation:30},grid:{display:false}},
+      y:{min:1,max:5,ticks:{callback:v=>v+'%',color:'#5a6478',font:{size:9}},grid:{color:'rgba(255,255,255,.04)'}}
+    }
+  }});
 }
 
 
@@ -1295,36 +1322,46 @@ function renderConsTable(){
     const deltaStr = Math.abs(delta) < 0.05 ? '=' : (delta > 0 ? '+' : '') + delta.toFixed(1) + '%';
     const deltaColor = Math.abs(delta) < 0.05 ? 'var(--t3)' : delta > 0 ? 'var(--teal)' : 'var(--red)';
 
-    // Tre score individuali normalizzati 0-100
+    // Calcola euro necessari per bilanciamento (sempre su origCap)
+    const totOrig2  = ORIG.reduce((s,a) => s + a.origCap, 0);
+    const pesoOrigE = totOrig2 > 0 ? ORIG[m.i].origCap / totOrig2 * 100 : 0;
+    const deltaEur  = Math.round((m.targetPct - pesoOrigE) / 100 * totOrig2);
+    const deltaEurStr = Math.abs(deltaEur) < 50 ? '' :
+      `<div style="font-size:10px;color:${deltaColor};font-family:'JetBrains Mono',monospace;margin-top:1px;">${deltaEur>0?'+':''}€${fE(Math.abs(deltaEur))}</div>`;
+
+    // Score 0-100
     const sC   = scoreConsensus(m.sentX, peso, m.targetPct);
     const sM   = scoreMomentum(m.mom1y||0, m.mom6m||0, m.mom3m||0);
     const sV   = scoreVolatility(m.vol||0.3, peso, m.targetPct);
-    const cPct = Math.round(sC * 50 + 50); // 0-100
-    const mPct = Math.round(sM * 50 + 50);
-    const vPct = Math.round(sV * 50 + 50);
-    const scoreFinale = Math.round((sC*0.5 + sM*0.25 + sV*0.25) * 50 + 50);
-
-    const barC = cPct>=60?'var(--teal)':cPct>=45?'var(--amber)':'var(--red)';
+    const cPct = Math.round(sC*50+50);
+    const mPct = Math.round(sM*50+50);
+    const vPct = Math.round(sV*50+50);
+    const scoreFinale = Math.round((sC*0.30+sM*0.20+sV*0.20)*50+50);
     const barM = mPct>=60?'var(--teal)':mPct>=45?'var(--amber)':'var(--red)';
     const barV = vPct>=60?'var(--teal)':vPct>=45?'var(--amber)':'var(--red)';
 
-    // Momentum: mostra rendimenti 1y/6m/3m
-    const m1s = (m.mom1y||0)>=0?'+':''; const m6s=(m.mom6m||0)>=0?'+':''; const m3s=(m.mom3m||0)>=0?'+':'';
-    const momDetail = `${m1s}${((m.mom1y||0)*100).toFixed(0)}% / ${m6s}${((m.mom6m||0)*100).toFixed(0)}% / ${m3s}${((m.mom3m||0)*100).toFixed(0)}%`;
-    const momBar = `
-      <div style="font-size:9px;color:var(--t3);margin-bottom:2px;">${momDetail} <span style="color:${barM};">${mPct}/100</span></div>
-      <div style="background:var(--bg4);border-radius:2px;height:4px;width:90px;">
-        <div style="width:${mPct}%;height:100%;background:${barM};border-radius:2px;"></div>
-      </div>`;
+    // Momentum: barra con testo sovrapposto
+    const m1s=(m.mom1y||0)>=0?'+':''; const m6s=(m.mom6m||0)>=0?'+':''; const m3s=(m.mom3m||0)>=0?'+':'';
+    const momBar = `<div style="position:relative;width:100%;min-width:120px;">
+        <div style="background:var(--bg4);border-radius:3px;height:18px;">
+          <div style="width:${mPct}%;height:100%;background:${barM};opacity:.25;border-radius:3px;"></div>
+        </div>
+        <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:space-between;padding:0 6px;">
+          <span style="font-size:9px;color:var(--t2);">${m1s}${((m.mom1y||0)*100).toFixed(0)}% · ${m6s}${((m.mom6m||0)*100).toFixed(0)}% · ${m3s}${((m.mom3m||0)*100).toFixed(0)}%</span>
+          <span style="font-size:10px;font-weight:700;color:${barM};">${mPct}</span>
+        </div></div>`;
 
     const volPct = Math.round((m.vol||0.3)*100);
-    const volBar = `
-      <div style="font-size:9px;color:var(--t3);margin-bottom:2px;">vol ${volPct}% <span style="color:${barV};">${vPct}/100</span></div>
-      <div style="background:var(--bg4);border-radius:2px;height:4px;width:90px;">
-        <div style="width:${vPct}%;height:100%;background:${barV};border-radius:2px;"></div>
-      </div>`;
+    const volBar = `<div style="position:relative;width:100%;min-width:80px;">
+        <div style="background:var(--bg4);border-radius:3px;height:18px;">
+          <div style="width:${vPct}%;height:100%;background:${barV};opacity:.25;border-radius:3px;"></div>
+        </div>
+        <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:space-between;padding:0 6px;">
+          <span style="font-size:9px;color:var(--t2);">vol ${volPct}%</span>
+          <span style="font-size:10px;font-weight:700;color:${barV};">${vPct}</span>
+        </div></div>`;
 
-    // Raccomandazione con score finale e breakdown
+    // Raccomandazione
     const isBal = Math.abs(peso - m.targetPct) <= 1.5;
     const nPct  = Math.round((rec.sN||0)*50+50);
     const iPct  = Math.round((rec.sI||0)*50+50);
@@ -1340,9 +1377,11 @@ function renderConsTable(){
       <td>${m.outlookBadge}</td>
       <td style="font-family:'JetBrains Mono',monospace;color:var(--teal);">${m.target}</td>
       <td style="font-family:'JetBrains Mono',monospace;">${peso.toFixed(1)}% ${tag}</td>
-      <td style="font-family:'JetBrains Mono',monospace;font-weight:600;color:${deltaColor};">${deltaStr}</td>
-      <td>${momBar}</td>
-      <td>${volBar}</td>
+      <td style="font-family:'JetBrains Mono',monospace;">
+        <div style="font-weight:600;color:${deltaColor};">${deltaStr}</div>${deltaEurStr}
+      </td>
+      <td style="padding:3px 6px;">${momBar}</td>
+      <td style="padding:3px 6px;">${volBar}</td>
       <td>${recHtml}</td>`;
     tb.appendChild(tr);
   });
