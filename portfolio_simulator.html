@@ -1226,19 +1226,15 @@ const MACRO_USA = {
   nfpScore: -0.15,
   cpiScore:  -0.60,
 };
-function scoreConsensus(sentX, pesoPct, targetPct){
-  const s=(sentX-50)/50, d=(targetPct-pesoPct)/20;
-  return Math.max(-1,Math.min(1,s*0.6+d*0.4));
+function scoreConsensus(sentX){
+  // Solo sentiment istituzionale — no peso portafoglio
+  return (sentX-50)/50;
 }
 function scoreMomentum(mom1y,mom6m,mom3m){
   return Math.max(-1,Math.min(1,(mom1y*0.5+mom6m*0.3+mom3m*0.2)/0.50));
 }
 function scoreVolatility(vol){
-  // Score basato solo sulla volatilità di mercato dell'asset
-  // vol bassa (0.10-0.20) = buono = score positivo
-  // vol alta (0.50-0.70) = rischio = score negativo
-  // Normalizzazione: vol 0.16 → +0.7, vol 0.35 → 0, vol 0.70 → -0.7
-  return Math.max(-1, Math.min(1, (0.35 - vol) / 0.35));
+  return Math.max(-1,Math.min(1,(0.35-vol)/0.35));
 }
 function scoreNFP(nfpScore,cat){
   if(cat==='commodity')    return -nfpScore*0.8;
@@ -1255,29 +1251,30 @@ function scoreCPI(cpiScore,cat){
   return cpiScore*0.5;
 }
 function getRec(sentX,pesoPct,targetPct,mom1y=0,mom6m=0,mom3m=0,vol=0.3,cat='equity-theme'){
-  const sC=scoreConsensus(sentX,pesoPct,targetPct);
+  // Score basato SOLO su dati di mercato — il peso NON influenza le raccomandazioni
+  const sC=scoreConsensus(sentX);
   const sM=scoreMomentum(mom1y,mom6m,mom3m);
   const sV=scoreVolatility(vol);
   const sN=scoreNFP(MACRO_USA.nfpScore,cat);
   const sI=scoreCPI(MACRO_USA.cpiScore,cat);
-  // Momentum 40% · Consensus 25% · Volatilità 10% · NFP 15% · CPI 10%
   const score=sC*0.25+sM*0.40+sV*0.10+sN*0.15+sI*0.10;
-  if(score> 0.55)return{text:'⬆ Aumenta',         color:'var(--teal)', score,sC,sM,sV,sN,sI};
-  if(score> 0.25)return{text:'↗ Valuta aumento',  color:'var(--teal)', score,sC,sM,sV,sN,sI};
-  if(score> 0.05)return{text:'✅ Mantieni',        color:'var(--t2)',  score,sC,sM,sV,sN,sI};
-  if(score>-0.05)return{text:'⟷ Neutro',           color:'var(--t3)',  score,sC,sM,sV,sN,sI};
-  if(score>-0.25)return{text:'⚠ Monitora',        color:'var(--amber)',score,sC,sM,sV,sN,sI};
-  if(score>-0.55)return{text:'↘ Valuta riduzione',color:'var(--amber)',score,sC,sM,sV,sN,sI};
-  return              {text:'⬇ Riduci',           color:'var(--red)', score,sC,sM,sV,sN,sI};
+  let text,color;
+  if(score> 0.55){text='⬆ Aumenta';         color='var(--teal)';}
+  else if(score> 0.25){text='↗ Valuta aumento';  color='var(--teal)';}
+  else if(score> 0.05){text='✅ Mantieni';        color='var(--t2)';}
+  else if(score>-0.05){text='⟷ Neutro';           color='var(--t3)';}
+  else if(score>-0.25){text='⚠ Monitora';        color='var(--amber)';}
+  else               {text='⬇ Riduci';           color='var(--red)';}
+  return{text,color,score,sC,sM,sV,sN,sI};
 }
-function pesoTag(pesoPct, effectivePct){
-  // Se siamo in modalità bilanciata, mostra sempre ✅
-  if(_isBalanced) return `<span style="color:var(--teal);">✅</span>`;
-  const delta = pesoPct - effectivePct;
-  if(Math.abs(delta) <= 2.0) return `<span style="color:var(--teal);">✅</span>`;
-  if(delta < -2.0)           return `<span style="color:var(--amber);">⚠ basso</span>`;
-  return                            `<span style="color:var(--amber);">⚠ alto</span>`;
+function pesoTag(pesoPct,targetPct){
+  if(_isBalanced)return`<span style="color:var(--teal);">✅</span>`;
+  const d=pesoPct-targetPct;
+  if(Math.abs(d)<=1.5)return`<span style="color:var(--teal);">✅</span>`;
+  if(d<-1.5)return`<span style="color:var(--amber);">⚠ basso</span>`;
+  return`<span style="color:var(--amber);">⚠ alto</span>`;
 }
+
 function rMacroCharts(){
   const nd = MACRO_USA.nfp;
   mk('c-nfp',{type:'bar',data:{labels:nd.map(d=>d.m),datasets:[
@@ -1327,41 +1324,39 @@ function renderConsTable(){
     const pesoOrig = totOrig > 0 ? ORIG[m.i].origCap / totOrig * 100 : 0;
     const rec = getRec(m.sentX, peso, m.targetPct, m.mom1y||0, m.mom6m||0, m.mom3m||0, m.vol||0.3, m.cat||'equity-theme');
 
-    // Target effettivo — usa peso CORRENTE (reattivo alle simulazioni)
-    let effectivePct;
-    if      (rec.score >  0.20) effectivePct = Math.max(peso, m.targetPct);
-    else if (rec.score < -0.10) effectivePct = m.targetPct;
-    else                        effectivePct = peso;
+    // Bilanciamento: dopo bilancia il target è il peso attuale (caps[] già aggiornati)
+    // Prima del bilancia: target derivato da raccomandazione su pesoOrig
+    let targetOttimale;
+    if (_isBalanced) {
+      targetOttimale = peso; // post-bilancia: ogni asset è già al suo target
+    } else if (rec.score >  0.15) {
+      targetOttimale = Math.max(pesoOrig, m.targetPct);
+    } else if (rec.score < -0.10) {
+      targetOttimale = Math.min(pesoOrig, m.targetPct);
+    } else {
+      targetOttimale = pesoOrig;
+    }
+    // Override pre-bilancia: sovrappeso eccessivo vs target
+    if (!_isBalanced && pesoOrig - m.targetPct > 5) targetOttimale = m.targetPct;
 
-    // Override: se peso supera targetPct di più di 5 punti → segnala sempre
-    const overWeight = peso - m.targetPct;
-    if (overWeight > 5) effectivePct = m.targetPct;
-
-    // Override raccomandazione testuale se sovrappeso evidente
-    let recDisplay = rec;
-    if (overWeight > 10) recDisplay = {text:'⬇ Peso eccessivo', color:'var(--red)'};
-    else if (overWeight > 5) recDisplay = {text:'⚠ Valuta riduzione', color:'var(--amber)'};
-    else recDisplay = rec;
-
-    // Bilanciamento = delta tra effectivePct e peso corrente
-    const delta      = effectivePct - peso;
-    const isZero     = Math.abs(delta) < 0.05;
+    // Delta bilanciamento = differenza tra target ottimale e peso simulato
+    const delta      = targetOttimale - peso;
+    const isZero     = Math.abs(delta) < 0.1;
     const deltaStr   = isZero ? '=' : (delta > 0 ? '+' : '') + delta.toFixed(1) + '%';
     const deltaColor = isZero ? 'var(--t3)' : delta > 0 ? 'var(--teal)' : 'var(--amber)';
-    // Euro calcolati sul capitale originale TR (riferimento fisso)
-    const deltaOrigPct = effectivePct - pesoOrig;
-    const deltaEur   = Math.round(deltaOrigPct / 100 * totOrig);
-    const deltaEurStr = Math.abs(deltaEur) < 50 ? '' :
+
+    // Euro: sempre riferito a differenza tra targetOttimale pre-bilancia e pesoOrig
+    const targetPerEur = _isBalanced ? peso : targetOttimale;
+    const deltaEur     = Math.round((targetPerEur - pesoOrig) / 100 * totOrig);
+    const deltaEurStr  = _isBalanced || Math.abs(targetPerEur - pesoOrig) < 0.1 || Math.abs(deltaEur) < 50 ? '' :
       `<div style="font-size:10px;color:${deltaColor};font-family:'JetBrains Mono',monospace;margin-top:1px;">${deltaEur>0?'+':''}\u20ac${fE(Math.abs(deltaEur))}</div>`;
 
-
-    // Badge: dopo bilancia sempre ✅ (peso riflette già il bilanciamento)
-    // Prima del bilancia: confronta peso attuale vs target effettivo
+    // Badge peso
     const tag = _isBalanced
       ? `<span style="color:var(--teal);">✅</span>`
-      : (Math.abs(peso - effectivePct) <= 2.0
+      : (Math.abs(peso - targetOttimale) <= 2.0
           ? `<span style="color:var(--teal);">✅</span>`
-          : (peso < effectivePct - 2
+          : (peso < targetOttimale - 2
               ? `<span style="color:var(--amber);">⚠ basso</span>`
               : `<span style="color:var(--amber);">⚠ alto</span>`));
 
@@ -1387,10 +1382,22 @@ function renderConsTable(){
     const scoreFinale = Math.round(rec.score*50+50);
 
     // Raccomandazione
-    const isBal = _isBalanced && Math.abs(peso - effectivePct) <= 2.0;
+    const isBal = _isBalanced && Math.abs(delta) <= 2.0;
+
+    // Override visivo durante simulazione: basato su delta vs targetOttimale
+    let displayRec = rec;
+    if (!_isBalanced) {
+      const simDelta = peso - targetOttimale;
+      if      (simDelta > 10) displayRec = {text:'⬇ Troppo alto',  color:'var(--red)'};
+      else if (simDelta > 5)  displayRec = {text:'⚠ Riduci',       color:'var(--amber)'};
+      else if (simDelta < -5) displayRec = {text:'⬆ Da aumentare', color:'var(--teal)'};
+      else if (Math.abs(simDelta) <= 1.5 && rec.text.includes('aumento'))
+        // Peso già allineato ma rec dice "aumento" — mostra mantieni
+        displayRec = {text:'✅ Mantieni', color:'var(--t2)'};
+    }
     const recHtml = isBal
       ? `<span style="color:var(--teal);font-weight:700;">\u2705 Bilanciato</span><div style="font-size:9px;color:var(--t3);margin-top:2px;">C:${cPct} M:${mPct} V:${vPct} N:${nPct} I:${iPct} \u2192 ${scoreFinale}/100</div>`
-      : `<span style="color:${recDisplay.color};font-weight:600;">${recDisplay.text}</span><div style="font-size:9px;color:var(--t3);margin-top:2px;">C:${cPct} M:${mPct} V:${vPct} N:${nPct} I:${iPct} \u2192 ${scoreFinale}/100</div>`;
+      : `<span style="color:${displayRec.color};font-weight:600;">${displayRec.text}</span><div style="font-size:9px;color:var(--t3);margin-top:2px;">C:${cPct} M:${mPct} V:${vPct} N:${nPct} I:${iPct} \u2192 ${scoreFinale}/100</div>`;
 
     const tr = document.createElement('tr');
     tr.innerHTML = `<td style="font-weight:600;color:${m.color};">${m.name}</td><td>${m.outlookBadge}</td><td style="font-family:'JetBrains Mono',monospace;color:var(--teal);">${m.target}</td><td style="font-family:'JetBrains Mono',monospace;">${peso.toFixed(1)}% ${tag}</td><td style="font-family:'JetBrains Mono',monospace;"><div style="font-weight:600;color:${deltaColor};">${deltaStr}</div>${deltaEurStr}</td><td style="padding:3px 6px;">${momBar}</td><td style="padding:3px 6px;">${volBar}</td><td>${recHtml}</td>`;
@@ -1539,9 +1546,11 @@ function onPct(idx,val){
 function onSlider(idx,val){if(!_sup)onPct(idx,parseFloat(val));}
 function onTotChange(){
   if(_sup)return;
+  if(_isBalanced)return; // dopo bilancia non ridistribuire
   const nT=Math.max(1,parseFloat(document.getElementById('totInp').value)||0);
   const oT=totA();if(oT>0){const r=nT/oT;caps=caps.map(c=>c*r);}
   totalCap=nT;
+  _sbMode='sim';
   const sc=document.getElementById('sc-cap');if(sc)sc.value=Math.round(nT);
   updSBDisp();refresh();
 }
@@ -1557,7 +1566,7 @@ function bilanciaConsensus(){
   const targets = CONS_META.map(m => {
     const rec = getRec(m.sentX, origPcts[m.i], m.targetPct, m.mom1y||0, m.mom6m||0, m.mom3m||0, m.vol||0.3, m.cat||'equity-theme');
     let effectivePct;
-    if      (rec.score >  0.20) effectivePct = Math.max(origPcts[m.i], m.targetPct);
+    if      (rec.score >  0.15) effectivePct = Math.max(origPcts[m.i], m.targetPct);
     else if (rec.score < -0.10) effectivePct = m.targetPct;
     else                        effectivePct = origPcts[m.i];
     // Override: sovrappeso oltre 5% → segnala sempre
