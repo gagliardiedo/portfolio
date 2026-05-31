@@ -403,7 +403,7 @@ tbody tr:hover td{background:rgba(255,255,255,.015);}
   <!-- SINTESI CONSENSUS VISIVA -->
   <div class="card" style="border-color:rgba(240,201,110,.2);border-left:3px solid var(--gold2);">
     <p class="sec" style="margin-bottom:4px;">Sintesi consensus — posizionamento istituzionale sui tuoi asset</p>
-    <p style="font-size:14px;color:var(--t2);margin-bottom:14px;">Asse X = sentiment specifico sull'asset (Bearish → Bullish) · Asse Y = orizzonte temporale · Dimensione bolla = peso % nel portafoglio · <span style="color:var(--amber);">Probabilità calibrate su macro reale (CPI 3,8% + NFP in calo): Bear 35% · Base 45% · Bull 20%</span></p>
+    <p style="font-size:14px;color:var(--t2);margin-bottom:14px;">Asse X = <strong style="color:var(--t1);">Consensus + Momentum</strong> (50/50) · Asse Y = orizzonte temporale · Dimensione bolla = peso % nel portafoglio · <span style="color:var(--amber);">Probabilità scenari: Bear 35% · Base 45% · Bull 20%</span></p>
     <div style="position:relative;height:340px;margin-bottom:14px;">
       <canvas id="c-consensus-bubble" role="img" aria-label="Consensus bubble chart"></canvas>
     </div>
@@ -1191,7 +1191,7 @@ const CONS_META = [
 ];
 
 // ═══════════════ MODELLO A 5 FATTORI ═══════════════
-// Consensus 20% · Momentum 35% · Volatilità 25% · NFP 10% · CPI 10%
+// Momentum 40% · Consensus 25% · Volatilità 10% · NFP 15% · CPI 10%
 // Consensus ridotto perché basato su interpretazione qualitativa
 // Momentum e Volatilità aumentati perché basati su dati di mercato reali
 const MACRO_USA = {
@@ -1260,8 +1260,8 @@ function getRec(sentX,pesoPct,targetPct,mom1y=0,mom6m=0,mom3m=0,vol=0.3,cat='equ
   const sV=scoreVolatility(vol);
   const sN=scoreNFP(MACRO_USA.nfpScore,cat);
   const sI=scoreCPI(MACRO_USA.cpiScore,cat);
-  // Consensus 20% · Momentum 35% · Volatilità 25% · NFP 10% · CPI 10%
-  const score=sC*0.20+sM*0.35+sV*0.25+sN*0.10+sI*0.10;
+  // Momentum 40% · Consensus 25% · Volatilità 10% · NFP 15% · CPI 10%
+  const score=sC*0.25+sM*0.40+sV*0.10+sN*0.15+sI*0.10;
   if(score> 0.55)return{text:'⬆ Aumenta',         color:'var(--teal)', score,sC,sM,sV,sN,sI};
   if(score> 0.25)return{text:'↗ Valuta aumento',  color:'var(--teal)', score,sC,sM,sV,sN,sI};
   if(score> 0.05)return{text:'✅ Mantieni',        color:'var(--t2)',  score,sC,sM,sV,sN,sI};
@@ -1327,20 +1327,33 @@ function renderConsTable(){
     const pesoOrig = totOrig > 0 ? ORIG[m.i].origCap / totOrig * 100 : 0;
     const rec = getRec(m.sentX, peso, m.targetPct, m.mom1y||0, m.mom6m||0, m.mom3m||0, m.vol||0.3, m.cat||'equity-theme');
 
-    // Target effettivo dalla raccomandazione
+    // Target effettivo — usa peso CORRENTE (reattivo alle simulazioni)
     let effectivePct;
-    if      (rec.score >  0.20) effectivePct = Math.max(pesoOrig, m.targetPct);
+    if      (rec.score >  0.20) effectivePct = Math.max(peso, m.targetPct);
     else if (rec.score < -0.10) effectivePct = m.targetPct;
-    else                        effectivePct = pesoOrig;
+    else                        effectivePct = peso;
 
-    // Bilanciamento = delta tra effectivePct e peso originale TR
-    const delta      = effectivePct - pesoOrig;
+    // Override: se peso supera targetPct di più di 5 punti → segnala sempre
+    const overWeight = peso - m.targetPct;
+    if (overWeight > 5) effectivePct = m.targetPct;
+
+    // Override raccomandazione testuale se sovrappeso evidente
+    let recDisplay = rec;
+    if (overWeight > 10) recDisplay = {text:'⬇ Peso eccessivo', color:'var(--red)'};
+    else if (overWeight > 5) recDisplay = {text:'⚠ Valuta riduzione', color:'var(--amber)'};
+    else recDisplay = rec;
+
+    // Bilanciamento = delta tra effectivePct e peso corrente
+    const delta      = effectivePct - peso;
     const isZero     = Math.abs(delta) < 0.05;
     const deltaStr   = isZero ? '=' : (delta > 0 ? '+' : '') + delta.toFixed(1) + '%';
     const deltaColor = isZero ? 'var(--t3)' : delta > 0 ? 'var(--teal)' : 'var(--amber)';
-    const deltaEur   = Math.round(delta / 100 * totOrig);
+    // Euro calcolati sul capitale originale TR (riferimento fisso)
+    const deltaOrigPct = effectivePct - pesoOrig;
+    const deltaEur   = Math.round(deltaOrigPct / 100 * totOrig);
     const deltaEurStr = Math.abs(deltaEur) < 50 ? '' :
       `<div style="font-size:10px;color:${deltaColor};font-family:'JetBrains Mono',monospace;margin-top:1px;">${deltaEur>0?'+':''}\u20ac${fE(Math.abs(deltaEur))}</div>`;
+
 
     // Badge: dopo bilancia sempre ✅ (peso riflette già il bilanciamento)
     // Prima del bilancia: confronta peso attuale vs target effettivo
@@ -1377,7 +1390,7 @@ function renderConsTable(){
     const isBal = _isBalanced && Math.abs(peso - effectivePct) <= 2.0;
     const recHtml = isBal
       ? `<span style="color:var(--teal);font-weight:700;">\u2705 Bilanciato</span><div style="font-size:9px;color:var(--t3);margin-top:2px;">C:${cPct} M:${mPct} V:${vPct} N:${nPct} I:${iPct} \u2192 ${scoreFinale}/100</div>`
-      : `<span style="color:${rec.color};font-weight:600;">${rec.text}</span><div style="font-size:9px;color:var(--t3);margin-top:2px;">C:${cPct} M:${mPct} V:${vPct} N:${nPct} I:${iPct} \u2192 ${scoreFinale}/100</div>`;
+      : `<span style="color:${recDisplay.color};font-weight:600;">${recDisplay.text}</span><div style="font-size:9px;color:var(--t3);margin-top:2px;">C:${cPct} M:${mPct} V:${vPct} N:${nPct} I:${iPct} \u2192 ${scoreFinale}/100</div>`;
 
     const tr = document.createElement('tr');
     tr.innerHTML = `<td style="font-weight:600;color:${m.color};">${m.name}</td><td>${m.outlookBadge}</td><td style="font-family:'JetBrains Mono',monospace;color:var(--teal);">${m.target}</td><td style="font-family:'JetBrains Mono',monospace;">${peso.toFixed(1)}% ${tag}</td><td style="font-family:'JetBrains Mono',monospace;"><div style="font-weight:600;color:${deltaColor};">${deltaStr}</div>${deltaEurStr}</td><td style="padding:3px 6px;">${momBar}</td><td style="padding:3px 6px;">${volBar}</td><td>${recHtml}</td>`;
@@ -1463,9 +1476,27 @@ function updSBDisp(){
     if(si&&document.activeElement!==si)si.value=Math.min(pct,60).toFixed(1);
     if(bi)bi.style.width=mx>0?(caps[i]/mx*100).toFixed(0)+'%':'0%';
   });
-  // Aggiorna sc-cap con il totale corrente
   const scCap=document.getElementById('sc-cap');
   if(scCap&&document.activeElement!==scCap)scCap.value=Math.round(tot);
+  // Mostra "Da allocare" durante simulazioni (non dopo bilancia che lo gestisce da solo)
+  if (!_isBalanced) {
+    const totOrig = ORIG.reduce((s,a) => s + a.origCap, 0);
+    const diff    = tot - totOrig;
+    const ncInline = document.getElementById('sb-nc-inline');
+    const ncAmt    = document.getElementById('sb-nc-amount');
+    const ncLbl    = document.querySelector('#sb-nc-inline span:first-child');
+    if (ncInline && ncAmt) {
+      if (Math.abs(diff) > 50) {
+        ncInline.style.display = 'block';
+        ncAmt.textContent  = (diff > 0 ? '+' : '') + '€' + fE(Math.round(Math.abs(diff)));
+        ncAmt.style.color  = diff > 0 ? 'var(--teal)' : 'var(--red)';
+        if (ncLbl) ncLbl.textContent = diff > 0 ? 'Nuovo capitale simulato' : 'Capitale ridotto';
+        if (ncLbl) ncLbl.style.color = diff > 0 ? 'var(--teal)' : 'var(--red)';
+      } else {
+        ncInline.style.display = 'none';
+      }
+    }
+  }
   _sup=false;updSBSt();checkAlerts();
 }
 
@@ -1487,18 +1518,20 @@ function updSBSt(){
 }
 
 function onCap(idx,val){
-  if(_sup)return;caps[idx]=Math.max(0,parseFloat(val)||0);
+  if(_sup)return;
+  caps[idx]=Math.max(0,parseFloat(val)||0);
+  totalCap=totA(); // totale = somma di tutti i caps
   _isBalanced=false;_sbMode='sim';
   const el=document.getElementById('hd-'+idx);if(el)el.textContent='';
   updSBDisp();refresh();
 }
 function onPct(idx,val){
   if(_sup)return;
-  const np=Math.max(0,Math.min(100,parseFloat(val)||0));
-  const nc=totalCap*np/100,delta=nc-caps[idx];
-  const ot=caps.reduce((s,c,i)=>i!==idx?s+c:s,0);
-  if(ot>0)caps.forEach((c,i)=>{if(i!==idx)caps[i]=Math.max(0,c-delta*(c/ot));});
-  caps[idx]=nc;
+  const tot=totA();
+  const np=Math.max(0,parseFloat(val)||0);
+  // Calcola il nuovo capitale per questo asset in base alla % sul totale attuale
+  caps[idx]=Math.max(0, tot>0 ? tot*np/100 : 0);
+  totalCap=totA();
   _isBalanced=false;_sbMode='sim';
   const el=document.getElementById('hd-'+idx);if(el)el.textContent='';
   updSBDisp();refresh();
@@ -1525,8 +1558,10 @@ function bilanciaConsensus(){
     const rec = getRec(m.sentX, origPcts[m.i], m.targetPct, m.mom1y||0, m.mom6m||0, m.mom3m||0, m.vol||0.3, m.cat||'equity-theme');
     let effectivePct;
     if      (rec.score >  0.20) effectivePct = Math.max(origPcts[m.i], m.targetPct);
-    else if (rec.score < -0.10) effectivePct = m.targetPct; // segnala solo
+    else if (rec.score < -0.10) effectivePct = m.targetPct;
     else                        effectivePct = origPcts[m.i];
+    // Override: sovrappeso oltre 5% → segnala sempre
+    if (origPcts[m.i] - m.targetPct > 5) effectivePct = m.targetPct;
     return {...m, effectivePct, origPct: origPcts[m.i], rec};
   });
 
@@ -1576,6 +1611,9 @@ function bilanciaConsensus(){
   if (ncInline && ncAmt) {
     ncInline.style.display = nuovoCapitale > 10 ? 'block' : 'none';
     ncAmt.textContent = '+€' + fE(Math.round(nuovoCapitale));
+    ncAmt.style.color = 'var(--teal)';
+    const ncLbl = document.querySelector('#sb-nc-inline span:first-child');
+    if (ncLbl) { ncLbl.textContent = 'Da allocare'; ncLbl.style.color = 'var(--teal)'; }
     if (ncSel) {
       ncSel.style.display = toSell.length > 0 ? 'block' : 'none';
       if (toSell.length > 0)
@@ -1583,7 +1621,7 @@ function bilanciaConsensus(){
     }
   }
 
-  _sup = false; _isBalanced = true; _sbMode = 'bal';
+  _isBalanced = true; _sbMode = 'bal'; _sup = false;
   updSBDisp(); refresh(); setTimeout(()=>renderConsTable(), 50);
 }
 
@@ -1903,22 +1941,32 @@ function renderScenario(){
   tb.appendChild(tr3);
 
   // ── Consensus bubble chart — REATTIVO ai pesi sidebar ──
-  // Bubble chart — usa CONS_META globale, pesi live da caps[]
+  // Bubble chart — usa score finale del modello a 5 fattori come asse X
   const totBubble = totA();
-  const CONSENSUS_DATA = CONS_META.map(m => ({
-    ...m,
-    peso: totBubble > 0 ? +(caps[m.i] / totBubble * 100).toFixed(1) : 0,
-    label: m.name.replace(/ USD$/,'').replace(/ ESG$/,'').replace(/ EUR$/,'')
-                 .replace(/Physical /,'').replace(/ Value-Chain$/,'')
-                 .replace(/Electrification & /,'').replace(/Core MSCI /,'')
-                 .replace(/ IMI$/,'').replace(/Global /,''),
-  }));
+  const CONSENSUS_DATA = CONS_META.map(m => {
+    const peso = totBubble > 0 ? +(caps[m.i] / totBubble * 100).toFixed(1) : 0;
+    // Asse X bubble = Consensus (solo sentiment, no peso) + Momentum (50/50)
+    const sC_b = (m.sentX - 50) / 50; // solo sentiment, ignora delta peso
+    const sM_b = scoreMomentum(m.mom1y||0, m.mom6m||0, m.mom3m||0);
+    const scoreX = Math.round((sC_b*0.50 + sM_b*0.50) * 50 + 50);
+    const rec  = getRec(m.sentX, peso, m.targetPct, m.mom1y||0, m.mom6m||0, m.mom3m||0, m.vol||0.3, m.cat||'equity-theme');
+    return {
+      ...m,
+      peso,
+      scoreX,
+      rec,
+      label: m.name.replace(/ USD$/,'').replace(/ ESG$/,'').replace(/ EUR$/,'')
+                   .replace(/Physical /,'').replace(/ Value-Chain$/,'')
+                   .replace(/Electrification & /,'').replace(/Core MSCI /,'')
+                   .replace(/ IMI$/,'').replace(/Global /,''),
+    };
+  });
 
   mk('c-consensus-bubble',{
     type:'bubble',
     data:{datasets:CONSENSUS_DATA.map(d=>({
       label:d.label,
-      data:[{x:d.sentX, y:d.y, r:Math.max(6, d.peso*1.8)}],
+      data:[{x:d.scoreX, y:d.y, r:Math.max(6, d.peso*1.8)}],
       backgroundColor:d.color+'55',
       borderColor:d.color,
       borderWidth:2,
@@ -1929,16 +1977,13 @@ function renderScenario(){
         legend:{display:false},
         tooltip:{callbacks:{label:ctx=>{
           const d=CONSENSUS_DATA[ctx.datasetIndex];
-          const rec=getRec(d.sentX,d.peso,d.targetPct,d.mom1y||0,d.mom6m||0,d.mom3m||0,d.vol||0.3);
-          const sC=(scoreConsensus(d.sentX,d.peso,d.targetPct)*50+50).toFixed(0);
-          const sM=(scoreMomentum(d.mom1y||0,d.mom6m||0,d.mom3m||0)*50+50).toFixed(0);
-          return [` ${d.name}`,` Peso: ${d.peso}% → target ${d.targetPct}%`,` ${d.target}`,` ${rec.text}`,` Consensus ${sC}/100 · Mom ${sM}/100`];
+          return [` ${d.name}`,` Score modello: ${d.scoreX}/100`,` Peso: ${d.peso}% → target ${d.targetPct}%`,` ${d.target}`,` ${d.rec.text}`];
         }}},
       },
       scales:{
         x:{min:0,max:100,
-          title:{display:true,text:'← Bearish  ·  Sentiment  ·  Bullish →',color:'#7a8394',font:{size:10}},
-          ticks:{callback:v=>v===0?'Bearish':v===50?'Neutral':v===100?'Bullish':'',color:'#7a8394',font:{size:10}},stepSize:25,
+          title:{display:true,text:'← Debole  ·  Consensus + Momentum (50/50)  ·  Forte →',color:'#7a8394',font:{size:10}},
+          ticks:{callback:v=>v===0?'0':v===50?'50':v===100?'100':v%25===0?v:'',color:'#7a8394',font:{size:10}},stepSize:25,
           grid:{color:'rgba(255,255,255,0.08)'}},
         y:{min:1,max:6,
           title:{display:true,text:'Orizzonte temporale (anni)',color:'#7a8394',font:{size:10}},
