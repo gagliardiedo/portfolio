@@ -419,64 +419,112 @@ tbody tr:hover td{background:rgba(255,255,255,.015);}
   <div class="card" style="margin-top:16px;border:1px solid rgba(39,201,154,.15);background:rgba(39,201,154,.03);">
     <p class="sec" style="margin-bottom:14px;color:var(--teal);">Come vengono calcolate le raccomandazioni</p>
 
-    <!-- BARRE DEI PESI -->
+    <!-- BARRE DEI PESI INTERATTIVE -->
     <div style="margin-bottom:16px;">
-      <div style="font-size:11px;color:var(--t3);font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px;">Peso di ogni fattore nello score finale</div>
-      <div style="display:flex;flex-direction:column;gap:7px;">
-        <div style="display:flex;align-items:center;gap:10px;">
-          <div style="width:120px;font-size:11px;color:#8b6fff;font-family:'JetBrains Mono',monospace;flex-shrink:0;">P Tuo consensus</div>
-          <div style="flex:1;background:var(--bg4);border-radius:3px;height:16px;overflow:hidden;">
-            <div style="width:30%;height:100%;background:#8b6fff;border-radius:3px;opacity:.7;"></div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+        <div style="font-size:11px;color:var(--t3);font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:.06em;">Peso di ogni fattore — trascina per simulare</div>
+        <button onclick="resetWeights()" style="font-size:10px;color:var(--teal);background:rgba(39,201,154,.08);border:1px solid rgba(39,201,154,.25);border-radius:4px;padding:3px 10px;cursor:pointer;font-family:'JetBrains Mono',monospace;">↺ reset default</button>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px;" id="weights-sliders">
+      <div style="display:flex;flex-direction:column;gap:8px;" id="weights-sliders">
+        <div>
+          <div style="position:relative;height:34px;cursor:pointer;">
+            <div style="position:absolute;inset:0;background:var(--bg4);border-radius:8px;overflow:hidden;">
+              <div id="wb-P" style="width:30%;height:100%;background:#8b6fff;opacity:.25;border-radius:8px;transition:width .12s;"></div>
+            </div>
+            <div style="position:absolute;inset:0;display:flex;align-items:center;padding:0 12px;pointer-events:none;">
+              <span style="font-size:13px;font-weight:700;color:#8b6fff;font-family:'JetBrains Mono',monospace;margin-right:8px;min-width:18px;">P</span>
+              <span style="font-size:12px;color:var(--t2);flex:1;">Tuo consensus</span>
+              <span style="font-size:13px;font-weight:700;color:#8b6fff;font-family:'JetBrains Mono',monospace;" id="wv-P">30%</span>
+            </div>
+            <input type="range" min="0" max="60" value="30" id="w-P" oninput="onWeightChange('P')" style="position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;margin:0;">
           </div>
-          <div style="width:32px;font-size:11px;font-weight:700;color:#8b6fff;font-family:'JetBrains Mono',monospace;text-align:right;">30%</div>
         </div>
-        <div style="display:flex;align-items:center;gap:10px;">
-          <div style="width:120px;font-size:11px;color:var(--teal);font-family:'JetBrains Mono',monospace;flex-shrink:0;">M Momentum</div>
-          <div style="flex:1;background:var(--bg4);border-radius:3px;height:16px;overflow:hidden;">
-            <div style="width:27%;height:100%;background:var(--teal);border-radius:3px;opacity:.7;"></div>
+        <div>
+          <div style="position:relative;height:34px;cursor:pointer;">
+            <div style="position:absolute;inset:0;background:var(--bg4);border-radius:8px;overflow:hidden;">
+              <div id="wb-M" style="width:27%;height:100%;background:var(--teal);opacity:.25;border-radius:8px;transition:width .12s;"></div>
+            </div>
+            <div style="position:absolute;inset:0;display:flex;align-items:center;padding:0 12px;pointer-events:none;">
+              <span style="font-size:13px;font-weight:700;color:var(--teal);font-family:'JetBrains Mono',monospace;margin-right:8px;min-width:18px;">M</span>
+              <span style="font-size:12px;color:var(--t2);flex:1;">Momentum</span>
+              <span style="font-size:13px;font-weight:700;color:var(--teal);font-family:'JetBrains Mono',monospace;" id="wv-M">27%</span>
+            </div>
+            <input type="range" min="0" max="60" value="27" id="w-M" oninput="onWeightChange('M')" style="position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;margin:0;">
           </div>
-          <div style="width:32px;font-size:11px;font-weight:700;color:var(--teal);font-family:'JetBrains Mono',monospace;text-align:right;">27%</div>
         </div>
-        <div style="display:flex;align-items:center;gap:10px;">
-          <div style="width:120px;font-size:11px;color:var(--amber);font-family:'JetBrains Mono',monospace;flex-shrink:0;">E EUR/USD</div>
-          <div style="flex:1;background:var(--bg4);border-radius:3px;height:16px;overflow:hidden;">
-            <div style="width:12%;height:100%;background:var(--amber);border-radius:3px;opacity:.7;"></div>
+        <div>
+          <div style="position:relative;height:34px;cursor:pointer;">
+            <div style="position:absolute;inset:0;background:var(--bg4);border-radius:8px;overflow:hidden;">
+              <div id="wb-E" style="width:12%;height:100%;background:var(--amber);opacity:.25;border-radius:8px;transition:width .12s;"></div>
+            </div>
+            <div style="position:absolute;inset:0;display:flex;align-items:center;padding:0 12px;pointer-events:none;">
+              <span style="font-size:13px;font-weight:700;color:var(--amber);font-family:'JetBrains Mono',monospace;margin-right:8px;min-width:18px;">E</span>
+              <span style="font-size:12px;color:var(--t2);flex:1;">EUR/USD</span>
+              <span style="font-size:13px;font-weight:700;color:var(--amber);font-family:'JetBrains Mono',monospace;" id="wv-E">12%</span>
+            </div>
+            <input type="range" min="0" max="60" value="12" id="w-E" oninput="onWeightChange('E')" style="position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;margin:0;">
           </div>
-          <div style="width:32px;font-size:11px;font-weight:700;color:var(--amber);font-family:'JetBrains Mono',monospace;text-align:right;">12%</div>
         </div>
-        <div style="display:flex;align-items:center;gap:10px;">
-          <div style="width:120px;font-size:11px;color:var(--t2);font-family:'JetBrains Mono',monospace;flex-shrink:0;">C Consensus ist.</div>
-          <div style="flex:1;background:var(--bg4);border-radius:3px;height:16px;overflow:hidden;">
-            <div style="width:10%;height:100%;background:var(--t2);border-radius:3px;opacity:.5;"></div>
+        <div>
+          <div style="position:relative;height:34px;cursor:pointer;">
+            <div style="position:absolute;inset:0;background:var(--bg4);border-radius:8px;overflow:hidden;">
+              <div id="wb-C" style="width:10%;height:100%;background:#7a8394;opacity:.25;border-radius:8px;transition:width .12s;"></div>
+            </div>
+            <div style="position:absolute;inset:0;display:flex;align-items:center;padding:0 12px;pointer-events:none;">
+              <span style="font-size:13px;font-weight:700;color:#7a8394;font-family:'JetBrains Mono',monospace;margin-right:8px;min-width:18px;">C</span>
+              <span style="font-size:12px;color:var(--t2);flex:1;">Consensus ist.</span>
+              <span style="font-size:13px;font-weight:700;color:#7a8394;font-family:'JetBrains Mono',monospace;" id="wv-C">10%</span>
+            </div>
+            <input type="range" min="0" max="60" value="10" id="w-C" oninput="onWeightChange('C')" style="position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;margin:0;">
           </div>
-          <div style="width:32px;font-size:11px;font-weight:700;color:var(--t2);font-family:'JetBrains Mono',monospace;text-align:right;">10%</div>
         </div>
-        <div style="display:flex;align-items:center;gap:10px;">
-          <div style="width:120px;font-size:11px;color:var(--amber);font-family:'JetBrains Mono',monospace;flex-shrink:0;">N NFP</div>
-          <div style="flex:1;background:var(--bg4);border-radius:3px;height:16px;overflow:hidden;">
-            <div style="width:7%;height:100%;background:var(--amber);border-radius:3px;opacity:.6;"></div>
+        <div>
+          <div style="position:relative;height:34px;cursor:pointer;">
+            <div style="position:absolute;inset:0;background:var(--bg4);border-radius:8px;overflow:hidden;">
+              <div id="wb-N" style="width:9%;height:100%;background:var(--amber);opacity:.25;border-radius:8px;transition:width .12s;"></div>
+            </div>
+            <div style="position:absolute;inset:0;display:flex;align-items:center;padding:0 12px;pointer-events:none;">
+              <span style="font-size:13px;font-weight:700;color:var(--amber);font-family:'JetBrains Mono',monospace;margin-right:8px;min-width:18px;">N</span>
+              <span style="font-size:12px;color:var(--t2);flex:1;">NFP</span>
+              <span style="font-size:13px;font-weight:700;color:var(--amber);font-family:'JetBrains Mono',monospace;" id="wv-N">9%</span>
+            </div>
+            <input type="range" min="0" max="60" value="9" id="w-N" oninput="onWeightChange('N')" style="position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;margin:0;">
           </div>
-          <div style="width:32px;font-size:11px;font-weight:700;color:var(--amber);font-family:'JetBrains Mono',monospace;text-align:right;">7%</div>
         </div>
-        <div style="display:flex;align-items:center;gap:10px;">
-          <div style="width:120px;font-size:11px;color:var(--red);font-family:'JetBrains Mono',monospace;flex-shrink:0;">I CPI</div>
-          <div style="flex:1;background:var(--bg4);border-radius:3px;height:16px;overflow:hidden;">
-            <div style="width:7%;height:100%;background:var(--red);border-radius:3px;opacity:.6;"></div>
+        <div>
+          <div style="position:relative;height:34px;cursor:pointer;">
+            <div style="position:absolute;inset:0;background:var(--bg4);border-radius:8px;overflow:hidden;">
+              <div id="wb-I" style="width:9%;height:100%;background:var(--red);opacity:.25;border-radius:8px;transition:width .12s;"></div>
+            </div>
+            <div style="position:absolute;inset:0;display:flex;align-items:center;padding:0 12px;pointer-events:none;">
+              <span style="font-size:13px;font-weight:700;color:var(--red);font-family:'JetBrains Mono',monospace;margin-right:8px;min-width:18px;">I</span>
+              <span style="font-size:12px;color:var(--t2);flex:1;">CPI</span>
+              <span style="font-size:13px;font-weight:700;color:var(--red);font-family:'JetBrains Mono',monospace;" id="wv-I">9%</span>
+            </div>
+            <input type="range" min="0" max="60" value="9" id="w-I" oninput="onWeightChange('I')" style="position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;margin:0;">
           </div>
-          <div style="width:32px;font-size:11px;font-weight:700;color:var(--red);font-family:'JetBrains Mono',monospace;text-align:right;">7%</div>
         </div>
-        <div style="display:flex;align-items:center;gap:10px;">
-          <div style="width:120px;font-size:11px;color:var(--teal);font-family:'JetBrains Mono',monospace;flex-shrink:0;">Is ISM PMI</div>
-          <div style="flex:1;background:var(--bg4);border-radius:3px;height:16px;overflow:hidden;">
-            <div style="width:7%;height:100%;background:var(--teal);border-radius:3px;opacity:.5;"></div>
+        <div>
+          <div style="position:relative;height:34px;cursor:pointer;">
+            <div style="position:absolute;inset:0;background:var(--bg4);border-radius:8px;overflow:hidden;">
+              <div id="wb-Is" style="width:9%;height:100%;background:var(--teal);opacity:.25;border-radius:8px;transition:width .12s;"></div>
+            </div>
+            <div style="position:absolute;inset:0;display:flex;align-items:center;padding:0 12px;pointer-events:none;">
+              <span style="font-size:13px;font-weight:700;color:var(--teal);font-family:'JetBrains Mono',monospace;margin-right:8px;min-width:18px;">Is</span>
+              <span style="font-size:12px;color:var(--t2);flex:1;">ISM PMI</span>
+              <span style="font-size:13px;font-weight:700;color:var(--teal);font-family:'JetBrains Mono',monospace;" id="wv-Is">9%</span>
+            </div>
+            <input type="range" min="0" max="60" value="9" id="w-Is" oninput="onWeightChange('Is')" style="position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;margin:0;">
           </div>
-          <div style="width:32px;font-size:11px;font-weight:700;color:var(--teal);font-family:'JetBrains Mono',monospace;text-align:right;">7%</div>
         </div>
       </div>
+
     </div>
 
+
     <!-- PROGRESSIONE + NOTA -->
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:20px;padding-top:16px;border-top:1px solid var(--border);">
       <div>
         <div style="font-size:11px;color:var(--t3);font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;">Progressione raccomandazioni</div>
         <div style="display:flex;flex-direction:column;gap:4px;">
@@ -1436,6 +1484,78 @@ function computeOptimalWeights(){
   return weights;
 }
 
+// ═══════════════ PESI DINAMICI ═══════════════
+// Valori default — modificabili via slider nella UI
+let MODEL_WEIGHTS = {P:0.30, M:0.27, E:0.12, C:0.10, N:0.09, I:0.09, Is:0.09};
+const DEFAULT_WEIGHTS = {P:0.30, M:0.27, E:0.12, C:0.10, N:0.09, I:0.09, Is:0.09};
+
+function onWeightChange(changed){
+  const keys = ['P','M','E','C','N','I','Is'];
+  // Leggi il nuovo valore dallo slider modificato
+  const sl = document.getElementById('w-'+changed);
+  if(!sl) return;
+  const changedVal = parseInt(sl.value) || 0;
+  const remaining = 100 - changedVal;
+
+  // Usa MODEL_WEIGHTS come fonte di verità (non il DOM)
+  const others = keys.filter(k => k !== changed);
+  const othersSum = others.reduce((s,k) => s + Math.round(MODEL_WEIGHTS[k]*100), 0);
+
+  // Scala proporzionalmente rispetto ai pesi attuali in MODEL_WEIGHTS
+  const newVals = {};
+  newVals[changed] = changedVal;
+
+  if(othersSum > 0){
+    let assigned = 0;
+    others.forEach((k, idx) => {
+      if(idx < others.length - 1){
+        const v = Math.max(0, Math.round(MODEL_WEIGHTS[k]*100 / othersSum * remaining));
+        newVals[k] = v;
+        assigned += v;
+      } else {
+        newVals[k] = Math.max(0, remaining - assigned);
+      }
+    });
+  } else {
+    const each = Math.floor(remaining / others.length);
+    others.forEach((k, idx) => {
+      newVals[k] = idx === others.length-1 ? remaining - each*(others.length-1) : each;
+    });
+  }
+
+  // Aggiorna MODEL_WEIGHTS, slider, label, barra — tutto in sincronia
+  keys.forEach(k => {
+    const v = newVals[k];
+    MODEL_WEIGHTS[k] = v / 100;
+    const slk  = document.getElementById('w-'+k);
+    const lbl  = document.getElementById('wv-'+k);
+    const bar  = document.getElementById('wb-'+k);
+    if(slk) slk.value = v;
+    if(lbl) lbl.textContent = v + '%';
+    if(bar) bar.style.width = v + '%';
+  });
+
+  if(curPane==='scenario') setTimeout(()=>renderConsTable(), 30);
+}
+
+function resetWeights(){
+  const defaults = {P:30, M:27, E:12, C:10, N:9, I:9, Is:9};
+  Object.entries(defaults).forEach(([k,v]) => {
+    const sl = document.getElementById('w-'+k);
+    if(sl) sl.value = v;
+  });
+  // Aggiorna labels, barre e MODEL_WEIGHTS direttamente senza chiamare onWeightChange
+  Object.entries(defaults).forEach(([k,v]) => {
+    const lbl = document.getElementById('wv-'+k);
+    const bar = document.getElementById('wb-'+k);
+    if(lbl) lbl.textContent = v + '%';
+    if(bar) bar.style.width = v + '%';
+    MODEL_WEIGHTS[k] = v / 100;
+  });
+  if(curPane==='scenario') setTimeout(()=>renderConsTable(), 30);
+}
+
+
 // ═══════════════ MODELLO A 6 FATTORI ═══════════════
 // Momentum 37% · EUR/USD 16% · Consensus 15% · NFP 11% · CPI 11% · ISM 10%
 // Volatilità rimossa dal modello — solo grafico informativo
@@ -1585,7 +1705,8 @@ function getRec(sentX,pesoPct,targetPct,mom1y=0,mom6m=0,mom3m=0,vol=0.3,cat='equ
   const sE  = scoreEURUSD(MACRO_USA.eurusdScore,cat);
   const sIs = scoreISM(MACRO_USA.ismScore,cat);
   // Momentum 27% · Tuo consensus 30% · EUR/USD 12% · Consensus ist. 10% · NFP 7% · CPI 7% · ISM 7%
-  const score=sM*0.27+sP*0.30+sE*0.12+sC*0.10+sN*0.07+sI*0.07+sIs*0.07;
+  // Usa pesi dinamici (modificabili via slider UI)
+  const score=sM*MODEL_WEIGHTS.M+sP*MODEL_WEIGHTS.P+sE*MODEL_WEIGHTS.E+sC*MODEL_WEIGHTS.C+sN*MODEL_WEIGHTS.N+sI*MODEL_WEIGHTS.I+sIs*MODEL_WEIGHTS.Is;
   let text,color;
   if(score> 0.55){text='⬆ Aumenta';         color='var(--teal)';}
   else if(score> 0.25){text='↗ Valuta aumento';  color='var(--teal)';}
