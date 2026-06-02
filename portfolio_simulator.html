@@ -414,50 +414,278 @@ tbody tr:hover td{background:rgba(255,255,255,.015);}
     </table>
     <p class="note">Dati da Goldman Sachs Commodity Outlook 2026, JPMorgan Market Outlook, BlackRock Investment Institute, GSAM Market Know-How Q2 2026, S&P Global Energy Horizons 2026, World Nuclear Association Report 2026, Sprott Uranium Outlook 2026. Aggiornato maggio 2026. Conversioni a USD/EUR 0.8577 (29 mag 2026).</p>
   </div>
-  <div class="card"><p class="sec">Forecast 2026 — tre scenari sul tuo portafoglio attuale</p><div class="cw" style="height:260px;"><canvas id="c-fc" role="img" aria-label="Forecast 2026 tre scenari">Forecast 2026.</canvas></div></div>
-  <div class="card"><p class="sec">Dettaglio per asset</p><table><thead><tr><th>Asset</th><th>Peso</th><th>Bear 35%</th><th>Base 45%</th><th>Bull 20%</th><th>Contrib. base</th><th style="color:var(--gold);">Atteso pond.</th></tr></thead><tbody id="sc-tbl"></tbody></table></div>
 
+  <!-- METODOLOGIA RACCOMANDAZIONI -->
+  <div class="card" style="margin-top:16px;border:1px solid rgba(39,201,154,.15);background:rgba(39,201,154,.03);">
+    <p class="sec" style="margin-bottom:14px;color:var(--teal);">Come vengono calcolate le raccomandazioni</p>
 
-  <!-- MACRO USA 2026 -->
-  <p class="sec" style="margin:20px 0 12px;">Dati macro USA 2026 — fattori che influenzano le raccomandazioni</p>
-  <div class="g2" style="margin-bottom:14px;">
-
-    <!-- NFP -->
-    <div class="card">
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;">
-        <div>
-          <p class="sec" style="margin-bottom:3px;">Buste paga non agricole (NFP)</p>
-          <p style="font-size:11px;color:var(--t2);">Variazione mensile posti di lavoro · Target Fed: ~150K/mese</p>
+    <!-- BARRE DEI PESI -->
+    <div style="margin-bottom:16px;">
+      <div style="font-size:11px;color:var(--t3);font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px;">Peso di ogni fattore nello score finale</div>
+      <div style="display:flex;flex-direction:column;gap:7px;">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div style="width:120px;font-size:11px;color:#8b6fff;font-family:'JetBrains Mono',monospace;flex-shrink:0;">P Tuo consensus</div>
+          <div style="flex:1;background:var(--bg4);border-radius:3px;height:16px;overflow:hidden;">
+            <div style="width:30%;height:100%;background:#8b6fff;border-radius:3px;opacity:.7;"></div>
+          </div>
+          <div style="width:32px;font-size:11px;font-weight:700;color:#8b6fff;font-family:'JetBrains Mono',monospace;text-align:right;">30%</div>
         </div>
-        <div style="text-align:right;">
-          <div style="font-size:11px;color:var(--t3);">Ultimo dato</div>
-          <div style="font-size:18px;font-weight:700;font-family:'JetBrains Mono',monospace;color:var(--amber);">+115K</div>
-          <div style="font-size:10px;color:var(--t3);">Apr 2026</div>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div style="width:120px;font-size:11px;color:var(--teal);font-family:'JetBrains Mono',monospace;flex-shrink:0;">M Momentum</div>
+          <div style="flex:1;background:var(--bg4);border-radius:3px;height:16px;overflow:hidden;">
+            <div style="width:27%;height:100%;background:var(--teal);border-radius:3px;opacity:.7;"></div>
+          </div>
+          <div style="width:32px;font-size:11px;font-weight:700;color:var(--teal);font-family:'JetBrains Mono',monospace;text-align:right;">27%</div>
         </div>
-      </div>
-      <div style="position:relative;height:180px;"><canvas id="c-nfp"></canvas></div>
-      <div style="margin-top:8px;padding:8px;background:rgba(240,201,110,.06);border-radius:var(--r);border-left:2px solid var(--amber);">
-        <div style="font-size:11px;color:var(--t2);line-height:1.6;"><strong style="color:var(--t1);">Lettura:</strong> NFP in rallentamento da 185K (mar) a 115K (apr). Feb -156K fu anomalia da sciopero sanità. Trend in indebolimento — segnale di economia che rallenta sotto pressione tariffe+energia. <strong style="color:var(--amber);">Effetto sul portafoglio:</strong> mercato lavoro debole → Fed in trappola stagflazionaria → favorevole per oro e commodity, negativo per growth.</div>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div style="width:120px;font-size:11px;color:var(--amber);font-family:'JetBrains Mono',monospace;flex-shrink:0;">E EUR/USD</div>
+          <div style="flex:1;background:var(--bg4);border-radius:3px;height:16px;overflow:hidden;">
+            <div style="width:12%;height:100%;background:var(--amber);border-radius:3px;opacity:.7;"></div>
+          </div>
+          <div style="width:32px;font-size:11px;font-weight:700;color:var(--amber);font-family:'JetBrains Mono',monospace;text-align:right;">12%</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div style="width:120px;font-size:11px;color:var(--t2);font-family:'JetBrains Mono',monospace;flex-shrink:0;">C Consensus ist.</div>
+          <div style="flex:1;background:var(--bg4);border-radius:3px;height:16px;overflow:hidden;">
+            <div style="width:10%;height:100%;background:var(--t2);border-radius:3px;opacity:.5;"></div>
+          </div>
+          <div style="width:32px;font-size:11px;font-weight:700;color:var(--t2);font-family:'JetBrains Mono',monospace;text-align:right;">10%</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div style="width:120px;font-size:11px;color:var(--amber);font-family:'JetBrains Mono',monospace;flex-shrink:0;">N NFP</div>
+          <div style="flex:1;background:var(--bg4);border-radius:3px;height:16px;overflow:hidden;">
+            <div style="width:7%;height:100%;background:var(--amber);border-radius:3px;opacity:.6;"></div>
+          </div>
+          <div style="width:32px;font-size:11px;font-weight:700;color:var(--amber);font-family:'JetBrains Mono',monospace;text-align:right;">7%</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div style="width:120px;font-size:11px;color:var(--red);font-family:'JetBrains Mono',monospace;flex-shrink:0;">I CPI</div>
+          <div style="flex:1;background:var(--bg4);border-radius:3px;height:16px;overflow:hidden;">
+            <div style="width:7%;height:100%;background:var(--red);border-radius:3px;opacity:.6;"></div>
+          </div>
+          <div style="width:32px;font-size:11px;font-weight:700;color:var(--red);font-family:'JetBrains Mono',monospace;text-align:right;">7%</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div style="width:120px;font-size:11px;color:var(--teal);font-family:'JetBrains Mono',monospace;flex-shrink:0;">Is ISM PMI</div>
+          <div style="flex:1;background:var(--bg4);border-radius:3px;height:16px;overflow:hidden;">
+            <div style="width:7%;height:100%;background:var(--teal);border-radius:3px;opacity:.5;"></div>
+          </div>
+          <div style="width:32px;font-size:11px;font-weight:700;color:var(--teal);font-family:'JetBrains Mono',monospace;text-align:right;">7%</div>
+        </div>
       </div>
     </div>
 
-    <!-- CPI -->
+    <!-- PROGRESSIONE + NOTA -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+      <div>
+        <div style="font-size:11px;color:var(--t3);font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;">Progressione raccomandazioni</div>
+        <div style="display:flex;flex-direction:column;gap:4px;">
+          <div style="display:flex;align-items:center;gap:8px;font-size:11px;">
+            <span style="width:20px;text-align:center;">⬆</span>
+            <span style="color:var(--teal);font-weight:600;">Aumenta</span>
+            <span style="color:var(--t3);font-family:'JetBrains Mono',monospace;">&gt;+10% sottopesato</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;font-size:11px;">
+            <span style="width:20px;text-align:center;">↗</span>
+            <span style="color:var(--teal);">Valuta aumento</span>
+            <span style="color:var(--t3);font-family:'JetBrains Mono',monospace;">+5% a +10%</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;font-size:11px;">
+            <span style="width:20px;text-align:center;">⟷</span>
+            <span style="color:var(--t2);">Mantieni</span>
+            <span style="color:var(--t3);font-family:'JetBrains Mono',monospace;">+1.5% a +5%</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;font-size:11px;background:rgba(39,201,154,.06);padding:3px 6px;border-radius:4px;">
+            <span style="width:20px;text-align:center;">✅</span>
+            <span style="color:var(--teal);font-weight:600;">Allineato</span>
+            <span style="color:var(--t3);font-family:'JetBrains Mono',monospace;">±1.5% dal target</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;font-size:11px;">
+            <span style="width:20px;text-align:center;">⟷</span>
+            <span style="color:var(--t2);">Mantieni</span>
+            <span style="color:var(--t3);font-family:'JetBrains Mono',monospace;">-1.5% a -5%</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;font-size:11px;">
+            <span style="width:20px;text-align:center;">⚠</span>
+            <span style="color:var(--amber);">Valuta riduzione</span>
+            <span style="color:var(--t3);font-family:'JetBrains Mono',monospace;">-5% a -10%</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;font-size:11px;">
+            <span style="width:20px;text-align:center;">⬇</span>
+            <span style="color:var(--red);font-weight:600;">Riduci</span>
+            <span style="color:var(--t3);font-family:'JetBrains Mono',monospace;">&lt;-10% sovrappesato</span>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div style="font-size:11px;color:var(--t3);font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;">Legenda fattori</div>
+        <div style="font-size:11px;color:var(--t2);line-height:1.9;">
+          <span style="color:#8b6fff;font-weight:600;">P</span> — La tua visione a 10-15 anni: infrastruttura AI, de-dollarizzazione, metalli fisici<br>
+          <span style="color:var(--teal);font-weight:600;">M</span> — Rendimenti reali ETF: 1 anno, 6 mesi, 3 mesi (fonte: justETF)<br>
+          <span style="color:var(--amber);font-weight:600;">E</span> — EUR/USD: euro forte penalizza asset in USD per investitore europeo<br>
+          <span style="color:var(--t2);font-weight:600;">C</span> — Outlook GS, JPM, BlackRock (interpretazione qualitativa)<br>
+          <span style="color:var(--amber);font-weight:600;">N</span> — NFP: mercato lavoro debole → Fed bloccata → favorevole commodity<br>
+          <span style="color:var(--red);font-weight:600;">I</span> — CPI: inflazione alta → oro/argento come hedge, penalizza equity<br>
+          <span style="color:var(--teal);font-weight:600;">Is</span> — ISM &gt;50: espansione manifatturiera → positivo per metalli industriali
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top:12px;padding:8px 10px;background:rgba(0,0,0,.2);border-radius:4px;font-size:10px;color:var(--t3);font-family:'JetBrains Mono',monospace;">
+      ⚠ Il peso in portafoglio NON influenza lo score. Il bilanciamento confronta il peso attuale vs il peso ottimale calcolato proporzionalmente allo score di ogni asset.
+    </div>
+  </div>
+  <div class="card"><p class="sec">Forecast 2026 — tre scenari sul tuo portafoglio attuale</p><div class="cw" style="height:260px;"><canvas id="c-fc" role="img" aria-label="Forecast 2026 tre scenari">Forecast 2026.</canvas></div></div>
+
+
+  <!-- MACRO USA + GLOBALE 2026 -->
+  <p class="sec" style="margin:20px 0 12px;">Dashboard macro 2026 — fattori che influenzano le raccomandazioni</p>
+
+  <!-- ROW 1: NFP + CPI (nel modello) -->
+  <p style="font-size:11px;color:var(--teal);font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;">⚙ Fattori nel modello raccomandazioni</p>
+  <div class="g2" style="margin-bottom:14px;">
     <div class="card">
       <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;">
-        <div>
-          <p class="sec" style="margin-bottom:3px;">Inflazione USA (CPI) + Previsioni</p>
-          <p style="font-size:11px;color:var(--t2);">Inflazione reale vs target Fed 2% · previsione GS fine 2026</p>
-        </div>
+        <div><p class="sec" style="margin-bottom:3px;">NFP — Buste paga non agricole</p>
+          <p style="font-size:11px;color:var(--t2);">Variazione mensile · Target Fed ~150K/mese · Peso nel modello: 11%</p></div>
         <div style="text-align:right;">
-          <div style="font-size:11px;color:var(--t3);">Ultimo dato</div>
+          <div style="font-size:18px;font-weight:700;font-family:'JetBrains Mono',monospace;color:var(--amber);">+115K</div>
+          <div style="font-size:10px;color:var(--t3);">Apr 2026</div></div>
+      </div>
+      <div style="position:relative;height:160px;"><canvas id="c-nfp"></canvas></div>
+      <div style="margin-top:6px;padding:7px;background:rgba(240,201,110,.06);border-radius:var(--r);border-left:2px solid var(--amber);">
+        <div style="font-size:11px;color:var(--t2);line-height:1.5;"><strong style="color:var(--t1);">Lettura:</strong> Trend in indebolimento — economia rallenta. <strong style="color:var(--amber);">Effetto:</strong> favorevole per commodity/oro, negativo per azionario EM.</div>
+      </div>
+    </div>
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;">
+        <div><p class="sec" style="margin-bottom:3px;">CPI — Inflazione USA</p>
+          <p style="font-size:11px;color:var(--t2);">Inflazione reale vs target Fed 2% · Peso nel modello: 11%</p></div>
+        <div style="text-align:right;">
           <div style="font-size:18px;font-weight:700;font-family:'JetBrains Mono',monospace;color:var(--red);">3.8%</div>
-          <div style="font-size:10px;color:var(--t3);">Apr 2026</div>
-        </div>
+          <div style="font-size:10px;color:var(--t3);">Apr 2026</div></div>
       </div>
-      <div style="position:relative;height:180px;"><canvas id="c-cpi"></canvas></div>
-      <div style="margin-top:8px;padding:8px;background:rgba(232,80,74,.06);border-radius:var(--r);border-left:2px solid var(--red);">
-        <div style="font-size:11px;color:var(--t2);line-height:1.6;"><strong style="color:var(--t1);">Lettura:</strong> CPI accelera: 2.4% (gen/feb) → 3.3% (mar) → 3.8% (apr). Driver: guerra Iran → energia +17.9%, benzina +28.4%. Previsione GS: 3.5% fine 2026. <strong style="color:var(--red);">Effetto sul portafoglio:</strong> inflazione alta blocca tagli Fed → oro e argento come hedge inflazione, USD sotto pressione → favorevole per commodity in €.</div>
+      <div style="position:relative;height:160px;"><canvas id="c-cpi"></canvas></div>
+      <div style="margin-top:6px;padding:7px;background:rgba(232,80,74,.06);border-radius:var(--r);border-left:2px solid var(--red);">
+        <div style="font-size:11px;color:var(--t2);line-height:1.5;"><strong style="color:var(--t1);">Lettura:</strong> Inflazione alta blocca tagli Fed. <strong style="color:var(--red);">Effetto:</strong> oro/argento come hedge, penalizza azionario.</div>
       </div>
+    </div>
+  </div>
+
+  <!-- ROW 2: EUR/USD + ISM (nel modello) -->
+  <div class="g2" style="margin-bottom:14px;">
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;">
+        <div><p class="sec" style="margin-bottom:3px;">EUR/USD — Cambio valutario</p>
+          <p style="font-size:11px;color:var(--t2);">Cambio euro/dollaro · Media storica ~1.15 · Peso nel modello: 16%</p></div>
+        <div style="text-align:right;">
+          <div style="font-size:18px;font-weight:700;font-family:'JetBrains Mono',monospace;color:var(--amber);">1.163</div>
+          <div style="font-size:10px;color:var(--t3);">Mag 2026</div></div>
+      </div>
+      <div style="position:relative;height:160px;"><canvas id="c-eurusd"></canvas></div>
+      <div style="margin-top:6px;padding:7px;background:rgba(240,201,110,.06);border-radius:var(--r);border-left:2px solid var(--amber);">
+        <div style="font-size:11px;color:var(--t2);line-height:1.5;"><strong style="color:var(--t1);">Lettura:</strong> Euro moderatamente forte vs USD. <strong style="color:var(--amber);">Effetto:</strong> penalizza asset in USD (Gold, Silver, Uranium, Bitcoin) per investitore in €.</div>
+      </div>
+    </div>
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;">
+        <div><p class="sec" style="margin-bottom:3px;">ISM Manufacturing PMI</p>
+          <p style="font-size:11px;color:var(--t2);">PMI manifatturiero USA · >50 = espansione · Peso nel modello: 10%</p></div>
+        <div style="text-align:right;">
+          <div style="font-size:18px;font-weight:700;font-family:'JetBrains Mono',monospace;color:var(--teal);">52.7</div>
+          <div style="font-size:10px;color:var(--t3);">Apr 2026</div></div>
+      </div>
+      <div style="position:relative;height:160px;"><canvas id="c-ism"></canvas></div>
+      <div style="margin-top:6px;padding:7px;background:rgba(39,201,154,.06);border-radius:var(--r);border-left:2px solid var(--teal);">
+        <div style="font-size:11px;color:var(--t2);line-height:1.5;"><strong style="color:var(--t1);">Lettura:</strong> Espansione manifatturiera solida (4° mese). <strong style="color:var(--teal);">Effetto:</strong> positivo per Copper, Battery, Grid — domanda industriale in crescita.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ROW 3: CAPE + VIX (solo informativi) -->
+  <p style="font-size:11px;color:var(--t3);font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;">📊 Indicatori informativi — non influenzano le raccomandazioni</p>
+  <div class="g2" style="margin-bottom:14px;">
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;">
+        <div><p class="sec" style="margin-bottom:3px;">CAPE Shiller — Valutazione S&amp;P 500</p>
+          <p style="font-size:11px;color:var(--t2);">P/E ciclicamente aggiustato · Media storica 16 · Sopravvalutato >30</p></div>
+        <div style="text-align:right;">
+          <div style="font-size:18px;font-weight:700;font-family:'JetBrains Mono',monospace;color:var(--red);">42.8</div>
+          <div style="font-size:10px;color:var(--t3);">Giu 2026</div></div>
+      </div>
+      <div style="position:relative;height:160px;"><canvas id="c-cape"></canvas></div>
+      <div style="margin-top:6px;padding:7px;background:rgba(232,80,74,.06);border-radius:var(--r);border-left:2px solid var(--red);">
+        <div style="font-size:11px;color:var(--t2);line-height:1.5;"><strong style="color:var(--t1);">Lettura:</strong> CAPE 42.8 = 50% sopra media 20 anni (27.6). Rendimento S&P 500 atteso prossimi 10 anni: ~1.1%/anno. Segnale di mercato USA sopravvalutato.</div>
+      </div>
+    </div>
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;">
+        <div><p class="sec" style="margin-bottom:3px;">VIX — Indice di volatilità</p>
+          <p style="font-size:11px;color:var(--t2);">Paura del mercato · &lt;20 calmo · 20-30 moderato · &gt;30 alta tensione</p></div>
+        <div style="text-align:right;">
+          <div style="font-size:18px;font-weight:700;font-family:'JetBrains Mono',monospace;color:var(--teal);">16.2</div>
+          <div style="font-size:10px;color:var(--t3);">Mag 2026</div></div>
+      </div>
+      <div style="position:relative;height:160px;"><canvas id="c-vix"></canvas></div>
+      <div style="margin-top:6px;padding:7px;background:rgba(39,201,154,.06);border-radius:var(--r);border-left:2px solid var(--teal);">
+        <div style="font-size:11px;color:var(--t2);line-height:1.5;"><strong style="color:var(--t1);">Lettura:</strong> VIX basso = mercato calmo, poca paura. Attenzione: VIX basso prima di correzioni importanti è comune.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ROW 4: Real Rate + Yield Curve (solo informativi) -->
+  <div class="g2" style="margin-bottom:20px;">
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;">
+        <div><p class="sec" style="margin-bottom:3px;">Tasso Reale USA (Fed - CPI)</p>
+          <p style="font-size:11px;color:var(--t2);">Fed Funds 4.33% - CPI · Negativo = favorevole per oro</p></div>
+        <div style="text-align:right;">
+          <div style="font-size:18px;font-weight:700;font-family:'JetBrains Mono',monospace;color:var(--amber);">+0.53%</div>
+          <div style="font-size:10px;color:var(--t3);">Apr 2026</div></div>
+      </div>
+      <div style="position:relative;height:160px;"><canvas id="c-realrate"></canvas></div>
+      <div style="margin-top:6px;padding:7px;background:rgba(240,201,110,.06);border-radius:var(--r);border-left:2px solid var(--amber);">
+        <div style="font-size:11px;color:var(--t2);line-height:1.5;"><strong style="color:var(--t1);">Lettura:</strong> Tasso reale vicino a zero — quasi neutro per oro. Se CPI sale oltre 4.33% il tasso reale diventa negativo, molto bullish per oro e argento.</div>
+      </div>
+    </div>
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;">
+        <div><p class="sec" style="margin-bottom:3px;">Yield Curve USA (10Y - 2Y)</p>
+          <p style="font-size:11px;color:var(--t2);">Spread tassi · Negativo = inversione = segnale recessione</p></div>
+        <div style="text-align:right;">
+          <div style="font-size:18px;font-weight:700;font-family:'JetBrains Mono',monospace;color:var(--teal);">+0.15%</div>
+          <div style="font-size:10px;color:var(--t3);">Mag 2026</div></div>
+      </div>
+      <div style="position:relative;height:160px;"><canvas id="c-yieldcurve"></canvas></div>
+      <div style="margin-top:6px;padding:7px;background:rgba(39,201,154,.06);border-radius:var(--r);border-left:2px solid var(--teal);">
+        <div style="font-size:11px;color:var(--t2);line-height:1.5;"><strong style="color:var(--t1);">Lettura:</strong> Yield curve leggermente positiva — nessuna inversione in corso. Segnale neutro per recessione.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TUO CONSENSUS PERSONALE -->
+  <p class="sec" style="margin:20px 0 12px;">Il tuo consensus personale — investor conviction</p>
+  <div class="card" style="margin-bottom:16px;border:1px solid rgba(139,111,255,.2);background:rgba(139,111,255,.04);">
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:12px;">
+      <div style="padding:10px;background:rgba(0,0,0,.2);border-radius:6px;border-left:3px solid #8b6fff;">
+        <div style="font-size:11px;color:#8b6fff;font-weight:600;margin-bottom:4px;text-transform:uppercase;letter-spacing:.06em;">Tesi 1</div>
+        <div style="font-size:12px;color:var(--t1);line-height:1.5;">Infrastruttura energetica per l'AI — non le aziende AI, ma chi costruisce la capacità: grid, rinnovabili, nucleare, storage.</div>
+        <div style="margin-top:6px;font-size:10px;color:var(--t3);">→ Grid 90 · CleanE 85 · Uranium 85 · Battery 80 · Hydrogen 80</div>
+      </div>
+      <div style="padding:10px;background:rgba(0,0,0,.2);border-radius:6px;border-left:3px solid var(--gold2);">
+        <div style="font-size:11px;color:var(--gold2);font-weight:600;margin-bottom:4px;text-transform:uppercase;letter-spacing:.06em;">Tesi 2</div>
+        <div style="font-size:12px;color:var(--t1);line-height:1.5;">De-dollarizzazione e metalli fisici — riserve alternative al dollaro, domanda industriale strutturale per la transizione.</div>
+        <div style="margin-top:6px;font-size:10px;color:var(--t3);">→ Gold 85 · Copper 80 · Silver 75</div>
+      </div>
+      <div style="padding:10px;background:rgba(0,0,0,.2);border-radius:6px;border-left:3px solid var(--t3);">
+        <div style="font-size:11px;color:var(--t3);font-weight:600;margin-bottom:4px;text-transform:uppercase;letter-spacing:.06em;">Posizioni neutrali</div>
+        <div style="font-size:12px;color:var(--t1);line-height:1.5;">Crypto = posizione speculativa consapevole, non legata a tesi specifica. EM e Private Equity fuori dalla tesi principale.</div>
+        <div style="margin-top:6px;font-size:10px;color:var(--t3);">→ Bitcoin 50 · EM 40 · PrivEq 45 · Quantum 70</div>
+      </div>
+    </div>
+    <div style="display:flex;flex-wrap:wrap;gap:8px;" id="personal-scores-display"></div>
+    <div style="margin-top:10px;font-size:10px;color:var(--t3);font-family:'JetBrains Mono',monospace;">
+      ⚙ Il tuo consensus pesa il 15% nelle raccomandazioni · Gli score riflettono la tua visione a 10-15 anni
     </div>
   </div>
 
@@ -1134,18 +1362,18 @@ tbody tr:hover td{background:rgba(255,255,255,.015);}
 <script>
 // ═══════════════ DATA ═══════════════
 const ORIG=[
-  {name:'Physical Gold USD', cat:'commodity',short:'Gold',origCap:38657.73,vol:.16,cat:'commodity',isT:false,ret25:.648,retAcq:.3832,color:'#d4a843',geo:{USA:0,Cina:0,Canada:0,Australia:0,Giappone:0,Europa:0,Corea:0,LatAm:0,'EM+KZ':0,UK:0},sec:{'Metalli preziosi':100},bear:.05,base:.15,bull:.25},
-  {name:'Global Hydrogen ESG', cat:'equity-theme',short:'Hydrogen',origCap:26539.11,vol:.35,cat:'equity-theme',isT:true,ret25:.438,retAcq:.1552,color:'#27c99a',geo:{USA:30,UK:15,Giappone:12,Europa:25,Cina:5,Canada:8,Australia:5},sec:{'Industriali/Grid':35,'Clean energy':25,'Tech emergente':20,'Utilities/Infra':20},bear:-.15,base:.10,bull:.30},
-  {name:'Core MSCI EM IMI', cat:'equity-broad',short:'EM IMI',origCap:22502.25,vol:.22,cat:'equity-broad',isT:false,ret25:.322,retAcq:.1250,color:'#BA7517',geo:{Cina:27,'EM+KZ':63,Corea:10},sec:{'Finanziari':22,'Tech emergente':18,'Consumer/Health/IT':15,'Materiali/Mining':12,'Utilities/Infra':10,'Clean energy':8,'Industriali/Grid':15},bear:-.05,base:.12,bull:.22},
-  {name:'Global Clean Energy', cat:'equity-theme',short:'Clean E.',origCap:20292.55,vol:.27,cat:'equity-theme',isT:true,ret25:.466,retAcq:.1593,color:'#4d9de0',geo:{USA:35,Europa:17,Cina:9,'EM+KZ':24,Giappone:5,UK:5,LatAm:5},sec:{'Clean energy':75,'Utilities/Infra':15,'Industriali/Grid':10},bear:.00,base:.15,bull:.35},
-  {name:'Copper Miners USD', cat:'equity-theme',short:'Copper',origCap:10587.23,vol:.38,cat:'equity-theme',isT:true,ret25:.930,retAcq:.0589,color:'#CD7F32',geo:{Canada:25,LatAm:18,Australia:15,USA:10,Europa:10,'EM+KZ':14,UK:8},sec:{'Materiali/Mining':97,'Industriali/Grid':3},bear:-.15,base:.12,bull:.35},
-  {name:'Battery Value-Chain', cat:'equity-theme',short:'Battery',origCap:9994.87,vol:.40,cat:'equity-theme',isT:true,ret25:.155,retAcq:-.0007,color:'#8b6fff',geo:{Cina:30,Corea:25,USA:15,Giappone:12,'EM+KZ':10,Europa:8},sec:{'Tech emergente':35,'Materiali/Mining':30,'Industriali/Grid':20,'Clean energy':15},bear:-.10,base:.08,bull:.25},
-  {name:'Physical Silver', cat:'commodity',short:'Silver',origCap:7043.20,vol:.28,cat:'commodity',isT:false,ret25:1.447,retAcq:-.0612,color:'#C0C0C0',geo:{},sec:{'Metalli preziosi':100},bear:-.20,base:.15,bull:.40},
-  {name:'Uranium & Nuclear', cat:'equity-theme',short:'Uranium',origCap:5269.59,vol:.42,cat:'equity-theme',isT:true,ret25:.860,retAcq:.0001,color:'#d4903a',geo:{Canada:35,'EM+KZ':15,Australia:12,USA:25,Europa:8,UK:5},sec:{'Nucleare/Uranio':80,'Materiali/Mining':12,'Utilities/Infra':8},bear:-.10,base:.20,bull:.45},
-  {name:'Electrification & Grid', cat:'equity-theme',short:'Grid',origCap:4980.22,vol:.35,cat:'equity-theme',isT:true,ret25:.220,retAcq:-.0042,color:'#27c99a',geo:{USA:45,Europa:35,Giappone:8,UK:7,Australia:5},sec:{'Industriali/Grid':55,'Utilities/Infra':30,'Tech emergente':15},bear:.00,base:.12,bull:.22},
-  {name:'Quantum Computing',short:'Quantum',origCap:110.56,vol:.55,cat:'equity-theme',isT:true,ret25:.850,retAcq:.3286,color:'#3C3489',geo:{USA:85,UK:8,Canada:5,'EM+KZ':2},sec:{'Tech emergente':100},bear:-.30,base:.25,bull:.80},
-  {name:'Private Equity', cat:'alternative',short:'Priv.Eq.',origCap:5375.00,vol:.18,cat:'alternative',isT:false,ret25:0,retAcq:.0750,color:'#9e7aff',geo:{USA:40,Europa:35,UK:15,Canada:10},sec:{'Finanziari':60,'Consumer/Health/IT':25,'Industriali/Grid':15},bear:-.05,base:.07,bull:.15},
-  {name:'Bitcoin', cat:'crypto',short:'Bitcoin',origCap:9890.00,vol:.70,cat:'crypto',isT:false,ret25:0,retAcq:-.0827,color:'#F7931A',geo:{},sec:{'Tech emergente':100},bear:-.40,base:.30,bull:.90},
+  {name:'Physical Gold USD', personalScore:85, cat:'commodity',short:'Gold',origCap:38657.73,vol:.16,cat:'commodity',isT:false,ret25:.648,retAcq:.3832,color:'#d4a843',geo:{USA:0,Cina:0,Canada:0,Australia:0,Giappone:0,Europa:0,Corea:0,LatAm:0,'EM+KZ':0,UK:0},sec:{'Metalli preziosi':100},bear:.05,base:.15,bull:.25},
+  {name:'Global Hydrogen ESG', personalScore:80, cat:'equity-theme',short:'Hydrogen',origCap:26539.11,vol:.35,cat:'equity-theme',isT:true,ret25:.438,retAcq:.1552,color:'#27c99a',geo:{USA:30,UK:15,Giappone:12,Europa:25,Cina:5,Canada:8,Australia:5},sec:{'Industriali/Grid':35,'Clean energy':25,'Tech emergente':20,'Utilities/Infra':20},bear:-.15,base:.10,bull:.30},
+  {name:'Core MSCI EM IMI', personalScore:40, cat:'equity-broad',short:'EM IMI',origCap:22502.25,vol:.22,cat:'equity-broad',isT:false,ret25:.322,retAcq:.1250,color:'#BA7517',geo:{Cina:27,'EM+KZ':63,Corea:10},sec:{'Finanziari':22,'Tech emergente':18,'Consumer/Health/IT':15,'Materiali/Mining':12,'Utilities/Infra':10,'Clean energy':8,'Industriali/Grid':15},bear:-.05,base:.12,bull:.22},
+  {name:'Global Clean Energy', personalScore:85, cat:'equity-theme',short:'Clean E.',origCap:20292.55,vol:.27,cat:'equity-theme',isT:true,ret25:.466,retAcq:.1593,color:'#4d9de0',geo:{USA:35,Europa:17,Cina:9,'EM+KZ':24,Giappone:5,UK:5,LatAm:5},sec:{'Clean energy':75,'Utilities/Infra':15,'Industriali/Grid':10},bear:.00,base:.15,bull:.35},
+  {name:'Copper Miners USD', personalScore:80, cat:'equity-theme',short:'Copper',origCap:10587.23,vol:.38,cat:'equity-theme',isT:true,ret25:.930,retAcq:.0589,color:'#CD7F32',geo:{Canada:25,LatAm:18,Australia:15,USA:10,Europa:10,'EM+KZ':14,UK:8},sec:{'Materiali/Mining':97,'Industriali/Grid':3},bear:-.15,base:.12,bull:.35},
+  {name:'Battery Value-Chain', personalScore:80, cat:'equity-theme',short:'Battery',origCap:9994.87,vol:.40,cat:'equity-theme',isT:true,ret25:.155,retAcq:-.0007,color:'#8b6fff',geo:{Cina:30,Corea:25,USA:15,Giappone:12,'EM+KZ':10,Europa:8},sec:{'Tech emergente':35,'Materiali/Mining':30,'Industriali/Grid':20,'Clean energy':15},bear:-.10,base:.08,bull:.25},
+  {name:'Physical Silver', personalScore:75, cat:'commodity',short:'Silver',origCap:7043.20,vol:.28,cat:'commodity',isT:false,ret25:1.447,retAcq:-.0612,color:'#C0C0C0',geo:{},sec:{'Metalli preziosi':100},bear:-.20,base:.15,bull:.40},
+  {name:'Uranium & Nuclear', personalScore:85, cat:'equity-theme',short:'Uranium',origCap:5269.59,vol:.42,cat:'equity-theme',isT:true,ret25:.860,retAcq:.0001,color:'#d4903a',geo:{Canada:35,'EM+KZ':15,Australia:12,USA:25,Europa:8,UK:5},sec:{'Nucleare/Uranio':80,'Materiali/Mining':12,'Utilities/Infra':8},bear:-.10,base:.20,bull:.45},
+  {name:'Electrification & Grid', personalScore:90, cat:'equity-theme',short:'Grid',origCap:4980.22,vol:.35,cat:'equity-theme',isT:true,ret25:.220,retAcq:-.0042,color:'#27c99a',geo:{USA:45,Europa:35,Giappone:8,UK:7,Australia:5},sec:{'Industriali/Grid':55,'Utilities/Infra':30,'Tech emergente':15},bear:.00,base:.12,bull:.22},
+  {name:'Quantum Computing', personalScore:70,short:'Quantum',origCap:110.56,vol:.55,cat:'equity-theme',isT:true,ret25:.850,retAcq:.3286,color:'#3C3489',geo:{USA:85,UK:8,Canada:5,'EM+KZ':2},sec:{'Tech emergente':100},bear:-.30,base:.25,bull:.80},
+  {name:'Private Equity', personalScore:45, cat:'alternative',short:'Priv.Eq.',origCap:5375.00,vol:.18,cat:'alternative',isT:false,ret25:0,retAcq:.0750,color:'#9e7aff',geo:{USA:40,Europa:35,UK:15,Canada:10},sec:{'Finanziari':60,'Consumer/Health/IT':25,'Industriali/Grid':15},bear:-.05,base:.07,bull:.15},
+  {name:'Bitcoin', personalScore:50, cat:'crypto',short:'Bitcoin',origCap:9890.00,vol:.70,cat:'crypto',isT:false,ret25:0,retAcq:-.0827,color:'#F7931A',geo:{},sec:{'Tech emergente':100},bear:-.40,base:.30,bull:.90},
 ];
 const CORR={'commodity-commodity':.65,'commodity-equity-broad':.05,'commodity-equity-theme':.10,'commodity-alternative':.02,'commodity-crypto':-.05,'equity-broad-equity-broad':1,'equity-broad-equity-theme':.60,'equity-broad-alternative':.45,'equity-broad-crypto':.15,'equity-theme-equity-theme':.55,'equity-theme-alternative':.35,'equity-theme-crypto':.20,'alternative-alternative':1,'alternative-crypto':.10,'crypto-crypto':1};
 function co(a,b){if(a===b)return 1;const k=[a,b].sort().join('-');return CORR[k]??CORR[[b,a].sort().join('-')]??0.4;}
@@ -1177,18 +1405,18 @@ let stressShocks=ORIG.map(()=>0);
 // vol: volatilità annualizzata
 // targetPct: peso % ottimale secondo consensus
 const CONS_META = [
-  {i:0,  name:'Physical Gold USD', cat:'commodity',      color:'#f0c96e', fonte:'GS, JPM, BofA',       outlookBadge:'<span class="badge bg">Bullish</span>',            target:'€135–€166/g',  sentX:88, targetPct:26, y:3.5, mom1y:.41, mom6m:.11, mom3m:-.095, vol:.16},
-  {i:1,  name:'Global Hydrogen ESG', cat:'equity-theme',    color:'#27c99a', fonte:'BlackRock, iShares',   outlookBadge:'<span class="badge ba">Early stage</span>',         target:'$11T al 2050', sentX:62, targetPct:12, y:5.0, mom1y:.25, mom6m:.40, mom3m:.558, vol:.35},
-  {i:2,  name:'Core MSCI EM IMI', cat:'equity-broad',       color:'#BA7517', fonte:'GS, BlackRock',        outlookBadge:'<span class="badge ba">Neutral</span>',           target:'Cina-risk',     sentX:45, targetPct:11, y:2.5, mom1y:.15, mom6m:.08, mom3m:.05, vol:.22},
-  {i:3,  name:'Global Clean Energy', cat:'equity-theme',    color:'#4d9de0', fonte:'BlackRock, IEA',       outlookBadge:'<span class="badge ba">Misto breve</span>',       target:'Volat. alta',   sentX:58, targetPct:10, y:3.5, mom1y:.5568, mom6m:.3713, mom3m:.0355, vol:.27},
-  {i:4,  name:'Copper Miners USD', cat:'equity-theme',      color:'#CD7F32', fonte:'GS, GSAM',             outlookBadge:'<span class="badge bg">Bullish strutturale</span>',target:'€9.800/ton',   sentX:85, targetPct:10, y:4.5, mom1y:.62, mom6m:.29, mom3m:.10, vol:.38},
-  {i:5,  name:'Battery Value-Chain', cat:'equity-theme',    color:'#8b6fff', fonte:'GS, GSAM',             outlookBadge:'<span class="badge bg">Bullish LT</span>',        target:'EV+Storage',    sentX:75, targetPct:8,  y:4.0, mom1y:.30, mom6m:.15, mom3m:.05, vol:.40},
-  {i:6,  name:'Physical Silver', cat:'commodity',        color:'#C0C0C0', fonte:'Silver Inst., JPM',    outlookBadge:'<span class="badge bg">Bullish</span>',           target:'€1,0–€1,2/g',  sentX:80, targetPct:6,  y:3.0, mom1y:.60, mom6m:.30, mom3m:.12, vol:.28},
-  {i:7,  name:'Uranium & Nuclear', cat:'equity-theme',      color:'#d4903a', fonte:'WNA, Sprott',          outlookBadge:'<span class="badge bg">Bullish LT</span>',        target:'€170–€208/kg',  sentX:78, targetPct:6,  y:4.8, mom1y:.64, mom6m:.20, mom3m:.05, vol:.42},
-  {i:8,  name:'Electrification & Grid', cat:'equity-theme', color:'#27c99a', fonte:'S&P Global',           outlookBadge:'<span class="badge bg">Bullish LT</span>',        target:'€584B EU',      sentX:82, targetPct:5,  y:4.2, mom1y:.45, mom6m:.22, mom3m:.08, vol:.35},
-  {i:10, name:'Private Equity', cat:'alternative',         color:'#9e7aff', fonte:'Varia',                outlookBadge:'<span class="badge bb">Neutral</span>',           target:'PE diversif.',  sentX:50, targetPct:3,  y:2.0, mom1y:.07, mom6m:.03, mom3m:.01, vol:.18},
-  {i:11, name:'Bitcoin', cat:'crypto',                color:'#F7931A', fonte:'Varia',                outlookBadge:'<span class="badge ba">Speculativo</span>',       target:'Volatile',      sentX:55, targetPct:3,  y:1.5, mom1y:.20, mom6m:-.10, mom3m:-.08, vol:.70},
-  {i:9,  name:'Quantum Computing', cat:'equity-theme',    color:'#3C3489', fonte:'Defiance, ARK',       outlookBadge:'<span class="badge bg">Speculativo LT</span>',  target:'QTUM +87% 1y',  sentX:78, targetPct:1,  y:5.5, mom1y:.87, mom6m:.52, mom3m:.37, vol:.55},
+  {i:0,  name:'Physical Gold USD', personalScore:85, cat:'commodity',      color:'#f0c96e', fonte:'GS, JPM, BofA',       outlookBadge:'<span class="badge bg">Bullish</span>',            target:'€135–€166/g',  sentX:88, targetPct:26, y:3.5, mom1y:.41, mom6m:.11, mom3m:-.095, vol:.16},
+  {i:1,  name:'Global Hydrogen ESG', personalScore:80, cat:'equity-theme',    color:'#27c99a', fonte:'BlackRock, iShares',   outlookBadge:'<span class="badge ba">Early stage</span>',         target:'$11T al 2050', sentX:62, targetPct:12, y:5.0, mom1y:.25, mom6m:.40, mom3m:.558, vol:.35},
+  {i:2,  name:'Core MSCI EM IMI', personalScore:40, cat:'equity-broad',       color:'#BA7517', fonte:'GS, BlackRock',        outlookBadge:'<span class="badge ba">Neutral</span>',           target:'Cina-risk',     sentX:45, targetPct:11, y:2.5, mom1y:.15, mom6m:.08, mom3m:.05, vol:.22},
+  {i:3,  name:'Global Clean Energy', personalScore:85, cat:'equity-theme',    color:'#4d9de0', fonte:'BlackRock, IEA',       outlookBadge:'<span class="badge ba">Misto breve</span>',       target:'Volat. alta',   sentX:58, targetPct:10, y:3.5, mom1y:.5568, mom6m:.3713, mom3m:.0355, vol:.27},
+  {i:4,  name:'Copper Miners USD', personalScore:80, cat:'equity-theme',      color:'#CD7F32', fonte:'GS, GSAM',             outlookBadge:'<span class="badge bg">Bullish strutturale</span>',target:'€9.800/ton',   sentX:85, targetPct:10, y:4.5, mom1y:.62, mom6m:.29, mom3m:.10, vol:.38},
+  {i:5,  name:'Battery Value-Chain', personalScore:80, cat:'equity-theme',    color:'#8b6fff', fonte:'GS, GSAM',             outlookBadge:'<span class="badge bg">Bullish LT</span>',        target:'EV+Storage',    sentX:75, targetPct:8,  y:4.0, mom1y:.30, mom6m:.15, mom3m:.05, vol:.40},
+  {i:6,  name:'Physical Silver', personalScore:75, cat:'commodity',        color:'#C0C0C0', fonte:'Silver Inst., JPM',    outlookBadge:'<span class="badge bg">Bullish</span>',           target:'€1,0–€1,2/g',  sentX:80, targetPct:6,  y:3.0, mom1y:.60, mom6m:.30, mom3m:.12, vol:.28},
+  {i:7,  name:'Uranium & Nuclear', personalScore:85, cat:'equity-theme',      color:'#d4903a', fonte:'WNA, Sprott',          outlookBadge:'<span class="badge bg">Bullish LT</span>',        target:'€170–€208/kg',  sentX:78, targetPct:6,  y:4.8, mom1y:.64, mom6m:.20, mom3m:.05, vol:.42},
+  {i:8,  name:'Electrification & Grid', personalScore:90, cat:'equity-theme', color:'#27c99a', fonte:'S&P Global',           outlookBadge:'<span class="badge bg">Bullish LT</span>',        target:'€584B EU',      sentX:82, targetPct:5,  y:4.2, mom1y:.45, mom6m:.22, mom3m:.08, vol:.35},
+  {i:10, name:'Private Equity', personalScore:45, cat:'alternative',         color:'#9e7aff', fonte:'Varia',                outlookBadge:'<span class="badge bb">Neutral</span>',           target:'PE diversif.',  sentX:50, targetPct:3,  y:2.0, mom1y:.07, mom6m:.03, mom3m:.01, vol:.18},
+  {i:11, name:'Bitcoin', personalScore:50, cat:'crypto',                color:'#F7931A', fonte:'Varia',                outlookBadge:'<span class="badge ba">Speculativo</span>',       target:'Volatile',      sentX:55, targetPct:3,  y:1.5, mom1y:.20, mom6m:-.10, mom3m:-.08, vol:.70},
+  {i:9,  name:'Quantum Computing', personalScore:70, cat:'equity-theme',    color:'#3C3489', fonte:'Defiance, ARK',       outlookBadge:'<span class="badge bg">Speculativo LT</span>',  target:'QTUM +87% 1y',  sentX:78, targetPct:1,  y:5.5, mom1y:.87, mom6m:.52, mom3m:.37, vol:.55},
 ];
 
 
@@ -1197,7 +1425,7 @@ const CONS_META = [
 // Chi ha score più alto merita più peso
 function computeOptimalWeights(){
   const scores = CONS_META.map(m => {
-    const score = getRec(m.sentX, 0, m.targetPct, m.mom1y||0, m.mom6m||0, m.mom3m||0, m.vol||0.3, m.cat||'equity-theme').score;
+    const score = getRec(m.sentX, 0, m.targetPct, m.mom1y||0, m.mom6m||0, m.mom3m||0, m.vol||0.3, m.cat||'equity-theme', m.personalScore||50).score;
     return {i: m.i, score, raw: Math.max(0, score)}; // solo score positivi
   });
   const totScore = scores.reduce((s,x) => s + x.raw, 0);
@@ -1208,74 +1436,156 @@ function computeOptimalWeights(){
   return weights;
 }
 
-// ═══════════════ MODELLO A 5 FATTORI ═══════════════
-// Momentum 40% · Consensus 25% · Volatilità 10% · NFP 15% · CPI 10%
-// Consensus ridotto perché basato su interpretazione qualitativa
-// Momentum e Volatilità aumentati perché basati su dati di mercato reali
+// ═══════════════ MODELLO A 6 FATTORI ═══════════════
+// Momentum 37% · EUR/USD 16% · Consensus 15% · NFP 11% · CPI 11% · ISM 10%
+// Volatilità rimossa dal modello — solo grafico informativo
 const MACRO_USA = {
+  // NFP — buste paga non agricole USA (K)
   nfp: [
-    {m:'Gen 26', v:130,  a:70,   prev:null},
-    {m:'Feb 26', v:-156, a:65,   prev:null},
-    {m:'Mar 26', v:185,  a:60,   prev:null},
-    {m:'Apr 26', v:115,  a:65,   prev:null},
-    {m:'Mag 26', v:null, a:null, prev:80},
-    {m:'Giu 26', v:null, a:null, prev:75},
-    {m:'Lug 26', v:null, a:null, prev:70},
-    {m:'Ago 26', v:null, a:null, prev:65},
-    {m:'Set 26', v:null, a:null, prev:60},
-    {m:'Ott 26', v:null, a:null, prev:55},
-    {m:'Nov 26', v:null, a:null, prev:60},
-    {m:'Dic 26', v:null, a:null, prev:65},
+    {m:'Gen 26', v:130,  prev:null},
+    {m:'Feb 26', v:-156, prev:null},
+    {m:'Mar 26', v:185,  prev:null},
+    {m:'Apr 26', v:115,  prev:null},
+    {m:'Mag 26', v:null, prev:80},
+    {m:'Giu 26', v:null, prev:75},
+    {m:'Lug 26', v:null, prev:70},
+    {m:'Ago 26', v:null, prev:65},
+    {m:'Set 26', v:null, prev:60},
+    {m:'Ott 26', v:null, prev:55},
+    {m:'Nov 26', v:null, prev:60},
+    {m:'Dic 26', v:null, prev:65},
   ],
+  // CPI — inflazione USA %
   cpi: [
-    {m:'Gen 26', v:2.4, c:2.5, p:null},
-    {m:'Feb 26', v:2.4, c:2.5, p:null},
-    {m:'Mar 26', v:3.3, c:2.6, p:null},
-    {m:'Apr 26', v:3.8, c:2.8, p:null},
-    {m:'Mag 26', v:null, c:null, p:3.6},
-    {m:'Giu 26', v:null, c:null, p:3.5},
-    {m:'Lug 26', v:null, c:null, p:3.4},
-    {m:'Ago 26', v:null, c:null, p:3.4},
-    {m:'Set 26', v:null, c:null, p:3.3},
-    {m:'Ott 26', v:null, c:null, p:3.2},
-    {m:'Nov 26', v:null, c:null, p:3.5},
-    {m:'Dic 26', v:null, c:null, p:3.5},
+    {m:'Gen 26', v:2.4, p:null},
+    {m:'Feb 26', v:2.4, p:null},
+    {m:'Mar 26', v:3.3, p:null},
+    {m:'Apr 26', v:3.8, p:null},
+    {m:'Mag 26', v:null, p:3.6},
+    {m:'Giu 26', v:null, p:3.5},
+    {m:'Lug 26', v:null, p:3.4},
+    {m:'Ago 26', v:null, p:3.4},
+    {m:'Set 26', v:null, p:3.3},
+    {m:'Ott 26', v:null, p:3.2},
+    {m:'Nov 26', v:null, p:3.5},
+    {m:'Dic 26', v:null, p:3.5},
   ],
-  nfpScore: -0.15,
-  cpiScore:  -0.60,
+  // EUR/USD — cambio euro/dollaro
+  eurusd: [
+    {m:'Gen 26', v:1.030, p:null},
+    {m:'Feb 26', v:1.048, p:null},
+    {m:'Mar 26', v:1.085, p:null},
+    {m:'Apr 26', v:1.135, p:null},
+    {m:'Mag 26', v:1.163, p:null},
+    {m:'Giu 26', v:null,  p:1.165},
+    {m:'Lug 26', v:null,  p:1.170},
+    {m:'Ago 26', v:null,  p:1.175},
+    {m:'Set 26', v:null,  p:1.172},
+    {m:'Ott 26', v:null,  p:1.168},
+    {m:'Nov 26', v:null,  p:1.165},
+    {m:'Dic 26', v:null,  p:1.162},
+  ],
+  // ISM Manufacturing PMI (>50 = espansione)
+  ism: [
+    {m:'Gen 26', v:52.6, p:null},
+    {m:'Feb 26', v:52.4, p:null},
+    {m:'Mar 26', v:52.7, p:null},
+    {m:'Apr 26', v:52.7, p:null},
+    {m:'Mag 26', v:null, p:53.0},
+    {m:'Giu 26', v:null, p:52.5},
+    {m:'Lug 26', v:null, p:52.0},
+    {m:'Ago 26', v:null, p:51.5},
+    {m:'Set 26', v:null, p:51.0},
+    {m:'Ott 26', v:null, p:51.5},
+    {m:'Nov 26', v:null, p:52.0},
+    {m:'Dic 26', v:null, p:52.0},
+  ],
+  // CAPE Shiller — solo grafico informativo
+  cape: [
+    {m:'Gen 26', v:36.2}, {m:'Feb 26', v:37.1}, {m:'Mar 26', v:38.5},
+    {m:'Apr 26', v:40.1}, {m:'Mag 26', v:41.4},
+  ],
+  // VIX — solo grafico informativo
+  vix: [
+    {m:'Gen 26', v:22.1}, {m:'Feb 26', v:19.8}, {m:'Mar 26', v:24.3},
+    {m:'Apr 26', v:18.5}, {m:'Mag 26', v:16.2},
+  ],
+  // Real Interest Rate = Fed Funds (4.33%) - CPI — solo grafico informativo
+  realRate: [
+    {m:'Gen 26', v:1.93}, {m:'Feb 26', v:1.93}, {m:'Mar 26', v:1.03},
+    {m:'Apr 26', v:0.53},
+  ],
+  // Yield Curve 10Y - 2Y — solo grafico informativo
+  yieldCurve: [
+    {m:'Gen 26', v:0.25}, {m:'Feb 26', v:0.30}, {m:'Mar 26', v:0.22},
+    {m:'Apr 26', v:0.18}, {m:'Mag 26', v:0.15},
+  ],
+  // Score per il modello (aggiornati manualmente ad ogni revisione)
+  nfpScore:   -0.15,  // mercato lavoro debole ma resiliente
+  cpiScore:   -0.60,  // inflazione alta blocca Fed
+  // EUR/USD score: euro forte = negativo per asset USD
+  // EUR 1.163 vs media storica ~1.15 = leggermente sopra media = moderatamente negativo
+  eurusdScore: -0.20, // euro moderatamente forte → penalizza asset in USD
+  // ISM score: >50 = espansione = positivo per industriali/commodity
+  // ISM 52.7 = espansione solida
+  ismScore:    +0.35, // espansione manifatturiera = positivo
 };
 function scoreConsensus(sentX){
-  // Solo sentiment istituzionale — no peso portafoglio
   return (sentX-50)/50;
+}
+function scorePersonal(personalScore){
+  // Tuo consensus personale: infrastruttura AI, de-dollarizzazione, metalli fisici
+  return (personalScore-50)/50;
 }
 function scoreMomentum(mom1y,mom6m,mom3m){
   return Math.max(-1,Math.min(1,(mom1y*0.5+mom6m*0.3+mom3m*0.2)/0.50));
 }
 function scoreVolatility(vol){
-  return Math.max(-1,Math.min(1,(0.35-vol)/0.35));
+  return Math.max(-1,Math.min(1,(0.35-vol)/0.35)); // solo per grafico
 }
 function scoreNFP(nfpScore,cat){
-  if(cat==='commodity')    return -nfpScore*0.8;
-  if(cat==='equity-broad') return  nfpScore;
-  if(cat==='crypto')       return  nfpScore*0.5;
-  if(cat==='alternative')  return  nfpScore*0.3;
-  return nfpScore*0.4;
+  if(cat==='commodity')    return -nfpScore*0.6;
+  if(cat==='equity-broad') return  nfpScore*0.9;
+  if(cat==='crypto')       return  nfpScore*0.4;
+  if(cat==='alternative')  return  nfpScore*0.2;
+  return nfpScore*0.5;
 }
 function scoreCPI(cpiScore,cat){
-  if(cat==='commodity')    return -cpiScore;
-  if(cat==='equity-broad') return  cpiScore*0.8;
-  if(cat==='crypto')       return -cpiScore*0.3;
-  if(cat==='alternative')  return  cpiScore*0.2;
-  return cpiScore*0.5;
+  if(cat==='commodity')    return -cpiScore*1.0;
+  if(cat==='equity-broad') return  cpiScore*0.7;
+  if(cat==='equity-theme') return  cpiScore*0.4;
+  if(cat==='crypto')       return -cpiScore*0.2;
+  if(cat==='alternative')  return  cpiScore*0.1;
+  return cpiScore*0.4;
 }
-function getRec(sentX,pesoPct,targetPct,mom1y=0,mom6m=0,mom3m=0,vol=0.3,cat='equity-theme'){
-  // Score basato SOLO su dati di mercato — il peso NON influenza le raccomandazioni
-  const sC=scoreConsensus(sentX);
-  const sM=scoreMomentum(mom1y,mom6m,mom3m);
-  const sV=scoreVolatility(vol);
-  const sN=scoreNFP(MACRO_USA.nfpScore,cat);
-  const sI=scoreCPI(MACRO_USA.cpiScore,cat);
-  const score=sC*0.25+sM*0.40+sV*0.10+sN*0.15+sI*0.10;
+function scoreEURUSD(eurusdScore,cat){
+  // EUR forte = asset USD valgono meno in € = negativo per investitore europeo
+  if(cat==='commodity')    return eurusdScore*1.0;
+  if(cat==='crypto')       return eurusdScore*0.9;
+  if(cat==='equity-broad') return eurusdScore*0.7;
+  if(cat==='equity-theme') return eurusdScore*0.5;
+  if(cat==='alternative')  return eurusdScore*0.2;
+  return eurusdScore*0.5;
+}
+function scoreISM(ismScore,cat){
+  if(cat==='commodity')    return ismScore*0.3;
+  if(cat==='equity-broad') return ismScore*0.6;
+  if(cat==='equity-theme') return ismScore*0.7;
+  if(cat==='crypto')       return ismScore*0.3;
+  if(cat==='alternative')  return ismScore*0.2;
+  return ismScore*0.5;
+}
+function getRec(sentX,pesoPct,targetPct,mom1y=0,mom6m=0,mom3m=0,vol=0.3,cat='equity-theme',personalScore=50){
+  // Modello a 7 fattori — peso NON influenza le raccomandazioni
+  const sC  = scoreConsensus(sentX);
+  const sP  = scorePersonal(personalScore);
+  const sM  = scoreMomentum(mom1y,mom6m,mom3m);
+  const sN  = scoreNFP(MACRO_USA.nfpScore,cat);
+  const sI  = scoreCPI(MACRO_USA.cpiScore,cat);
+  const sE  = scoreEURUSD(MACRO_USA.eurusdScore,cat);
+  const sIs = scoreISM(MACRO_USA.ismScore,cat);
+  // Momentum 27% · Tuo consensus 30% · EUR/USD 12% · Consensus ist. 10% · NFP 7% · CPI 7% · ISM 7%
+  const score=sM*0.27+sP*0.30+sE*0.12+sC*0.10+sN*0.07+sI*0.07+sIs*0.07;
   let text,color;
   if(score> 0.55){text='⬆ Aumenta';         color='var(--teal)';}
   else if(score> 0.25){text='↗ Valuta aumento';  color='var(--teal)';}
@@ -1283,7 +1593,7 @@ function getRec(sentX,pesoPct,targetPct,mom1y=0,mom6m=0,mom3m=0,vol=0.3,cat='equ
   else if(score>-0.05){text='⟷ Neutro';           color='var(--t3)';}
   else if(score>-0.25){text='⚠ Monitora';        color='var(--amber)';}
   else               {text='⬇ Riduci';           color='var(--red)';}
-  return{text,color,score,sC,sM,sV,sN,sI};
+  return{text,color,score,sC,sP,sM,sN,sI,sE,sIs};
 }
 function pesoTag(pesoPct,targetPct){
   if(_isBalanced)return`<span style="color:var(--teal);">✅</span>`;
@@ -1291,6 +1601,31 @@ function pesoTag(pesoPct,targetPct){
   if(Math.abs(d)<=1.5)return`<span style="color:var(--teal);">✅</span>`;
   if(d<-1.5)return`<span style="color:var(--amber);">⚠ basso</span>`;
   return`<span style="color:var(--amber);">⚠ alto</span>`;
+}
+function pesoTag(pesoPct,targetPct){
+  if(_isBalanced)return`<span style="color:var(--teal);">✅</span>`;
+  const d=pesoPct-targetPct;
+  if(Math.abs(d)<=1.5)return`<span style="color:var(--teal);">✅</span>`;
+  if(d<-1.5)return`<span style="color:var(--amber);">⚠ basso</span>`;
+  return`<span style="color:var(--amber);">⚠ alto</span>`;
+}
+
+function renderPersonalScores(){
+  const el = document.getElementById('personal-scores-display');
+  if(!el || typeof CONS_META === 'undefined') return;
+  el.innerHTML = CONS_META.map(m => {
+    const ps = m.personalScore || 50;
+    const color = ps >= 75 ? 'var(--teal)' : ps >= 55 ? 'var(--t2)' : ps >= 45 ? 'var(--t3)' : 'var(--amber)';
+    const bg    = ps >= 75 ? 'rgba(39,201,154,.1)' : ps >= 55 ? 'rgba(255,255,255,.05)' : 'rgba(240,201,110,.08)';
+    const short = m.name.replace('Physical ','').replace(' USD','').replace(' ESG','')
+                        .replace('Global ','').replace('Core MSCI ','').replace(' Value-Chain','')
+                        .replace('Electrification & ','').replace(' IMI','');
+    return `<div style="padding:4px 8px;border-radius:4px;background:${bg};border:1px solid ${color}33;display:flex;align-items:center;gap:5px;">
+      <span style="width:8px;height:8px;border-radius:50%;background:${m.color};display:inline-block;flex-shrink:0;"></span>
+      <span style="font-size:10px;color:var(--t2);">${short}</span>
+      <span style="font-size:11px;font-weight:700;color:${color};font-family:'JetBrains Mono',monospace;">${ps}</span>
+    </div>`;
+  }).join('');
 }
 
 function rMacroCharts(){
@@ -1327,7 +1662,48 @@ function rMacroCharts(){
       y:{min:1,max:5,ticks:{callback:v=>v+'%',color:'#5a6478',font:{size:9}},grid:{color:'rgba(255,255,255,.04)'}}
     }
   }});
+  // EUR/USD
+  const eu=MACRO_USA.eurusd;
+  mk('c-eurusd',{type:'line',data:{labels:eu.map(d=>d.m),datasets:[
+    {label:'EUR/USD reale',     data:eu.map(d=>d.v),borderColor:'#4d9de0',backgroundColor:'rgba(77,157,224,.08)',borderWidth:2.5,pointRadius:4,tension:.35,fill:true,spanGaps:false},
+    {label:'Previsione',        data:eu.map(d=>d.p),borderColor:'rgba(77,157,224,.5)',borderDash:[5,4],borderWidth:2,pointRadius:3,tension:.35,fill:false,spanGaps:false},
+    {label:'Media storica 1.15',data:eu.map(()=>1.15),borderColor:'rgba(255,255,255,.2)',borderDash:[3,4],borderWidth:1.5,pointRadius:0,fill:false},
+  ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#5a6478',font:{size:9},boxWidth:8}},tooltip:{callbacks:{label:ctx=>ctx.parsed.y!=null?`${ctx.dataset.label}: ${ctx.parsed.y.toFixed(3)}`:null}}},scales:{x:{ticks:{color:'#5a6478',font:{size:9},maxRotation:30},grid:{display:false}},y:{min:1.00,max:1.25,ticks:{callback:v=>v.toFixed(2),color:'#5a6478',font:{size:9}},grid:{color:'rgba(255,255,255,.04)'}}}}});
+  // ISM
+  const is=MACRO_USA.ism;
+  mk('c-ism',{type:'line',data:{labels:is.map(d=>d.m),datasets:[
+    {label:'ISM reale',  data:is.map(d=>d.v),borderColor:'#27c99a',backgroundColor:'rgba(39,201,154,.08)',borderWidth:2.5,pointRadius:4,tension:.35,fill:true,spanGaps:false},
+    {label:'Previsione', data:is.map(d=>d.p),borderColor:'rgba(39,201,154,.5)',borderDash:[5,4],borderWidth:2,pointRadius:3,tension:.35,fill:false,spanGaps:false},
+    {label:'Soglia 50',  data:is.map(()=>50),borderColor:'rgba(255,255,255,.25)',borderDash:[3,4],borderWidth:1.5,pointRadius:0,fill:false},
+  ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#5a6478',font:{size:9},boxWidth:8}}},scales:{x:{ticks:{color:'#5a6478',font:{size:9},maxRotation:30},grid:{display:false}},y:{min:45,max:60,ticks:{color:'#5a6478',font:{size:9}},grid:{color:'rgba(255,255,255,.04)'}}}}});
+  // CAPE
+  const cp=MACRO_USA.cape;
+  mk('c-cape',{type:'line',data:{labels:cp.map(d=>d.m),datasets:[
+    {label:'CAPE Shiller',       data:cp.map(d=>d.v),borderColor:'#e8504a',backgroundColor:'rgba(232,80,74,.08)',borderWidth:2.5,pointRadius:4,tension:.35,fill:true},
+    {label:'Media 20 anni 27.6', data:cp.map(()=>27.6),borderColor:'rgba(39,201,154,.4)',borderDash:[3,4],borderWidth:1.5,pointRadius:0,fill:false},
+    {label:'Soglia alta 30',     data:cp.map(()=>30),borderColor:'rgba(240,201,110,.3)',borderDash:[2,4],borderWidth:1,pointRadius:0,fill:false},
+  ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#5a6478',font:{size:9},boxWidth:8}}},scales:{x:{ticks:{color:'#5a6478',font:{size:9},maxRotation:30},grid:{display:false}},y:{min:20,max:50,ticks:{color:'#5a6478',font:{size:9}},grid:{color:'rgba(255,255,255,.04)'}}}}});
+  // VIX
+  const vx=MACRO_USA.vix;
+  mk('c-vix',{type:'line',data:{labels:vx.map(d=>d.m),datasets:[
+    {label:'VIX',            data:vx.map(d=>d.v),borderColor:'#8b6fff',backgroundColor:'rgba(139,111,255,.08)',borderWidth:2.5,pointRadius:4,tension:.35,fill:true},
+    {label:'Soglia alta 30', data:vx.map(()=>30),borderColor:'rgba(232,80,74,.4)',borderDash:[3,4],borderWidth:1.5,pointRadius:0,fill:false},
+    {label:'Calmo 20',       data:vx.map(()=>20),borderColor:'rgba(255,255,255,.2)',borderDash:[2,4],borderWidth:1,pointRadius:0,fill:false},
+  ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#5a6478',font:{size:9},boxWidth:8}}},scales:{x:{ticks:{color:'#5a6478',font:{size:9},maxRotation:30},grid:{display:false}},y:{min:10,max:40,ticks:{color:'#5a6478',font:{size:9}},grid:{color:'rgba(255,255,255,.04)'}}}}});
+  // Real Interest Rate
+  const rr=MACRO_USA.realRate;
+  mk('c-realrate',{type:'line',data:{labels:rr.map(d=>d.m),datasets:[
+    {label:'Tasso reale', data:rr.map(d=>d.v),borderColor:'#f0c96e',backgroundColor:'rgba(240,201,110,.08)',borderWidth:2.5,pointRadius:4,tension:.35,fill:true},
+    {label:'Soglia 0%',   data:rr.map(()=>0),borderColor:'rgba(232,80,74,.4)',borderDash:[3,4],borderWidth:1.5,pointRadius:0,fill:false},
+  ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#5a6478',font:{size:9},boxWidth:8}},tooltip:{callbacks:{label:ctx=>ctx.parsed.y!=null?`${ctx.dataset.label}: ${ctx.parsed.y.toFixed(2)}%`:null}}},scales:{x:{ticks:{color:'#5a6478',font:{size:9},maxRotation:30},grid:{display:false}},y:{ticks:{callback:v=>v.toFixed(1)+'%',color:'#5a6478',font:{size:9}},grid:{color:'rgba(255,255,255,.04)'}}}}});
+  // Yield Curve
+  const yc=MACRO_USA.yieldCurve;
+  mk('c-yieldcurve',{type:'line',data:{labels:yc.map(d=>d.m),datasets:[
+    {label:'10Y - 2Y',              data:yc.map(d=>d.v),borderColor:'#4d9de0',backgroundColor:'rgba(77,157,224,.08)',borderWidth:2.5,pointRadius:4,tension:.35,fill:true},
+    {label:'Soglia inversione 0%',  data:yc.map(()=>0),borderColor:'rgba(232,80,74,.4)',borderDash:[3,4],borderWidth:1.5,pointRadius:0,fill:false},
+  ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#5a6478',font:{size:9},boxWidth:8}},tooltip:{callbacks:{label:ctx=>ctx.parsed.y!=null?`${ctx.dataset.label}: ${ctx.parsed.y.toFixed(2)}%`:null}}},scales:{x:{ticks:{color:'#5a6478',font:{size:9},maxRotation:30},grid:{display:false}},y:{ticks:{callback:v=>v.toFixed(2)+'%',color:'#5a6478',font:{size:9}},grid:{color:'rgba(255,255,255,.04)'}}}}});
 }
+
 
 
 
@@ -1341,7 +1717,7 @@ function renderConsTable(){
   CONS_META.forEach(m => {
     const peso     = totCurr > 0 ? caps[m.i] / totCurr * 100 : 0;
     const pesoOrig = totOrig > 0 ? ORIG[m.i].origCap / totOrig * 100 : 0;
-    const rec = getRec(m.sentX, peso, m.targetPct, m.mom1y||0, m.mom6m||0, m.mom3m||0, m.vol||0.3, m.cat||'equity-theme');
+    const rec = getRec(m.sentX, peso, m.targetPct, m.mom1y||0, m.mom6m||0, m.mom3m||0, m.vol||0.3, m.cat||'equity-theme', m.personalScore||50);
 
     // Target ottimale = peso proporzionale allo score (portafoglio perfetto)
     const targetOttimale = _isBalanced ? peso : optWeights[m.i] || 0;
@@ -1382,10 +1758,18 @@ function renderConsTable(){
     const volBar = `<div style="position:relative;width:100%;min-width:80px;"><div style="background:var(--bg4);border-radius:3px;height:18px;"><div style="width:${vPct}%;height:100%;background:${barV};opacity:.25;border-radius:3px;"></div></div><div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:space-between;padding:0 6px;"><span style="font-size:9px;color:var(--t2);">vol ${Math.round((m.vol||0.3)*100)}%</span><span style="font-size:10px;font-weight:700;color:${barV};">${vPct}</span></div></div>`;
 
     // Score breakdown
-    const sC  = scoreConsensus(m.sentX, peso, m.targetPct);
-    const sN  = scoreNFP(MACRO_USA.nfpScore, m.cat||'equity-theme');
-    const sI  = scoreCPI(MACRO_USA.cpiScore, m.cat||'equity-theme');
-    const cPct = Math.round(sC*50+50), nPct = Math.round(sN*50+50), iPct = Math.round(sI*50+50);
+    const sC_d  = scoreConsensus(m.sentX);
+    const sP_d  = scorePersonal(m.personalScore||50);
+    const sN_d  = scoreNFP(MACRO_USA.nfpScore, m.cat||'equity-theme');
+    const sI_d  = scoreCPI(MACRO_USA.cpiScore, m.cat||'equity-theme');
+    const sE_d  = scoreEURUSD(MACRO_USA.eurusdScore, m.cat||'equity-theme');
+    const sIs_d = scoreISM(MACRO_USA.ismScore, m.cat||'equity-theme');
+    const cPct  = Math.round(sC_d*50+50);
+    const pPct  = Math.round(sP_d*50+50);
+    const nPct  = Math.round(sN_d*50+50);
+    const iPct  = Math.round(sI_d*50+50);
+    const ePct  = Math.round(sE_d*50+50);
+    const isPct = Math.round(sIs_d*50+50);
     const scoreFinale = Math.round(rec.score*50+50);
 
     // Raccomandazione
@@ -1407,8 +1791,8 @@ function renderConsTable(){
       displayRec = {text:'✅ Bilanciato', color:'var(--teal)'};
     }
     const recHtml = isBal
-      ? `<span style="color:var(--teal);font-weight:700;">\u2705 Bilanciato</span><div style="font-size:9px;color:var(--t3);margin-top:2px;">C:${cPct} M:${mPct} V:${vPct} N:${nPct} I:${iPct} \u2192 ${scoreFinale}/100</div>`
-      : `<span style="color:${displayRec.color};font-weight:600;">${displayRec.text}</span><div style="font-size:9px;color:var(--t3);margin-top:2px;">C:${cPct} M:${mPct} V:${vPct} N:${nPct} I:${iPct} \u2192 ${scoreFinale}/100</div>`;
+      ? `<span style="color:var(--teal);font-weight:700;">\u2705 Bilanciato</span><div style="font-size:9px;color:var(--t3);margin-top:2px;">M:${mPct} P:${pPct} E:${ePct} C:${cPct} N:${nPct} I:${iPct} Is:${isPct} \u2192 ${scoreFinale}/100</div>`
+      : `<span style="color:${displayRec.color};font-weight:600;">${displayRec.text}</span><div style="font-size:9px;color:var(--t3);margin-top:2px;">M:${mPct} P:${pPct} E:${ePct} C:${cPct} N:${nPct} I:${iPct} Is:${isPct} \u2192 ${scoreFinale}/100</div>`;
 
     const tr = document.createElement('tr');
     tr.innerHTML = `<td style="font-weight:600;color:${m.color};">${m.name}</td><td>${m.outlookBadge}</td><td style="font-family:'JetBrains Mono',monospace;color:var(--teal);">${m.target}</td><td style="font-family:'JetBrains Mono',monospace;">${peso.toFixed(1)}% ${tag}</td><td style="font-family:'JetBrains Mono',monospace;"><div style="font-weight:600;color:${deltaColor};">${deltaStr}</div>${deltaEurStr}</td><td style="padding:3px 6px;">${momBar}</td><td style="padding:3px 6px;">${volBar}</td><td>${recHtml}</td>`;
@@ -1576,7 +1960,7 @@ function bilanciaConsensus(){
 
   // Target di ogni asset = peso ottimale proporzionale allo score
   const targets = CONS_META.map(m => {
-    const rec = getRec(m.sentX, origPcts[m.i], m.targetPct, m.mom1y||0, m.mom6m||0, m.mom3m||0, m.vol||0.3, m.cat||'equity-theme');
+    const rec = getRec(m.sentX, origPcts[m.i], m.targetPct, m.mom1y||0, m.mom6m||0, m.mom3m||0, m.vol||0.3, m.cat||'equity-theme', m.personalScore||50);
     const effectivePct = optWeights[m.i] || 0;
     return {...m, effectivePct, origPct: origPcts[m.i], rec};
   });
@@ -1666,7 +2050,7 @@ function showPane(id,btn){
     renderStorico();
     return;
   }
-  if(id==='scenario'){setTimeout(()=>{renderScenario();renderConsTable();rMacroCharts();},80);return;}
+  if(id==='scenario'){setTimeout(()=>{renderScenario();renderConsTable();rMacroCharts();renderPersonalScores();},80);return;}
   if(id==='geo'){setTimeout(()=>{rGeo();},50);return;}
   refresh();
 }
@@ -1935,11 +2319,11 @@ function renderScenario(){
     {label:`Bull (${PROB.bull}%)`,data:ac.map(x=>+(x.a.bull*100).toFixed(1)),backgroundColor:'rgba(39,201,154,.75)',borderWidth:0,borderRadius:2},
   ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#7a8394',boxWidth:9,font:{size:10}},position:'top'},tooltip:{callbacks:{label:ctx=>`${ctx.dataset.label}: ${ctx.parsed.y>=0?'+':''}${ctx.parsed.y}%`}}},scales:{x:{ticks:{font:{size:10},color:'#3e4452'},grid:{display:false}},y:{ticks:{callback:v=>(v>=0?'+':'')+v+'%',font:{size:10},color:'#3e4452'},grid:{color:'rgba(255,255,255,.04)'}}}}});
 
-  const tb=document.getElementById('sc-tbl');tb.innerHTML='';let tb2=0;
+  const tb=document.getElementById('sc-tbl');
+  if(tb){tb.innerHTML='';let tb2=0;
   ORIG.forEach((a,i)=>{
     if(caps[i]<1)return;
     const c=nw[i]*a.base;tb2+=c;
-    // Valore atteso per asset
     const exp = nw[i] * (a.bear*PROB.bear + a.base*PROB.base + a.bull*PROB.bull) / 100;
     const tr=document.createElement('tr');
     tr.innerHTML=`
@@ -1956,6 +2340,7 @@ function renderScenario(){
   const expTot = (br*PROB.bear + bs*PROB.base + bu*PROB.bull) / 100;
   tr3.innerHTML=`<td>Portafoglio</td><td>100%</td><td style="color:${br>=0?'var(--teal)':'var(--red)'}">${br>=0?'+':''}${fP(br)}%</td><td style="color:var(--gold)">${bs>=0?'+':''}${fP(bs)}%</td><td style="color:var(--teal)">+${fP(bu)}%</td><td style="color:${tb2>=0?'var(--teal)':'var(--red)'}">${tb2>=0?'+':''}${fP(tb2)}%</td><td style="color:var(--gold);font-weight:700;">${expTot>=0?'+':''}${fP(expTot)}%</td>`;
   tb.appendChild(tr3);
+  }
 
   // ── Consensus bubble chart — REATTIVO ai pesi sidebar ──
   // Bubble chart — usa score finale del modello a 5 fattori come asse X
@@ -1966,7 +2351,7 @@ function renderScenario(){
     const sC_b = (m.sentX - 50) / 50; // solo sentiment, ignora delta peso
     const sM_b = scoreMomentum(m.mom1y||0, m.mom6m||0, m.mom3m||0);
     const scoreX = Math.round((sC_b*0.50 + sM_b*0.50) * 50 + 50);
-    const rec  = getRec(m.sentX, peso, m.targetPct, m.mom1y||0, m.mom6m||0, m.mom3m||0, m.vol||0.3, m.cat||'equity-theme');
+    const rec  = getRec(m.sentX, peso, m.targetPct, m.mom1y||0, m.mom6m||0, m.mom3m||0, m.vol||0.3, m.cat||'equity-theme', m.personalScore||50);
     return {
       ...m,
       peso,
@@ -2072,6 +2457,7 @@ function renderScenario(){
     `<div style="background:var(--bg2);border:1px solid rgba(240,201,110,.3);border-radius:var(--r2);padding:12px;">
       <div style="font-size:13px;color:var(--gold2);font-family:'JetBrains Mono',monospace;font-weight:600;margin-bottom:5px;">📊 ATTESO PONDERATO</div>
       <div style="font-size:22px;font-weight:700;color:${ec};">${expPct>=0?'+':''}${(expPct*100).toFixed(1)}%</div>
+      <div style="font-size:16px;font-weight:600;color:${ec};margin-top:2px;">${expPct>=0?'+':''}€${fE(Math.round(cap*expPct))}</div>
       <div style="font-size:13px;color:var(--t2);margin-top:2px;">Bear×35 + Base×45 + Bull×20</div>
     </div>`;
   }
