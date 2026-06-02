@@ -407,7 +407,7 @@ tbody tr:hover td{background:rgba(255,255,255,.015);}
     <div style="position:relative;height:340px;margin-bottom:14px;">
       <canvas id="c-consensus-bubble" role="img" aria-label="Consensus bubble chart"></canvas>
     </div>
-    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px;" id="consensus-cards"></div>
+    <div style="margin-bottom:14px;" id="consensus-cards"></div>
     <table>
       <thead><tr><th style="text-align:left;">Asset</th><th>Outlook</th><th>Target</th><th>Peso port.</th><th>Bilanciamento</th><th>Momentum</th><th>Volatilità</th><th>Raccomandazione</th></tr></thead>
       <tbody id="cons-tbl-body"></tbody>
@@ -917,6 +917,7 @@ tbody tr:hover td{background:rgba(255,255,255,.015);}
 
 
 </div>
+</div><!-- /pane-scenario -->
 
 <!-- STRESS TEST -->
 <div class="pane" id="pane-stress">
@@ -1562,83 +1563,225 @@ function resetWeights(){
 const MACRO_USA = {
   // NFP — buste paga non agricole USA (K)
   nfp: [
-    {m:'Gen 26', v:130,  prev:null},
-    {m:'Feb 26', v:-156, prev:null},
-    {m:'Mar 26', v:185,  prev:null},
-    {m:'Apr 26', v:115,  prev:null},
-    {m:'Mag 26', v:null, prev:80},
-    {m:'Giu 26', v:null, prev:75},
-    {m:'Lug 26', v:null, prev:70},
-    {m:'Ago 26', v:null, prev:65},
-    {m:'Set 26', v:null, prev:60},
-    {m:'Ott 26', v:null, prev:55},
-    {m:'Nov 26', v:null, prev:60},
-    {m:'Dic 26', v:null, prev:65},
+    // 2021
+    {m:'Gen 21',v:231},{m:'Feb 21',v:379},{m:'Mar 21',v:785},{m:'Apr 21',v:278},
+    {m:'Mag 21',v:614},{m:'Giu 21',v:962},{m:'Lug 21',v:1091},{m:'Ago 21',v:483},
+    {m:'Set 21',v:194},{m:'Ott 21',v:648},{m:'Nov 21',v:647},{m:'Dic 21',v:588},
+    // 2022
+    {m:'Gen 22',v:504},{m:'Feb 22',v:714},{m:'Mar 22',v:398},{m:'Apr 22',v:436},
+    {m:'Mag 22',v:398},{m:'Giu 22',v:293},{m:'Lug 22',v:537},{m:'Ago 22',v:315},
+    {m:'Set 22',v:263},{m:'Ott 22',v:284},{m:'Nov 22',v:256},{m:'Dic 22',v:223},
+    // 2023
+    {m:'Gen 23',v:517},{m:'Feb 23',v:311},{m:'Mar 23',v:236},{m:'Apr 23',v:294},
+    {m:'Mag 23',v:306},{m:'Giu 23',v:209},{m:'Lug 23',v:236},{m:'Ago 23',v:227},
+    {m:'Set 23',v:297},{m:'Ott 23',v:150},{m:'Nov 23',v:199},{m:'Dic 23',v:216},
+    // 2024
+    {m:'Gen 24',v:256},{m:'Feb 24',v:275},{m:'Mar 24',v:310},{m:'Apr 24',v:165},
+    {m:'Mag 24',v:272},{m:'Giu 24',v:206},{m:'Lug 24',v:114},{m:'Ago 24',v:159},
+    {m:'Set 24',v:223},{m:'Ott 24',v:36},{m:'Nov 24',v:227},{m:'Dic 24',v:307},
+    // 2025
+    {m:'Gen 25',v:125},{m:'Feb 25',v:151},{m:'Mar 25',v:228},{m:'Apr 25',v:177},
+    {m:'Mag 25',v:147},{m:'Giu 25',v:148},{m:'Lug 25',v:135},{m:'Ago 25',v:149},
+    {m:'Set 25',v:135},{m:'Ott 25',v:139},{m:'Nov 25',v:143},{m:'Dic 25',v:154},
+    // 2026 reali
+    {m:'Gen 26',v:130},{m:'Feb 26',v:-156},{m:'Mar 26',v:185},{m:'Apr 26',v:115},
+    // proiezioni H2 2026
+    {m:'Mag 26',prev:80},{m:'Giu 26',prev:75},{m:'Lug 26',prev:70},
+    {m:'Ago 26',prev:65},{m:'Set 26',prev:60},{m:'Ott 26',prev:55},{m:'Nov 26',prev:60},{m:'Dic 26',prev:65},
   ],
   // CPI — inflazione USA %
   cpi: [
-    {m:'Gen 26', v:2.4, p:null},
-    {m:'Feb 26', v:2.4, p:null},
-    {m:'Mar 26', v:3.3, p:null},
-    {m:'Apr 26', v:3.8, p:null},
-    {m:'Mag 26', v:null, p:3.6},
-    {m:'Giu 26', v:null, p:3.5},
-    {m:'Lug 26', v:null, p:3.4},
-    {m:'Ago 26', v:null, p:3.4},
-    {m:'Set 26', v:null, p:3.3},
-    {m:'Ott 26', v:null, p:3.2},
-    {m:'Nov 26', v:null, p:3.5},
-    {m:'Dic 26', v:null, p:3.5},
+    // 2021
+    {m:'Gen 21',v:1.4},{m:'Feb 21',v:1.7},{m:'Mar 21',v:2.6},{m:'Apr 21',v:4.2},
+    {m:'Mag 21',v:5.0},{m:'Giu 21',v:5.4},{m:'Lug 21',v:5.4},{m:'Ago 21',v:5.3},
+    {m:'Set 21',v:5.4},{m:'Ott 21',v:6.2},{m:'Nov 21',v:6.8},{m:'Dic 21',v:7.0},
+    // 2022
+    {m:'Gen 22',v:7.5},{m:'Feb 22',v:7.9},{m:'Mar 22',v:8.5},{m:'Apr 22',v:8.3},
+    {m:'Mag 22',v:8.6},{m:'Giu 22',v:9.1},{m:'Lug 22',v:8.5},{m:'Ago 22',v:8.3},
+    {m:'Set 22',v:8.2},{m:'Ott 22',v:7.7},{m:'Nov 22',v:7.1},{m:'Dic 22',v:6.5},
+    // 2023
+    {m:'Gen 23',v:6.4},{m:'Feb 23',v:6.0},{m:'Mar 23',v:5.0},{m:'Apr 23',v:4.9},
+    {m:'Mag 23',v:4.0},{m:'Giu 23',v:3.0},{m:'Lug 23',v:3.2},{m:'Ago 23',v:3.7},
+    {m:'Set 23',v:3.7},{m:'Ott 23',v:3.2},{m:'Nov 23',v:3.1},{m:'Dic 23',v:3.4},
+    // 2024
+    {m:'Gen 24',v:3.1},{m:'Feb 24',v:3.2},{m:'Mar 24',v:3.5},{m:'Apr 24',v:3.4},
+    {m:'Mag 24',v:3.3},{m:'Giu 24',v:3.0},{m:'Lug 24',v:2.9},{m:'Ago 24',v:2.5},
+    {m:'Set 24',v:2.4},{m:'Ott 24',v:2.6},{m:'Nov 24',v:2.7},{m:'Dic 24',v:2.9},
+    // 2025
+    {m:'Gen 25',v:3.0},{m:'Feb 25',v:2.8},{m:'Mar 25',v:2.4},{m:'Apr 25',v:2.3},
+    {m:'Mag 25',v:2.4},{m:'Giu 25',v:2.7},{m:'Lug 25',v:2.9},{m:'Ago 25',v:2.6},
+    {m:'Set 25',v:2.4},{m:'Ott 25',v:2.6},{m:'Nov 25',v:2.7},{m:'Dic 25',v:2.9},
+    // 2026 reali
+    {m:'Gen 26',v:2.4},{m:'Feb 26',v:2.4},{m:'Mar 26',v:3.3},{m:'Apr 26',v:3.8},
+    // proiezioni H2 2026
+    {m:'Mag 26',p:3.6},{m:'Giu 26',p:3.5},{m:'Lug 26',p:3.4},
+    {m:'Ago 26',p:3.4},{m:'Set 26',p:3.3},{m:'Ott 26',p:3.2},{m:'Nov 26',p:3.5},{m:'Dic 26',p:3.5},
   ],
   // EUR/USD — cambio euro/dollaro
+
   eurusd: [
-    {m:'Gen 26', v:1.030, p:null},
-    {m:'Feb 26', v:1.048, p:null},
-    {m:'Mar 26', v:1.085, p:null},
-    {m:'Apr 26', v:1.135, p:null},
-    {m:'Mag 26', v:1.163, p:null},
-    {m:'Giu 26', v:null,  p:1.165},
-    {m:'Lug 26', v:null,  p:1.170},
-    {m:'Ago 26', v:null,  p:1.175},
-    {m:'Set 26', v:null,  p:1.172},
-    {m:'Ott 26', v:null,  p:1.168},
-    {m:'Nov 26', v:null,  p:1.165},
-    {m:'Dic 26', v:null,  p:1.162},
+    // 2021
+    {m:'Gen 21',v:1.218},{m:'Feb 21',v:1.210},{m:'Mar 21',v:1.193},{m:'Apr 21',v:1.198},
+    {m:'Mag 21',v:1.218},{m:'Giu 21',v:1.196},{m:'Lug 21',v:1.179},{m:'Ago 21',v:1.175},
+    {m:'Set 21',v:1.171},{m:'Ott 21',v:1.161},{m:'Nov 21',v:1.133},{m:'Dic 21',v:1.129},
+    // 2022
+    {m:'Gen 22',v:1.130},{m:'Feb 22',v:1.135},{m:'Mar 22',v:1.109},{m:'Apr 22',v:1.085},
+    {m:'Mag 22',v:1.058},{m:'Giu 22',v:1.053},{m:'Lug 22',v:1.021},{m:'Ago 22',v:1.017},
+    {m:'Set 22',v:0.984},{m:'Ott 22',v:0.986},{m:'Nov 22',v:1.026},{m:'Dic 22',v:1.057},
+    // 2023
+    {m:'Gen 23',v:1.086},{m:'Feb 23',v:1.073},{m:'Mar 23',v:1.075},{m:'Apr 23',v:1.098},
+    {m:'Mag 23',v:1.087},{m:'Giu 23',v:1.085},{m:'Lug 23',v:1.107},{m:'Ago 23',v:1.091},
+    {m:'Set 23',v:1.062},{m:'Ott 23',v:1.058},{m:'Nov 23',v:1.085},{m:'Dic 23',v:1.102},
+    // 2024
+    {m:'Gen 24',v:1.085},{m:'Feb 24',v:1.079},{m:'Mar 24',v:1.085},{m:'Apr 24',v:1.073},
+    {m:'Mag 24',v:1.080},{m:'Giu 24',v:1.074},{m:'Lug 24',v:1.086},{m:'Ago 24',v:1.104},
+    {m:'Set 24',v:1.108},{m:'Ott 24',v:1.088},{m:'Nov 24',v:1.058},{m:'Dic 24',v:1.047},
+    // 2025
+    {m:'Gen 25',v:1.039},{m:'Feb 25',v:1.044},{m:'Mar 25',v:1.083},{m:'Apr 25',v:1.133},
+    {m:'Mag 25',v:1.128},{m:'Giu 25',v:1.132},{m:'Lug 25',v:1.142},{m:'Ago 25',v:1.107},
+    {m:'Set 25',v:1.109},{m:'Ott 25',v:1.095},{m:'Nov 25',v:1.055},{m:'Dic 25',v:1.049},
+    // 2026 reali
+    {m:'Gen 26',v:1.175},{m:'Feb 26',v:1.148},{m:'Mar 26',v:1.148},{m:'Apr 26',v:1.135},
+    {m:'Mag 26',v:1.163},
+    // proiezioni H2 2026 (BCE consensus)
+    {m:'Giu 26',p:1.165},{m:'Lug 26',p:1.168},{m:'Ago 26',p:1.172},
+    {m:'Set 26',p:1.170},{m:'Ott 26',p:1.166},{m:'Nov 26',p:1.162},{m:'Dic 26',p:1.160},
   ],
   // ISM Manufacturing PMI (>50 = espansione)
+
   ism: [
-    {m:'Gen 26', v:52.6, p:null},
-    {m:'Feb 26', v:52.4, p:null},
-    {m:'Mar 26', v:52.7, p:null},
-    {m:'Apr 26', v:52.7, p:null},
-    {m:'Mag 26', v:null, p:53.0},
-    {m:'Giu 26', v:null, p:52.5},
-    {m:'Lug 26', v:null, p:52.0},
-    {m:'Ago 26', v:null, p:51.5},
-    {m:'Set 26', v:null, p:51.0},
-    {m:'Ott 26', v:null, p:51.5},
-    {m:'Nov 26', v:null, p:52.0},
-    {m:'Dic 26', v:null, p:52.0},
+    // 2021
+    {m:'Gen 21',v:58.7},{m:'Feb 21',v:60.8},{m:'Mar 21',v:64.7},{m:'Apr 21',v:60.7},
+    {m:'Mag 21',v:61.2},{m:'Giu 21',v:60.6},{m:'Lug 21',v:59.5},{m:'Ago 21',v:59.9},
+    {m:'Set 21',v:61.1},{m:'Ott 21',v:60.8},{m:'Nov 21',v:61.1},{m:'Dic 21',v:58.8},
+    // 2022
+    {m:'Gen 22',v:57.6},{m:'Feb 22',v:58.6},{m:'Mar 22',v:57.1},{m:'Apr 22',v:55.4},
+    {m:'Mag 22',v:56.1},{m:'Giu 22',v:53.0},{m:'Lug 22',v:52.8},{m:'Ago 22',v:52.8},
+    {m:'Set 22',v:50.9},{m:'Ott 22',v:50.2},{m:'Nov 22',v:49.0},{m:'Dic 22',v:48.4},
+    // 2023
+    {m:'Gen 23',v:47.4},{m:'Feb 23',v:47.7},{m:'Mar 23',v:46.3},{m:'Apr 23',v:47.1},
+    {m:'Mag 23',v:46.9},{m:'Giu 23',v:46.0},{m:'Lug 23',v:46.4},{m:'Ago 23',v:47.6},
+    {m:'Set 23',v:49.0},{m:'Ott 23',v:46.7},{m:'Nov 23',v:46.7},{m:'Dic 23',v:47.4},
+    // 2024
+    {m:'Gen 24',v:49.1},{m:'Feb 24',v:47.8},{m:'Mar 24',v:50.3},{m:'Apr 24',v:49.2},
+    {m:'Mag 24',v:48.7},{m:'Giu 24',v:48.5},{m:'Lug 24',v:46.8},{m:'Ago 24',v:47.2},
+    {m:'Set 24',v:47.2},{m:'Ott 24',v:46.5},{m:'Nov 24',v:48.4},{m:'Dic 24',v:49.3},
+    // 2025
+    {m:'Gen 25',v:50.9},{m:'Feb 25',v:50.3},{m:'Mar 25',v:49.0},{m:'Apr 25',v:48.7},
+    {m:'Mag 25',v:48.7},{m:'Giu 25',v:48.8},{m:'Lug 25',v:49.8},{m:'Ago 25',v:50.9},
+    {m:'Set 25',v:51.5},{m:'Ott 25',v:50.8},{m:'Nov 25',v:51.4},{m:'Dic 25',v:52.2},
+    // 2026 reali
+    {m:'Gen 26',v:52.6},{m:'Feb 26',v:52.4},{m:'Mar 26',v:52.7},{m:'Apr 26',v:52.7},{m:'Mag 26',v:54.0},
+    // proiezioni H2 2026
+    {m:'Giu 26',p:53.5},{m:'Lug 26',p:52.5},{m:'Ago 26',p:52.0},
+    {m:'Set 26',p:51.5},{m:'Ott 26',p:51.5},{m:'Nov 26',p:52.0},{m:'Dic 26',p:52.0},
   ],
   // CAPE Shiller — solo grafico informativo
+
   cape: [
-    {m:'Gen 26', v:36.2}, {m:'Feb 26', v:37.1}, {m:'Mar 26', v:38.5},
-    {m:'Apr 26', v:40.1}, {m:'Mag 26', v:41.4},
+    // 2021
+    {m:'Gen 21',v:33.3},{m:'Feb 21',v:34.3},{m:'Mar 21',v:35.4},{m:'Apr 21',v:37.2},
+    {m:'Mag 21',v:37.1},{m:'Giu 21',v:38.0},{m:'Lug 21',v:38.7},{m:'Ago 21',v:39.6},
+    {m:'Set 21',v:38.9},{m:'Ott 21',v:39.3},{m:'Nov 21',v:40.4},{m:'Dic 21',v:40.0},
+    // 2022
+    {m:'Gen 22',v:39.9},{m:'Feb 22',v:37.9},{m:'Mar 22',v:37.9},{m:'Apr 22',v:35.8},
+    {m:'Mag 22',v:33.3},{m:'Giu 22',v:29.0},{m:'Lug 22',v:31.3},{m:'Ago 22',v:31.8},
+    {m:'Set 22',v:27.8},{m:'Ott 22',v:27.6},{m:'Nov 22',v:29.4},{m:'Dic 22',v:28.5},
+    // 2023
+    {m:'Gen 23',v:29.0},{m:'Feb 23',v:29.3},{m:'Mar 23',v:30.2},{m:'Apr 23',v:30.9},
+    {m:'Mag 23',v:31.3},{m:'Giu 23',v:32.5},{m:'Lug 23',v:33.5},{m:'Ago 23',v:33.2},
+    {m:'Set 23',v:31.4},{m:'Ott 23',v:30.4},{m:'Nov 23',v:32.1},{m:'Dic 23',v:33.6},
+    // 2024
+    {m:'Gen 24',v:34.1},{m:'Feb 24',v:35.5},{m:'Mar 24',v:36.4},{m:'Apr 24',v:35.0},
+    {m:'Mag 24',v:35.5},{m:'Giu 24',v:36.3},{m:'Lug 24',v:37.0},{m:'Ago 24',v:37.7},
+    {m:'Set 24',v:38.1},{m:'Ott 24',v:36.6},{m:'Nov 24',v:38.9},{m:'Dic 24',v:38.3},
+    // 2025
+    {m:'Gen 25',v:37.5},{m:'Feb 25',v:38.6},{m:'Mar 25',v:35.4},{m:'Apr 25',v:32.1},
+    {m:'Mag 25',v:34.8},{m:'Giu 25',v:36.3},{m:'Lug 25',v:37.8},{m:'Ago 25',v:38.4},
+    {m:'Set 25',v:38.9},{m:'Ott 25',v:39.6},{m:'Nov 25',v:40.3},{m:'Dic 25',v:41.2},
+    // 2026 reali
+    {m:'Gen 26',v:41.8},{m:'Feb 26',v:41.5},{m:'Mar 26',v:41.3},{m:'Apr 26',v:41.0},{m:'Mag 26',v:41.4},{m:'Giu 26',v:42.8},
   ],
   // VIX — solo grafico informativo
+
   vix: [
-    {m:'Gen 26', v:22.1}, {m:'Feb 26', v:19.8}, {m:'Mar 26', v:24.3},
-    {m:'Apr 26', v:18.5}, {m:'Mag 26', v:16.2},
+    // 2021
+    {m:'Gen 21',v:33.1},{m:'Feb 21',v:27.9},{m:'Mar 21',v:20.6},{m:'Apr 21',v:18.6},
+    {m:'Mag 21',v:18.6},{m:'Giu 21',v:15.8},{m:'Lug 21',v:18.2},{m:'Ago 21',v:16.4},
+    {m:'Set 21',v:21.9},{m:'Ott 21',v:16.3},{m:'Nov 21',v:27.2},{m:'Dic 21',v:22.0},
+    // 2022
+    {m:'Gen 22',v:28.9},{m:'Feb 22',v:32.0},{m:'Mar 22',v:25.1},{m:'Apr 22',v:32.4},
+    {m:'Mag 22',v:29.4},{m:'Giu 22',v:30.6},{m:'Lug 22',v:24.6},{m:'Ago 22',v:21.7},
+    {m:'Set 22',v:32.6},{m:'Ott 22',v:29.7},{m:'Nov 22',v:20.6},{m:'Dic 22',v:22.8},
+    // 2023
+    {m:'Gen 23',v:20.0},{m:'Feb 23',v:21.7},{m:'Mar 23',v:19.1},{m:'Apr 23',v:17.1},
+    {m:'Mag 23',v:17.0},{m:'Giu 23',v:13.6},{m:'Lug 23',v:13.9},{m:'Ago 23',v:17.0},
+    {m:'Set 23',v:17.5},{m:'Ott 23',v:19.7},{m:'Nov 23',v:12.5},{m:'Dic 23',v:12.5},
+    // 2024
+    {m:'Gen 24',v:13.3},{m:'Feb 24',v:13.8},{m:'Mar 24',v:13.0},{m:'Apr 24',v:15.6},
+    {m:'Mag 24',v:12.9},{m:'Giu 24',v:12.4},{m:'Lug 24',v:16.4},{m:'Ago 24',v:15.0},
+    {m:'Set 24',v:16.7},{m:'Ott 24',v:19.8},{m:'Nov 24',v:14.6},{m:'Dic 24',v:17.4},
+    // 2025
+    {m:'Gen 25',v:17.9},{m:'Feb 25',v:19.6},{m:'Mar 25',v:22.3},{m:'Apr 25',v:30.1},
+    {m:'Mag 25',v:18.4},{m:'Giu 25',v:16.2},{m:'Lug 25',v:15.8},{m:'Ago 25',v:14.5},
+    {m:'Set 25',v:15.3},{m:'Ott 25',v:16.1},{m:'Nov 25',v:14.7},{m:'Dic 25',v:15.8},
+    // 2026 reali
+    {m:'Gen 26',v:15.9},{m:'Feb 26',v:18.4},{m:'Mar 26',v:21.2},{m:'Apr 26',v:17.3},{m:'Mag 26',v:17.3},
   ],
   // Real Interest Rate = Fed Funds (4.33%) - CPI — solo grafico informativo
+
   realRate: [
-    {m:'Gen 26', v:1.93}, {m:'Feb 26', v:1.93}, {m:'Mar 26', v:1.03},
-    {m:'Apr 26', v:0.53},
+    // 2021 (Fed ~0%, CPI accelera)
+    {m:'Gen 21',v:-1.4},{m:'Feb 21',v:-1.7},{m:'Mar 21',v:-2.6},{m:'Apr 21',v:-4.1},
+    {m:'Mag 21',v:-4.9},{m:'Giu 21',v:-5.2},{m:'Lug 21',v:-5.1},{m:'Ago 21',v:-5.1},
+    {m:'Set 21',v:-5.4},{m:'Ott 21',v:-5.9},{m:'Nov 21',v:-6.6},{m:'Dic 21',v:-6.9},
+    // 2022 (Fed alza, CPI picco a 9.1%)
+    {m:'Gen 22',v:-7.5},{m:'Feb 22',v:-7.5},{m:'Mar 22',v:-7.7},{m:'Apr 22',v:-7.9},
+    {m:'Mag 22',v:-7.5},{m:'Giu 22',v:-8.8},{m:'Lug 22',v:-6.4},{m:'Ago 22',v:-5.6},
+    {m:'Set 22',v:-4.7},{m:'Ott 22',v:-3.5},{m:'Nov 22',v:-3.2},{m:'Dic 22',v:-1.8},
+    // 2023 (Fed 5.33%, CPI scende)
+    {m:'Gen 23',v:-1.6},{m:'Feb 23',v:-0.8},{m:'Mar 23',v:-0.3},{m:'Apr 23',v:0.4},
+    {m:'Mag 23',v:1.1},{m:'Giu 23',v:1.8},{m:'Lug 23',v:2.2},{m:'Ago 23',v:2.1},
+    {m:'Set 23',v:2.6},{m:'Ott 23',v:2.7},{m:'Nov 23',v:2.9},{m:'Dic 23',v:2.8},
+    // 2024 (Fed taglia a 4.33%)
+    {m:'Gen 24',v:2.0},{m:'Feb 24',v:1.9},{m:'Mar 24',v:1.5},{m:'Apr 24',v:0.8},
+    {m:'Mag 24',v:1.0},{m:'Giu 24',v:1.1},{m:'Lug 24',v:1.2},{m:'Ago 24',v:1.2},
+    {m:'Set 24',v:1.8},{m:'Ott 24',v:1.7},{m:'Nov 24',v:1.5},{m:'Dic 24',v:1.6},
+    // 2025
+    {m:'Gen 25',v:1.5},{m:'Feb 25',v:1.5},{m:'Mar 25',v:1.3},{m:'Apr 25',v:1.5},
+    {m:'Mag 25',v:1.8},{m:'Giu 25',v:1.9},{m:'Lug 25',v:1.9},{m:'Ago 25',v:1.8},
+    {m:'Set 25',v:1.9},{m:'Ott 25',v:2.0},{m:'Nov 25',v:2.1},{m:'Dic 25',v:1.9},
+    // 2026 reali (Fed 4.33%, CPI risale)
+    {m:'Gen 26',v:1.9},{m:'Feb 26',v:1.9},{m:'Mar 26',v:1.0},{m:'Apr 26',v:0.5},
   ],
   // Yield Curve 10Y - 2Y — solo grafico informativo
+
   yieldCurve: [
-    {m:'Gen 26', v:0.25}, {m:'Feb 26', v:0.30}, {m:'Mar 26', v:0.22},
-    {m:'Apr 26', v:0.18}, {m:'Mag 26', v:0.15},
+    // 2021 (curva normale, poi si appiattisce)
+    {m:'Gen 21',v:0.98},{m:'Feb 21',v:1.32},{m:'Mar 21',v:1.57},{m:'Apr 21',v:1.58},
+    {m:'Mag 21',v:1.49},{m:'Giu 21',v:1.23},{m:'Lug 21',v:1.09},{m:'Ago 21',v:1.06},
+    {m:'Set 21',v:1.20},{m:'Ott 21',v:1.20},{m:'Nov 21',v:1.05},{m:'Dic 21',v:0.88},
+    // 2022 (inversione progressiva)
+    {m:'Gen 22',v:0.60},{m:'Feb 22',v:0.37},{m:'Mar 22',v:0.06},{m:'Apr 22',v:-0.10},
+    {m:'Mag 22',v:-0.22},{m:'Giu 22',v:-0.15},{m:'Lug 22',v:-0.21},{m:'Ago 22',v:-0.35},
+    {m:'Set 22',v:-0.42},{m:'Ott 22',v:-0.52},{m:'Nov 22',v:-0.73},{m:'Dic 22',v:-0.69},
+    // 2023 (inversione profonda)
+    {m:'Gen 23',v:-0.70},{m:'Feb 23',v:-0.88},{m:'Mar 23',v:-1.02},{m:'Apr 23',v:-0.58},
+    {m:'Mag 23',v:-0.68},{m:'Giu 23',v:-1.09},{m:'Lug 23',v:-0.92},{m:'Ago 23',v:-0.72},
+    {m:'Set 23',v:-0.46},{m:'Ott 23',v:-0.27},{m:'Nov 23',v:-0.42},{m:'Dic 23',v:-0.35},
+    // 2024 (dis-inversione progressiva)
+    {m:'Gen 24',v:-0.35},{m:'Feb 24',v:-0.44},{m:'Mar 24',v:-0.37},{m:'Apr 24',v:-0.35},
+    {m:'Mag 24',v:-0.47},{m:'Giu 24',v:-0.47},{m:'Lug 24',v:-0.22},{m:'Ago 24',v:0.01},
+    {m:'Set 24',v:0.12},{m:'Ott 24',v:0.15},{m:'Nov 24',v:0.01},{m:'Dic 24',v:0.27},
+    // 2025
+    {m:'Gen 25',v:0.26},{m:'Feb 25',v:0.26},{m:'Mar 25',v:0.25},{m:'Apr 25',v:0.28},
+    {m:'Mag 25',v:0.39},{m:'Giu 25',v:0.45},{m:'Lug 25',v:0.50},{m:'Ago 25',v:0.55},
+    {m:'Set 25',v:0.58},{m:'Ott 25',v:0.60},{m:'Nov 25',v:0.62},{m:'Dic 25',v:0.64},
+    // 2026 reali (FRED)
+    {m:'Gen 26',v:0.68},{m:'Feb 26',v:0.65},{m:'Mar 26',v:0.53},
+    // proiezioni H2 2026
+    {m:'Giu 26',p:0.55},{m:'Lug 26',p:0.58},{m:'Ago 26',p:0.60},
+    {m:'Set 26',p:0.62},{m:'Ott 26',p:0.65},{m:'Nov 26',p:0.68},{m:'Dic 26',p:0.70},
   ],
   // Score per il modello (aggiornati manualmente ad ogni revisione)
   nfpScore:   -0.15,  // mercato lavoro debole ma resiliente
@@ -1772,57 +1915,96 @@ function rMacroCharts(){
   }});
   const ca=MACRO_USA.cpi;
   mk('c-cpi',{type:'line',data:{labels:ca.map(d=>d.m),datasets:[
-    {label:'CPI reale',      data:ca.map(d=>d.v),borderColor:'#e8504a',backgroundColor:'rgba(232,80,74,.08)',borderWidth:2.5,pointRadius:4,pointBackgroundColor:'#e8504a',tension:.35,fill:true,spanGaps:false},
-    {label:'Previsione GS',  data:ca.map(d=>d.p),borderColor:'rgba(240,201,110,.7)',borderDash:[5,4],borderWidth:2,pointRadius:3,tension:.35,fill:false,spanGaps:false},
+    {label:'CPI reale',      data:ca.map(d=>d.v),borderColor:'#e8504a',backgroundColor:'rgba(232,80,74,.08)',borderWidth:2,pointRadius:0,tension:.4,fill:true,spanGaps:false},
+    {label:'Previsione GS',  data:ca.map(d=>d.p),borderColor:'rgba(240,201,110,.7)',borderDash:[5,4],borderWidth:2,pointRadius:0,tension:.4,fill:false,spanGaps:false},
     {label:'Target Fed 2%',  data:ca.map(()=>2),borderColor:'rgba(39,201,154,.4)',borderDash:[3,4],borderWidth:1.5,pointRadius:0,fill:false},
   ]},options:{responsive:true,maintainAspectRatio:false,
     plugins:{legend:{labels:{color:'#5a6478',font:{size:9},boxWidth:8}},
       tooltip:{callbacks:{label:ctx=>ctx.parsed.y!=null?`${ctx.dataset.label}: ${ctx.parsed.y}%`:null}}},
     scales:{
-      x:{ticks:{color:'#5a6478',font:{size:9},maxRotation:30},grid:{display:false}},
-      y:{min:1,max:5,ticks:{callback:v=>v+'%',color:'#5a6478',font:{size:9}},grid:{color:'rgba(255,255,255,.04)'}}
+      x:{ticks:{color:'#5a6478',font:{size:9},maxRotation:30,maxTicksLimit:18},grid:{display:false}},
+      y:{min:0,max:10,ticks:{callback:v=>v+'%',color:'#5a6478',font:{size:9}},grid:{color:'rgba(255,255,255,.04)'}}
     }
   }});
   // EUR/USD
   const eu=MACRO_USA.eurusd;
   mk('c-eurusd',{type:'line',data:{labels:eu.map(d=>d.m),datasets:[
-    {label:'EUR/USD reale',     data:eu.map(d=>d.v),borderColor:'#4d9de0',backgroundColor:'rgba(77,157,224,.08)',borderWidth:2.5,pointRadius:4,tension:.35,fill:true,spanGaps:false},
-    {label:'Previsione',        data:eu.map(d=>d.p),borderColor:'rgba(77,157,224,.5)',borderDash:[5,4],borderWidth:2,pointRadius:3,tension:.35,fill:false,spanGaps:false},
+    {label:'EUR/USD reale',     data:eu.map(d=>d.v),borderColor:'#4d9de0',backgroundColor:'rgba(77,157,224,.08)',borderWidth:2,pointRadius:0,tension:.4,fill:true,spanGaps:false},
+    {label:'Previsione',        data:eu.map(d=>d.p),borderColor:'rgba(77,157,224,.5)',borderDash:[5,4],borderWidth:2,pointRadius:0,tension:.4,fill:false,spanGaps:false},
     {label:'Media storica 1.15',data:eu.map(()=>1.15),borderColor:'rgba(255,255,255,.2)',borderDash:[3,4],borderWidth:1.5,pointRadius:0,fill:false},
-  ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#5a6478',font:{size:9},boxWidth:8}},tooltip:{callbacks:{label:ctx=>ctx.parsed.y!=null?`${ctx.dataset.label}: ${ctx.parsed.y.toFixed(3)}`:null}}},scales:{x:{ticks:{color:'#5a6478',font:{size:9},maxRotation:30},grid:{display:false}},y:{min:1.00,max:1.25,ticks:{callback:v=>v.toFixed(2),color:'#5a6478',font:{size:9}},grid:{color:'rgba(255,255,255,.04)'}}}}});
+  ]},options:{responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{labels:{color:'#5a6478',font:{size:9},boxWidth:8}},
+      tooltip:{callbacks:{label:ctx=>ctx.parsed.y!=null?`${ctx.dataset.label}: ${ctx.parsed.y.toFixed(3)}`:null}}},
+    scales:{
+      x:{ticks:{color:'#5a6478',font:{size:9},maxRotation:30,maxTicksLimit:18},grid:{display:false}},
+      y:{min:0.95,max:1.30,ticks:{callback:v=>v.toFixed(2),color:'#5a6478',font:{size:9}},grid:{color:'rgba(255,255,255,.04)'}}
+    }
+  }});
   // ISM
   const is=MACRO_USA.ism;
   mk('c-ism',{type:'line',data:{labels:is.map(d=>d.m),datasets:[
-    {label:'ISM reale',  data:is.map(d=>d.v),borderColor:'#27c99a',backgroundColor:'rgba(39,201,154,.08)',borderWidth:2.5,pointRadius:4,tension:.35,fill:true,spanGaps:false},
-    {label:'Previsione', data:is.map(d=>d.p),borderColor:'rgba(39,201,154,.5)',borderDash:[5,4],borderWidth:2,pointRadius:3,tension:.35,fill:false,spanGaps:false},
+    {label:'ISM reale',  data:is.map(d=>d.v),borderColor:'#27c99a',backgroundColor:'rgba(39,201,154,.08)',borderWidth:2,pointRadius:0,tension:.4,fill:true,spanGaps:false},
+    {label:'Previsione', data:is.map(d=>d.p),borderColor:'rgba(39,201,154,.5)',borderDash:[5,4],borderWidth:2,pointRadius:0,tension:.4,fill:false,spanGaps:false},
     {label:'Soglia 50',  data:is.map(()=>50),borderColor:'rgba(255,255,255,.25)',borderDash:[3,4],borderWidth:1.5,pointRadius:0,fill:false},
-  ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#5a6478',font:{size:9},boxWidth:8}}},scales:{x:{ticks:{color:'#5a6478',font:{size:9},maxRotation:30},grid:{display:false}},y:{min:45,max:60,ticks:{color:'#5a6478',font:{size:9}},grid:{color:'rgba(255,255,255,.04)'}}}}});
+  ]},options:{responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{labels:{color:'#5a6478',font:{size:9},boxWidth:8}}},
+    scales:{
+      x:{ticks:{color:'#5a6478',font:{size:9},maxRotation:30,maxTicksLimit:18},grid:{display:false}},
+      y:{min:40,max:70,ticks:{color:'#5a6478',font:{size:9}},grid:{color:'rgba(255,255,255,.04)'}}
+    }
+  }});
   // CAPE
   const cp=MACRO_USA.cape;
   mk('c-cape',{type:'line',data:{labels:cp.map(d=>d.m),datasets:[
-    {label:'CAPE Shiller',       data:cp.map(d=>d.v),borderColor:'#e8504a',backgroundColor:'rgba(232,80,74,.08)',borderWidth:2.5,pointRadius:4,tension:.35,fill:true},
+    {label:'CAPE Shiller',       data:cp.map(d=>d.v),borderColor:'#e8504a',backgroundColor:'rgba(232,80,74,.08)',borderWidth:2,pointRadius:0,tension:.4,fill:true},
     {label:'Media 20 anni 27.6', data:cp.map(()=>27.6),borderColor:'rgba(39,201,154,.4)',borderDash:[3,4],borderWidth:1.5,pointRadius:0,fill:false},
     {label:'Soglia alta 30',     data:cp.map(()=>30),borderColor:'rgba(240,201,110,.3)',borderDash:[2,4],borderWidth:1,pointRadius:0,fill:false},
-  ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#5a6478',font:{size:9},boxWidth:8}}},scales:{x:{ticks:{color:'#5a6478',font:{size:9},maxRotation:30},grid:{display:false}},y:{min:20,max:50,ticks:{color:'#5a6478',font:{size:9}},grid:{color:'rgba(255,255,255,.04)'}}}}});
+  ]},options:{responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{labels:{color:'#5a6478',font:{size:9},boxWidth:8}}},
+    scales:{
+      x:{ticks:{color:'#5a6478',font:{size:9},maxRotation:30,maxTicksLimit:18},grid:{display:false}},
+      y:{min:20,max:48,ticks:{color:'#5a6478',font:{size:9}},grid:{color:'rgba(255,255,255,.04)'}}
+    }
+  }});
   // VIX
   const vx=MACRO_USA.vix;
   mk('c-vix',{type:'line',data:{labels:vx.map(d=>d.m),datasets:[
-    {label:'VIX',            data:vx.map(d=>d.v),borderColor:'#8b6fff',backgroundColor:'rgba(139,111,255,.08)',borderWidth:2.5,pointRadius:4,tension:.35,fill:true},
+    {label:'VIX',            data:vx.map(d=>d.v),borderColor:'#8b6fff',backgroundColor:'rgba(139,111,255,.08)',borderWidth:2,pointRadius:0,tension:.4,fill:true},
     {label:'Soglia alta 30', data:vx.map(()=>30),borderColor:'rgba(232,80,74,.4)',borderDash:[3,4],borderWidth:1.5,pointRadius:0,fill:false},
     {label:'Calmo 20',       data:vx.map(()=>20),borderColor:'rgba(255,255,255,.2)',borderDash:[2,4],borderWidth:1,pointRadius:0,fill:false},
-  ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#5a6478',font:{size:9},boxWidth:8}}},scales:{x:{ticks:{color:'#5a6478',font:{size:9},maxRotation:30},grid:{display:false}},y:{min:10,max:40,ticks:{color:'#5a6478',font:{size:9}},grid:{color:'rgba(255,255,255,.04)'}}}}});
+  ]},options:{responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{labels:{color:'#5a6478',font:{size:9},boxWidth:8}}},
+    scales:{
+      x:{ticks:{color:'#5a6478',font:{size:9},maxRotation:30,maxTicksLimit:18},grid:{display:false}},
+      y:{min:5,max:45,ticks:{color:'#5a6478',font:{size:9}},grid:{color:'rgba(255,255,255,.04)'}}
+    }
+  }});
   // Real Interest Rate
   const rr=MACRO_USA.realRate;
   mk('c-realrate',{type:'line',data:{labels:rr.map(d=>d.m),datasets:[
-    {label:'Tasso reale', data:rr.map(d=>d.v),borderColor:'#f0c96e',backgroundColor:'rgba(240,201,110,.08)',borderWidth:2.5,pointRadius:4,tension:.35,fill:true},
+    {label:'Tasso reale', data:rr.map(d=>d.v),borderColor:'#f0c96e',backgroundColor:'rgba(240,201,110,.08)',borderWidth:2,pointRadius:0,tension:.4,fill:true},
     {label:'Soglia 0%',   data:rr.map(()=>0),borderColor:'rgba(232,80,74,.4)',borderDash:[3,4],borderWidth:1.5,pointRadius:0,fill:false},
-  ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#5a6478',font:{size:9},boxWidth:8}},tooltip:{callbacks:{label:ctx=>ctx.parsed.y!=null?`${ctx.dataset.label}: ${ctx.parsed.y.toFixed(2)}%`:null}}},scales:{x:{ticks:{color:'#5a6478',font:{size:9},maxRotation:30},grid:{display:false}},y:{ticks:{callback:v=>v.toFixed(1)+'%',color:'#5a6478',font:{size:9}},grid:{color:'rgba(255,255,255,.04)'}}}}});
+  ]},options:{responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{labels:{color:'#5a6478',font:{size:9},boxWidth:8}},
+      tooltip:{callbacks:{label:ctx=>ctx.parsed.y!=null?`${ctx.dataset.label}: ${ctx.parsed.y.toFixed(2)}%`:null}}},
+    scales:{
+      x:{ticks:{color:'#5a6478',font:{size:9},maxRotation:30,maxTicksLimit:18},grid:{display:false}},
+      y:{min:-10,max:5,ticks:{callback:v=>v.toFixed(0)+'%',color:'#5a6478',font:{size:9}},grid:{color:'rgba(255,255,255,.04)'}}
+    }
+  }});
   // Yield Curve
   const yc=MACRO_USA.yieldCurve;
   mk('c-yieldcurve',{type:'line',data:{labels:yc.map(d=>d.m),datasets:[
-    {label:'10Y - 2Y',              data:yc.map(d=>d.v),borderColor:'#4d9de0',backgroundColor:'rgba(77,157,224,.08)',borderWidth:2.5,pointRadius:4,tension:.35,fill:true},
+    {label:'10Y - 2Y',              data:yc.map(d=>d.v),borderColor:'#4d9de0',backgroundColor:'rgba(77,157,224,.08)',borderWidth:2,pointRadius:0,tension:.4,fill:true},
     {label:'Soglia inversione 0%',  data:yc.map(()=>0),borderColor:'rgba(232,80,74,.4)',borderDash:[3,4],borderWidth:1.5,pointRadius:0,fill:false},
-  ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#5a6478',font:{size:9},boxWidth:8}},tooltip:{callbacks:{label:ctx=>ctx.parsed.y!=null?`${ctx.dataset.label}: ${ctx.parsed.y.toFixed(2)}%`:null}}},scales:{x:{ticks:{color:'#5a6478',font:{size:9},maxRotation:30},grid:{display:false}},y:{ticks:{callback:v=>v.toFixed(2)+'%',color:'#5a6478',font:{size:9}},grid:{color:'rgba(255,255,255,.04)'}}}}});
+  ]},options:{responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{labels:{color:'#5a6478',font:{size:9},boxWidth:8}},
+      tooltip:{callbacks:{label:ctx=>ctx.parsed.y!=null?`${ctx.dataset.label}: ${ctx.parsed.y.toFixed(2)}%`:null}}},
+    scales:{
+      x:{ticks:{color:'#5a6478',font:{size:9},maxRotation:30,maxTicksLimit:18},grid:{display:false}},
+      y:{min:-1.3,max:1.8,ticks:{callback:v=>v.toFixed(1)+'%',color:'#5a6478',font:{size:9}},grid:{color:'rgba(255,255,255,.04)'}}
+    }
+  }});
 }
 
 
@@ -1958,7 +2140,7 @@ function cSec(){
   const t=Object.values(ag).reduce((s,v)=>s+v,0);const o={};SL.forEach(l=>o[l]=t>0?ag[l]/t*100:0);return o;
 }
 function dc(id){if(charts[id]){charts[id].destroy();delete charts[id];}}
-function mk(id,cfg){dc(id);charts[id]=new Chart(document.getElementById(id),cfg);return charts[id];}
+function mk(id,cfg){const el=document.getElementById(id);if(!el)return null;dc(id);charts[id]=new Chart(el,cfg);return charts[id];}
 
 // ═══════════════ SIDEBAR ═══════════════
 function buildSB(){
@@ -2166,11 +2348,7 @@ function showPane(id,btn){
   const pane=document.getElementById('pane-'+id);
   if(pane){pane.classList.add('on');pane.style.display='block';}
   if(id==='autopsy'){initApTrades();return;}
-  if(id==='live'){
-    renderLivePane(liveData, null);
-    renderStorico();
-    return;
-  }
+  if(id==='live'){renderLivePane(liveData,null);renderStorico();return;}
   if(id==='scenario'){setTimeout(()=>{renderScenario();renderConsTable();rMacroCharts();renderPersonalScores();},80);return;}
   if(id==='geo'){setTimeout(()=>{rGeo();},50);return;}
   refresh();
@@ -2562,27 +2740,112 @@ function renderScenario(){
   }
   if(charts['c-consensus-bubble'])charts['c-consensus-bubble'].update();
 
-  // Consensus mini-cards
+  // Atteso Ponderato box
   const ccEl=document.getElementById('consensus-cards');
   if(ccEl){
-    const expPct=(br*PROB.bear+bs*PROB.base+bu*PROB.bull)/100;
+    const expPct=(br*0.35+bs*0.45+bu*0.20); // rendimento atteso ponderato (decimale, es. 0.101 = 10.1%)
     const ec=expPct>=0?'var(--teal)':'var(--red)';
-    ccEl.innerHTML=[
-      {label:'🟢 Bullish (7 asset)',items:'Gold · Copper · Uranium · Silver · Grid · Battery · Hydrogen*',color:'var(--teal)'},
-      {label:'🟡 Misto / Breve',items:'Clean Energy · Hydrogen (early stage)',color:'var(--amber)'},
-      {label:'🟠 Neutral',items:'MSCI EM (rischio Cina 27%)',color:'var(--t3)'},
-    ].map(g=>`<div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:12px;">
-      <div style="font-size:13px;color:${g.color};font-family:'JetBrains Mono',monospace;font-weight:600;margin-bottom:5px;">${g.label}</div>
-      <div style="font-size:14px;color:var(--t1);">${g.items}</div>
-    </div>`).join('')+
-    `<div style="background:var(--bg2);border:1px solid rgba(240,201,110,.3);border-radius:var(--r2);padding:12px;">
-      <div style="font-size:13px;color:var(--gold2);font-family:'JetBrains Mono',monospace;font-weight:600;margin-bottom:5px;">📊 ATTESO PONDERATO</div>
-      <div style="font-size:22px;font-weight:700;color:${ec};">${expPct>=0?'+':''}${(expPct*100).toFixed(1)}%</div>
-      <div style="font-size:16px;font-weight:600;color:${ec};margin-top:2px;">${expPct>=0?'+':''}€${fE(Math.round(cap*expPct))}</div>
-      <div style="font-size:13px;color:var(--t2);margin-top:2px;">Bear×35 + Base×45 + Bull×20</div>
+    const yearly = parseFloat(document.getElementById('sc-annual')?.value) || 50000;
+    ccEl.innerHTML=
+    `<div style="background:var(--bg2);border:1px solid rgba(240,201,110,.3);border-radius:var(--r2);padding:20px;width:100%;box-sizing:border-box;">
+      <div style="font-size:12px;color:var(--gold2);font-family:'JetBrains Mono',monospace;font-weight:600;margin-bottom:10px;text-transform:uppercase;letter-spacing:.06em;">📊 Atteso ponderato — proiezione portafoglio</div>
+      <div style="display:flex;align-items:baseline;gap:12px;margin-bottom:4px;">
+        <div style="font-size:32px;font-weight:700;color:${ec};font-family:'JetBrains Mono',monospace;">${expPct>=0?'+':''}${(expPct*100).toFixed(1)}%</div>
+        <div style="font-size:20px;font-weight:600;color:${ec};font-family:'JetBrains Mono',monospace;">${expPct>=0?'+':''}€${fE(Math.round(cap*expPct))}</div>
+        <div style="font-size:12px;color:var(--t3);">/ anno atteso · Bear×35% + Base×45% + Bull×20%</div>
+      </div>
+      <div style="height:1px;background:var(--border);margin:12px 0;"></div>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
+        <span style="font-size:12px;color:var(--t3);white-space:nowrap;">Versamento annuo</span>
+        <div style="display:flex;align-items:center;gap:5px;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:6px;padding:5px 10px;">
+          <span style="font-size:13px;color:var(--t3);">€</span>
+          <input type="number" id="sc-annual" value="${yearly}" min="0" step="1000"
+            oninput="updateProjections()"
+            style="background:transparent;border:none;outline:none;font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:600;color:var(--teal);width:90px;text-align:right;">
+          <span style="font-size:12px;color:var(--t3);">/anno</span>
+        </div>
+        <span style="font-size:11px;color:var(--t3);">Capitale attuale: €${fE(Math.round(cap))}</span>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:12px;" id="sc-projections">
+        ${buildProjections(cap, expPct, yearly)}
+      </div>
+      <div style="margin-top:4px;">
+        <div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+            <span style="font-size:11px;color:var(--amber);font-family:'JetBrains Mono',monospace;font-weight:600;">Anni simulati</span>
+            <span style="font-size:12px;font-weight:700;color:var(--amber);font-family:'JetBrains Mono',monospace;" id="sc-years-lbl">15 anni</span>
+          </div>
+          <div style="position:relative;height:34px;">
+            <div style="position:absolute;inset:0;background:var(--bg4);border-radius:8px;overflow:hidden;">
+              <div id="wb-years" style="width:47%;height:100%;background:var(--amber);opacity:.25;border-radius:8px;transition:width .12s;"></div>
+            </div>
+            <div style="position:absolute;inset:0;display:flex;align-items:center;padding:0 12px;pointer-events:none;">
+              <span style="font-size:13px;font-weight:700;color:var(--amber);font-family:'JetBrains Mono',monospace;margin-right:8px;">📅</span>
+              <span style="font-size:12px;color:var(--t2);flex:1;">Proiezione personalizzata</span>
+              <span style="font-size:13px;font-weight:700;color:var(--amber);font-family:'JetBrains Mono',monospace;" id="sc-years-lbl2">15 anni</span>
+            </div>
+            <input type="range" min="1" max="30" value="15" id="sc-years-slider"
+              oninput="onYearsSlide(this.value)"
+              style="position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;margin:0;">
+          </div>
+        </div>
+      </div>
+      <div id="sc-custom-proj" style="margin-top:8px;"></div>
     </div>`;
   }
 }
+function buildProjections(cap, annualRate, annualInput){
+  const yearly = annualInput !== undefined ? annualInput :
+    parseFloat(document.getElementById('sc-annual')?.value) || 50000;
+  const rate = annualRate;
+  const customY = parseInt(document.getElementById('sc-years-slider')?.value) || 15;
+  return [1, 5, 10, customY].map(y => {
+    let fv;
+    if(Math.abs(rate) < 0.0001){
+      fv = cap + yearly * y;
+    } else {
+      fv = cap * Math.pow(1+rate, y) + yearly * ((Math.pow(1+rate, y) - 1) / rate);
+    }
+    const versato  = cap + yearly * y;
+    const guadagno = fv - versato;
+    const color    = fv > cap ? 'var(--teal)' : 'var(--red)';
+    const isCustom = y === customY && y !== 1 && y !== 5 && y !== 10;
+    const label    = y === 1 ? '1 anno' : y === 5 ? '5 anni' : y === 10 ? '10 anni' : y+' anni';
+    const border   = isCustom ? 'border:1px solid rgba(240,201,110,.4);' : 'border:1px solid rgba(255,255,255,.06);';
+    return '<div style="padding:12px;background:rgba(255,255,255,.03);border-radius:8px;' + border + '">'
+      + `<div style="font-size:11px;color:${isCustom?'var(--amber)':'var(--t3)'};font-family:'JetBrains Mono',monospace;margin-bottom:6px;">${label}${isCustom?' 🎯':''}</div>`
+      + `<div style="font-size:18px;font-weight:700;color:${color};font-family:'JetBrains Mono',monospace;margin-bottom:3px;">€${fE(Math.round(fv))}</div>`
+      + `<div style="font-size:10px;color:var(--teal);font-family:'JetBrains Mono',monospace;">+€${fE(Math.round(guadagno))} dal mercato</div>`
+      + `<div style="font-size:10px;color:var(--t3);font-family:'JetBrains Mono',monospace;">€${fE(Math.round(versato))} versato</div>`
+      + '</div>';
+  }).join('');
+}
+
+function onYearsSlide(val){
+  const v = parseInt(val);
+  const lbl  = document.getElementById('sc-years-lbl');
+  const lbl2 = document.getElementById('sc-years-lbl2');
+  const bar  = document.getElementById('wb-years');
+  if(lbl)  lbl.textContent  = v + ' anni';
+  if(lbl2) lbl2.textContent = v + ' anni';
+  if(bar)  bar.style.width  = Math.round(v/30*100) + '%';
+  updateProjections();
+}
+
+function updateProjections(){
+  const el = document.getElementById('sc-projections');
+  if(!el) return;
+  const cap = totA();
+  const nw = nW();
+  const br = ORIG.reduce((s,a,i)=>s+nw[i]*a.bear,0);
+  const bs = ORIG.reduce((s,a,i)=>s+nw[i]*a.base,0);
+  const bu = ORIG.reduce((s,a,i)=>s+nw[i]*a.bull,0);
+  const expPct = br*0.35 + bs*0.45 + bu*0.20; // frazioni corrette
+  const yearly = parseFloat(document.getElementById('sc-annual')?.value) || 50000;
+  el.innerHTML = buildProjections(cap, expPct, yearly);
+}
+
+
 const STRESS_PRESETS={
   '2008':{label:'2008 — Lehman',shocks:[-.25,-.55,-.50,-.60,-.45,-.65,-.20,-.70,-.55,-.80,-.40,-.75]},
   covid:{label:'2020 — Covid crash',shocks:[.10,-.40,-.35,-.45,-.30,-.50,.05,-.45,-.35,-.60,-.25,-.55]},
@@ -3962,10 +4225,8 @@ document.getElementById('totInp').value=Math.round(totalCap);
 const scCapEl=document.getElementById('sc-cap');if(scCapEl)scCapEl.value=Math.round(totalCap);
 buildSB();
 buildStressSliders();
-// Ensure initial pane is visible
 document.querySelectorAll('.pane').forEach(p=>p.style.display=p.classList.contains('on')?'block':'none');
 rOv();
-rHistory();
 
 // Avvia live feed Google Sheets
 setTimeout(startLiveFeed, 800);
