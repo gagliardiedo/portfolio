@@ -2764,7 +2764,7 @@ function renderScenario(){
   if(ccEl){
     const expPct=(br*0.35+bs*0.45+bu*0.20); // rendimento atteso ponderato (decimale, es. 0.101 = 10.1%)
     const ec=expPct>=0?'var(--teal)':'var(--red)';
-    const yearly = parseFloat(document.getElementById('sc-annual')?.value) || 50000;
+    const yearly = (() => { const v = parseFloat(document.getElementById('sc-annual')?.value); return isNaN(v) ? 50000 : v; })();
     ccEl.innerHTML=
     `<div style="background:var(--bg2);border:1px solid rgba(240,201,110,.3);border-radius:var(--r2);padding:20px;width:100%;box-sizing:border-box;">
       <div style="font-size:12px;color:var(--gold2);font-family:'JetBrains Mono',monospace;font-weight:600;margin-bottom:10px;text-transform:uppercase;letter-spacing:.06em;">📊 Atteso ponderato — proiezione portafoglio</div>
@@ -2814,8 +2814,8 @@ function renderScenario(){
   }
 }
 function buildProjections(cap, annualRate, annualInput){
-  const yearly = annualInput !== undefined ? annualInput :
-    parseFloat(document.getElementById('sc-annual')?.value) || 50000;
+  const yearly = annualInput !== undefined && !isNaN(annualInput) ? annualInput :
+    (() => { const v = parseFloat(document.getElementById('sc-annual')?.value); return isNaN(v) ? 50000 : v; })();
   const rate = annualRate;
   const customY = parseInt(document.getElementById('sc-years-slider')?.value) || 15;
   return [1, 5, 10, customY].map(y => {
@@ -2860,7 +2860,7 @@ function updateProjections(){
   const bs = ORIG.reduce((s,a,i)=>s+nw[i]*a.base,0);
   const bu = ORIG.reduce((s,a,i)=>s+nw[i]*a.bull,0);
   const expPct = br*0.35 + bs*0.45 + bu*0.20; // frazioni corrette
-  const yearly = parseFloat(document.getElementById('sc-annual')?.value) || 50000;
+  const yearly = (() => { const v = parseFloat(document.getElementById('sc-annual')?.value); return isNaN(v) ? 50000 : v; })();
   el.innerHTML = buildProjections(cap, expPct, yearly);
 }
 
