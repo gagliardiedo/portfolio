@@ -2881,10 +2881,16 @@ const STRESS_PRESETS={
 
 function buildStressSliders(){
   const cont=document.getElementById('stress-sliders');cont.innerHTML='';
+  // Slider nascosti — usati solo internamente da applyStressPreset/onStressSlide
   ORIG.forEach((a,i)=>{
-    const d=document.createElement('div');d.className='ss-item';
-    d.innerHTML=`<div class="ss-head"><span class="ss-name">${a.name}</span><span class="ss-val" id="sv-${i}" style="color:${a.color}">0%</span></div><input type="range" class="ss-sl" id="ss-${i}" min="-80" max="80" step="1" value="0" oninput="onStressSlide(${i},this.value)" style="accent-color:${a.color}">`;
-    cont.appendChild(d);
+    const inp=document.createElement('input');
+    inp.type='range';inp.min='-80';inp.max='80';inp.step='1';inp.value='0';
+    inp.id='ss-'+i;inp.style.display='none';
+    inp.oninput=()=>onStressSlide(i,inp.value);
+    cont.appendChild(inp);
+    const sv=document.createElement('span');
+    sv.id='sv-'+i;sv.style.display='none';
+    cont.appendChild(sv);
   });
 }
 
