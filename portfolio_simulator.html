@@ -929,6 +929,9 @@ tbody tr:hover td{background:rgba(255,255,255,.015);}
     <button class="sp-btn" onclick="applyStressPreset('commodCrash')">Crollo commodity -30%</button>
     <button class="sp-btn" onclick="applyStressPreset('cryptoCrash')">Crypto -70%</button>
     <button class="sp-btn" onclick="applyStressPreset('goldRally')">Gold rally +40%</button>
+    <button class="sp-btn" onclick="applyStressPreset('dedollarization')" style="background:rgba(240,201,110,.15);border-color:rgba(240,201,110,.5);color:#f0c96e;">☢ De-dollarizzazione</button>
+    <button class="sp-btn" onclick="applyStressPreset('aiBubble')" style="background:rgba(240,201,110,.15);border-color:rgba(240,201,110,.5);color:#f0c96e;">💥 Scoppio bolla AI</button>
+    <button class="sp-btn" onclick="applyStressPreset('mixCrisis')" style="background:rgba(232,80,74,.2);border-color:rgba(232,80,74,.6);color:#e8504a;font-weight:700;">🔴 De-doll. + Bolla AI</button>
     <button class="sp-btn" onclick="applyStressPreset('reset')">↺ Reset</button>
   </div>
   <div class="stress-result">
@@ -2031,11 +2034,22 @@ function renderConsTable(){
     const deltaStr   = isZero ? '=' : (delta > 0 ? '+' : '') + delta.toFixed(1) + '%';
     const deltaColor = isZero ? 'var(--t3)' : delta > 0 ? 'var(--teal)' : 'var(--amber)';
 
-    // Euro: sempre riferito a differenza tra targetOttimale pre-bilancia e pesoOrig
-    const targetPerEur = _isBalanced ? peso : targetOttimale;
-    const deltaEur     = Math.round((targetPerEur - pesoOrig) / 100 * totOrig);
-    const deltaEurStr  = _isBalanced || Math.abs(targetPerEur - pesoOrig) < 0.1 || Math.abs(deltaEur) < 50 ? '' :
-      `<div style="font-size:10px;color:${deltaColor};font-family:'JetBrains Mono',monospace;margin-top:1px;">${deltaEur>0?'+':''}\u20ac${fE(Math.abs(deltaEur))}</div>`;
+    // Euro nella colonna bilanciamento
+    // Pre-bilancia: mostra quanto € serve per raggiungere il target ottimale
+    // Post-bilancia: mostra quanti € sono stati allocati a questo asset (differenza da origCap)
+    let deltaEurStr = '';
+    if (_isBalanced) {
+      const nuovoCapitale = caps[m.i] - ORIG[m.i].origCap;
+      if (nuovoCapitale > 50) {
+        deltaEurStr = `<div style="font-size:11px;color:var(--teal);font-family:'JetBrains Mono',monospace;margin-top:2px;font-weight:600;">+€${fE(Math.round(nuovoCapitale))}</div>`;
+      }
+    } else {
+      const targetPerEur = targetOttimale;
+      const deltaEur = Math.round((targetPerEur - pesoOrig) / 100 * totOrig);
+      if (Math.abs(deltaEur) >= 50) {
+        deltaEurStr = `<div style="font-size:10px;color:${deltaColor};font-family:'JetBrains Mono',monospace;margin-top:1px;">${deltaEur>0?'+':''}\u20ac${fE(Math.abs(deltaEur))}</div>`;
+      }
+    }
 
     // Badge peso
     const tag = _isBalanced
@@ -2161,8 +2175,17 @@ function buildSB(){
         </div>
         <span class="hi-ret" style="color:${rc}">${a.retAcq>=0?'+':''}${(a.retAcq*100).toFixed(1)}%</span>
       </div>
-      <input type="range" class="hi-sl" id="sl-${i}" min="0" max="60" step="0.1" value="${Math.min(pct,60).toFixed(1)}" oninput="onSlider(${i},this.value)" style="accent-color:${a.color}">
-      <div class="hi-bar" id="hb-${i}" style="background:${a.color};width:60%;"></div>`;
+      <div style="position:relative;height:28px;margin-top:4px;cursor:pointer;">
+        <div style="position:absolute;inset:0;background:var(--bg4);border-radius:6px;overflow:hidden;">
+          <div id="hb-${i}" style="width:${Math.min(pct,60)/60*100}%;height:100%;background:${a.color};opacity:.35;border-radius:6px;transition:width .2s;"></div>
+        </div>
+        <div style="position:absolute;inset:0;display:flex;align-items:center;padding:0 8px;pointer-events:none;">
+          <span style="font-size:11px;font-weight:700;color:${a.color};font-family:'JetBrains Mono',monospace;margin-right:6px;min-width:12px;">${a.short||a.name.split(' ')[0]}</span>
+          <span style="font-size:10px;color:var(--t2);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${a.name}</span>
+          <span style="font-size:11px;font-weight:700;color:${a.color};font-family:'JetBrains Mono',monospace;" id="hbpct-${i}">${pct.toFixed(1)}%</span>
+        </div>
+        <input type="range" min="0" max="60" step="0.1" value="${Math.min(pct,60).toFixed(1)}" id="sl-${i}" oninput="onSlider(${i},this.value)" style="position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;margin:0;">
+      </div>`;
     list.appendChild(d);
     if(sel1){const o=document.createElement('option');o.value=i;o.textContent=a.name;sel1.appendChild(o);}
     if(sel2){const o=document.createElement('option');o.value=i;o.textContent=a.name;sel2.appendChild(o);}
@@ -2179,7 +2202,9 @@ function updSBDisp(){
     if(ci&&document.activeElement!==ci)ci.value=Math.round(caps[i]);
     if(pi&&document.activeElement!==pi)pi.value=pct.toFixed(1);
     if(si&&document.activeElement!==si)si.value=Math.min(pct,60).toFixed(1);
-    if(bi)bi.style.width=mx>0?(caps[i]/mx*100).toFixed(0)+'%':'0%';
+    if(bi)bi.style.width=mx>0?(Math.min(pct,60)/60*100).toFixed(0)+'%':'0%';
+    const hbpct=document.getElementById('hbpct-'+i);
+    if(hbpct)hbpct.textContent=pct.toFixed(1)+'%';
   });
   const scCap=document.getElementById('sc-cap');
   if(scCap&&document.activeElement!==scCap)scCap.value=Math.round(tot);
@@ -2641,21 +2666,15 @@ function renderScenario(){
   tb.appendChild(tr3);
   }
 
-  // ── Consensus bubble chart — REATTIVO ai pesi sidebar ──
-  // Bubble chart — usa score finale del modello a 5 fattori come asse X
+  // ── Consensus bubble chart — Consensus istituzionale + Momentum ──
   const totBubble = totA();
   const CONSENSUS_DATA = CONS_META.map(m => {
     const peso = totBubble > 0 ? +(caps[m.i] / totBubble * 100).toFixed(1) : 0;
-    // Asse X bubble = Consensus (solo sentiment, no peso) + Momentum (50/50)
-    const sC_b = (m.sentX - 50) / 50; // solo sentiment, ignora delta peso
+    const sC_b = (m.sentX - 50) / 50;
     const sM_b = scoreMomentum(m.mom1y||0, m.mom6m||0, m.mom3m||0);
     const scoreX = Math.round((sC_b*0.50 + sM_b*0.50) * 50 + 50);
-    const rec  = getRec(m.sentX, peso, m.targetPct, m.mom1y||0, m.mom6m||0, m.mom3m||0, m.vol||0.3, m.cat||'equity-theme', m.personalScore||50);
     return {
-      ...m,
-      peso,
-      scoreX,
-      rec,
+      ...m, peso, scoreX,
       label: m.name.replace(/ USD$/,'').replace(/ ESG$/,'').replace(/ EUR$/,'')
                    .replace(/Physical /,'').replace(/ Value-Chain$/,'')
                    .replace(/Electrification & /,'').replace(/Core MSCI /,'')
@@ -2678,15 +2697,15 @@ function renderScenario(){
         legend:{display:false},
         tooltip:{callbacks:{label:ctx=>{
           const d=CONSENSUS_DATA[ctx.datasetIndex];
-          return [` ${d.name}`,` Score modello: ${d.scoreX}/100`,` Peso: ${d.peso}% → target ${d.targetPct}%`,` ${d.target}`,` ${d.rec.text}`];
+          return [` ${d.name}`,` Score C+M: ${d.scoreX}/100`,` Peso: ${d.peso}%`,` ${d.target}`];
         }}},
       },
       scales:{
-        x:{min:0,max:100,
+        x:{min:0, max:100,
           title:{display:true,text:'← Debole  ·  Consensus + Momentum (50/50)  ·  Forte →',color:'#7a8394',font:{size:10}},
-          ticks:{callback:v=>v===0?'0':v===50?'50':v===100?'100':v%25===0?v:'',color:'#7a8394',font:{size:10}},stepSize:25,
+          ticks:{callback:v=>[0,25,50,75,100].includes(v)?v:'',color:'#7a8394',font:{size:10}},
           grid:{color:'rgba(255,255,255,0.08)'}},
-        y:{min:1,max:6,
+        y:{min:1, max:6,
           title:{display:true,text:'Orizzonte temporale (anni)',color:'#7a8394',font:{size:10}},
           ticks:{callback:v=>v+'Y',color:'#7a8394',font:{size:10}},
           grid:{color:'rgba(255,255,255,0.08)'}}
@@ -2853,6 +2872,10 @@ const STRESS_PRESETS={
   commodCrash:{label:'Crollo commodity',shocks:[-.30,-.15,-.10,-.20,-.35,-.20,-.30,-.40,-.15,-.10,-.05,-.05]},
   cryptoCrash:{label:'Crypto -70%',shocks:[.02,.00,-.05,.00,.00,-.05,.02,.00,.00,-.20,.00,-.70]},
   goldRally:{label:'Gold rally +40%',shocks:[.40,.05,.05,.10,.10,.05,.35,.10,.05,.00,.00,.00]},
+  // Gold Hydrogen EM CleanE Copper Battery Silver Uranium Grid Quantum PrivEq Bitcoin
+  dedollarization:{label:'☢ De-dollarizzazione',shocks:[.55,.25,-.30,.20,-.15,-.10,.45,.35,.20,-.20,-.35,.60]},
+  aiBubble:{label:'💥 Scoppio bolla AI',shocks:[.18,-.05,-.08,-.10,-.10,-.10,.12,-.05,-.20,-.60,-.40,-.40]},
+  mixCrisis:{label:'🔴 De-doll. + Bolla AI',shocks:[.65,.18,-.35,.08,-.20,-.18,.50,.25,.05,-.65,-.50,.20]},
   reset:{label:'Reset',shocks:ORIG.map(()=>0)},
 };
 
