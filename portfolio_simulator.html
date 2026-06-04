@@ -300,87 +300,96 @@ tbody tr:hover td{background:rgba(255,255,255,.015);}
 
 <div class="nav">
   <button class="nt on"  onclick="showPane('overview',this)">Panoramica</button>
-  <button class="nt" onclick="showPane('volatility',this)">Volatilità</button>
-  <button class="nt" onclick="showPane('geo',this)">Geo / Settore</button>
   <button class="nt" onclick="showPane('scenario',this)">Scenario 2026</button>
   <button class="nt" onclick="showPane('stress',this)">🔥 Stress Test</button>
   <button class="nt" onclick="showPane('bench',this)">📊 Benchmark</button>
   <button class="nt" onclick="showPane('autopsy',this)">🔥 Autopsy</button>
+  <button class="nt" onclick="showPane('signals',this)" style="color:#27c99a;">🌟 Segnalazioni</button>
 </div>
 <div style="flex:1;overflow:hidden;position:relative;min-height:0;">
 
 <!-- LIVE -->
 
-<!-- OVERVIEW -->
+<!-- OVERVIEW (accorpa Volatilità + Geo/Settore) -->
 <div class="pane on" id="pane-overview">
-  <div class="kpis" id="kpi-ov"></div>
-  <div class="g2">
-    <div class="card"><p class="sec">Allocazione</p><div class="cw" style="height:240px;"><canvas id="c-donut" role="img" aria-label="Allocazione portafoglio">Allocazione portafoglio.</canvas></div></div>
-    <div class="card"><p class="sec">Peso % per asset</p><div id="ov-bars"></div></div>
-  </div>
-  <div class="card"><p class="sec">Dettaglio posizioni</p>
-    <table><thead><tr><th>Asset</th><th>Peso</th><th>Capitale</th><th>Volatilità</th><th>Rend. acq.</th></tr></thead><tbody id="ov-tbl"></tbody></table>
-  </div>
-</div>
 
-<!-- VOLATILITY -->
-<div class="pane" id="pane-volatility">
-  <div class="kpis" id="kpi-vol"></div>
-  <div class="card"><p class="sec">Contributo alla volatilità</p><div class="cw" style="height:260px;"><canvas id="c-vol" role="img" aria-label="Contributo volatilità per asset">Contributo volatilità.</canvas></div></div>
-  <div class="card"><p class="sec">Dettaglio</p>
-    <table><thead><tr><th>Asset</th><th>Peso</th><th>Vol. ind.</th><th>Contributo</th><th>% tot.</th><th>Livello</th></tr></thead><tbody id="vol-tbl"></tbody></table>
-  </div>
-</div>
-
-<!-- GEO -->
-<div class="pane" id="pane-geo">
-  <div style="display:flex;gap:5px;margin-bottom:12px;">
-    <button class="nt on" id="bgeo" onclick="setGV('geo',this)">Geografica</button>
-    <button class="nt" id="bsec" onclick="setGV('sec',this)">Settoriale</button>
+  <!-- SUB-TAB NAV -->
+  <div style="display:flex;gap:5px;margin-bottom:14px;border-bottom:1px solid var(--border);padding-bottom:10px;">
+    <button class="nt on" id="ovt-overview" onclick="setOvTab('ov-panel-overview',this)">📊 Panoramica</button>
+    <button class="nt"    id="ovt-vol"      onclick="setOvTab('ov-panel-vol',this)">〰 Volatilità</button>
+    <button class="nt"    id="ovt-geo"      onclick="setOvTab('ov-panel-geo',this)">🌍 Geo / Settore</button>
   </div>
 
-  <!-- GEOGRAFICA -->
-  <div id="vgeo">
-    <div class="card" style="margin-bottom:14px;">
-      <p class="sec" style="margin-bottom:6px;">Distribuzione globale</p>
-      <p style="font-size:14px;color:var(--t2);margin-bottom:12px;">Pesi % per area geografica — hover per dettaglio</p>
-      <div style="position:relative;height:380px;">
-        <canvas id="c-geo-radar" role="img" aria-label="Radar geografico portafoglio"></canvas>
-      </div>
-    </div>
-    <div class="card" style="margin-bottom:14px;">
-      <p class="sec" style="margin-bottom:8px;">Peso per area</p>
-      <div id="geo-leg" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px;font-size:13px;color:var(--t2);"></div>
-      <div id="geo-bars-new"></div>
-    </div>
-    <div class="card">
-      <p class="sec" style="margin-bottom:8px;">Stacked view</p>
-      <div style="position:relative;height:70px;">
-        <canvas id="c-geo" role="img" aria-label="Allocazione geografica portafoglio">Geo.</canvas>
-      </div>
-    </div>
-  </div>
-
-  <!-- SETTORIALE -->
-  <div id="vsec" style="display:none;">
-    <div class="card" style="margin-bottom:14px;">
-      <p class="sec" style="margin-bottom:6px;">Distribuzione settoriale</p>
-      <p style="font-size:14px;color:var(--t2);margin-bottom:12px;">Pesi % per settore GICS — hover per dettaglio</p>
-      <div style="position:relative;height:380px;">
-        <canvas id="c-sec-radar" role="img" aria-label="Radar settoriale portafoglio"></canvas>
-      </div>
-    </div>
+  <!-- PANEL: PANORAMICA -->
+  <div id="ov-panel-overview">
+    <div class="kpis" id="kpi-ov"></div>
     <div class="g2">
-      <div class="card">
-        <p class="sec" style="margin-bottom:6px;">Settori</p>
-        <div class="cw" style="height:220px;"><canvas id="c-sec" role="img" aria-label="Allocazione settoriale">Settori.</canvas></div>
+      <div class="card"><p class="sec">Allocazione</p><div class="cw" style="height:240px;"><canvas id="c-donut" role="img" aria-label="Allocazione portafoglio">Allocazione portafoglio.</canvas></div></div>
+      <div class="card"><p class="sec">Peso % per asset</p><div id="ov-bars"></div></div>
+    </div>
+    <div class="card"><p class="sec">Dettaglio posizioni</p>
+      <table><thead><tr><th>Asset</th><th>Peso</th><th>Capitale</th><th>Volatilità</th><th>Rend. acq.</th></tr></thead><tbody id="ov-tbl"></tbody></table>
+    </div>
+  </div>
+
+  <!-- PANEL: VOLATILITÀ -->
+  <div id="ov-panel-vol" style="display:none;">
+    <div class="kpis" id="kpi-vol"></div>
+    <div class="card"><p class="sec">Contributo alla volatilità</p><div class="cw" style="height:260px;"><canvas id="c-vol" role="img" aria-label="Contributo volatilità per asset">Contributo volatilità.</canvas></div></div>
+    <div class="card"><p class="sec">Dettaglio</p>
+      <table><thead><tr><th>Asset</th><th>Peso</th><th>Vol. ind.</th><th>Contributo</th><th>% tot.</th><th>Livello</th></tr></thead><tbody id="vol-tbl"></tbody></table>
+    </div>
+  </div>
+
+  <!-- PANEL: GEO / SETTORE -->
+  <div id="ov-panel-geo" style="display:none;">
+    <div style="display:flex;gap:5px;margin-bottom:12px;">
+      <button class="nt on" id="bgeo" onclick="setGV('geo',this)">Geografica</button>
+      <button class="nt" id="bsec" onclick="setGV('sec',this)">Settoriale</button>
+    </div>
+    <!-- GEOGRAFICA -->
+    <div id="vgeo">
+      <div class="card" style="margin-bottom:14px;">
+        <p class="sec" style="margin-bottom:6px;">Distribuzione globale</p>
+        <p style="font-size:14px;color:var(--t2);margin-bottom:12px;">Pesi % per area geografica — hover per dettaglio</p>
+        <div style="position:relative;height:380px;">
+          <canvas id="c-geo-radar" role="img" aria-label="Radar geografico portafoglio"></canvas>
+        </div>
+      </div>
+      <div class="card" style="margin-bottom:14px;">
+        <p class="sec" style="margin-bottom:8px;">Peso per area</p>
+        <div id="geo-leg" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px;font-size:13px;color:var(--t2);"></div>
+        <div id="geo-bars-new"></div>
       </div>
       <div class="card">
-        <p class="sec" style="margin-bottom:8px;">Peso settori</p>
-        <div id="sec-bars"></div>
+        <p class="sec" style="margin-bottom:8px;">Stacked view</p>
+        <div style="position:relative;height:70px;">
+          <canvas id="c-geo" role="img" aria-label="Allocazione geografica portafoglio">Geo.</canvas>
+        </div>
+      </div>
+    </div>
+    <!-- SETTORIALE -->
+    <div id="vsec" style="display:none;">
+      <div class="card" style="margin-bottom:14px;">
+        <p class="sec" style="margin-bottom:6px;">Distribuzione settoriale</p>
+        <p style="font-size:14px;color:var(--t2);margin-bottom:12px;">Pesi % per settore GICS — hover per dettaglio</p>
+        <div style="position:relative;height:380px;">
+          <canvas id="c-sec-radar" role="img" aria-label="Radar settoriale portafoglio"></canvas>
+        </div>
+      </div>
+      <div class="g2">
+        <div class="card">
+          <p class="sec" style="margin-bottom:6px;">Settori</p>
+          <div class="cw" style="height:220px;"><canvas id="c-sec" role="img" aria-label="Allocazione settoriale">Settori.</canvas></div>
+        </div>
+        <div class="card">
+          <p class="sec" style="margin-bottom:8px;">Peso settori</p>
+          <div id="sec-bars"></div>
+        </div>
       </div>
     </div>
   </div>
+
 </div>
 
 <!-- RETURNS -->
@@ -932,6 +941,7 @@ tbody tr:hover td{background:rgba(255,255,255,.015);}
     <button class="sp-btn" onclick="applyStressPreset('dedollarization')" style="background:rgba(240,201,110,.15);border-color:rgba(240,201,110,.5);color:#f0c96e;">☢ De-dollarizzazione</button>
     <button class="sp-btn" onclick="applyStressPreset('aiBubble')" style="background:rgba(240,201,110,.15);border-color:rgba(240,201,110,.5);color:#f0c96e;">💥 Scoppio bolla AI</button>
     <button class="sp-btn" onclick="applyStressPreset('mixCrisis')" style="background:rgba(232,80,74,.2);border-color:rgba(232,80,74,.6);color:#e8504a;font-weight:700;">🔴 De-doll. + Bolla AI</button>
+    <button class="sp-btn" onclick="applyStressPreset('dreamScenario')" style="background:rgba(39,201,154,.18);border-color:rgba(39,201,154,.6);color:#27c99a;font-weight:700;">🌟 Il mondo dei sogni</button>
     <button class="sp-btn" onclick="applyStressPreset('reset')">↺ Reset</button>
   </div>
   <div class="stress-result">
@@ -939,6 +949,10 @@ tbody tr:hover td{background:rgba(255,255,255,.015);}
     <div class="sr-big" id="stress-big">0.0%</div>
     <div class="sr-sub" id="stress-sub">Muovi gli slider o scegli un preset</div>
   </div>
+
+  <!-- BOX DESCRIZIONE SCENARIO -->
+  <div id="stress-scenario-box" style="display:none;margin-bottom:14px;"></div>
+
   <div class="stress-sliders" id="stress-sliders"></div>
   <div class="card"><p class="sec">Impatto per asset</p><div class="cw" style="height:250px;"><canvas id="c-stress" role="img" aria-label="Impatto stress test per asset">Stress test.</canvas></div></div>
   <div class="card"><p class="sec">Dettaglio impatto</p><table><thead><tr><th>Asset</th><th>Shock applicato</th><th>Valore attuale</th><th>Valore stressato</th><th>P&L stress</th></tr></thead><tbody id="stress-tbl"></tbody></table></div>
@@ -1407,6 +1421,403 @@ tbody tr:hover td{background:rgba(255,255,255,.015);}
   </div><!-- /atsub-lezioni -->
 
 </div><!-- /pane-autopsy -->
+
+<!-- SEGNALAZIONI -->
+<div class="pane" id="pane-signals">
+
+  <!-- HEADER -->
+  <div style="margin-bottom:20px;">
+    <div style="display:flex;align-items:baseline;gap:12px;margin-bottom:6px;">
+      <span style="font-size:22px;font-weight:700;color:var(--teal);font-family:'JetBrains Mono',monospace;">🌟 Il mondo dei sogni</span>
+      <span style="font-size:12px;color:var(--t3);font-family:'JetBrains Mono',monospace;">— idee di espansione del portafoglio</span>
+    </div>
+    <p style="font-size:14px;color:var(--t2);line-height:1.7;max-width:780px;">
+      Scenario: esplosione della domanda globale di elettricità (AI + veicoli elettrici), boom delle rinnovabili, mini-nucleare ovunque, robotica industriale accelerata, de-dollarizzazione con oro e Bitcoin come nuove riserve di valore. Queste sono le aree che beneficerebbero di più e gli strumenti per accedervi. <span style="color:var(--t3);">Non è consulenza finanziaria.</span>
+    </p>
+  </div>
+
+  <!-- SUB-TAB NAV -->
+  <div style="display:flex;gap:5px;margin-bottom:18px;border-bottom:1px solid var(--border);padding-bottom:10px;flex-wrap:wrap;">
+    <button class="nt on" id="sigt-energy"   onclick="setSigTab('sig-panel-energy',this)"  >⚡ Energia & Grid</button>
+    <button class="nt"    id="sigt-metals"   onclick="setSigTab('sig-panel-metals',this)"  >🪙 Metalli & Riserve</button>
+    <button class="nt"    id="sigt-nuclear"  onclick="setSigTab('sig-panel-nuclear',this)" >☢ Nucleare</button>
+    <button class="nt"    id="sigt-robotics" onclick="setSigTab('sig-panel-robotics',this)">🤖 Robotica & AI</button>
+    <button class="nt"    id="sigt-watch"    onclick="setSigTab('sig-panel-watch',this)"   >👁 Da tenere d'occhio</button>
+  </div>
+
+  <!-- ═══ PANEL: ENERGIA & GRID ═══ -->
+  <div id="sig-panel-energy">
+    <div class="card" style="border-left:3px solid var(--teal);margin-bottom:14px;">
+      <p class="sec" style="color:var(--teal);">Perché ora</p>
+      <p style="font-size:14px;color:var(--t2);line-height:1.8;">I datacenter per AI consumano <strong style="color:var(--t1);">3–5× più energia</strong> di un datacenter tradizionale. IEA stima che entro il 2030 la domanda elettrica globale crescerà del 25% solo per effetto dell'AI. Le rinnovabili sono già la fonte più economica di nuova capacità in Europa e USA. La rete elettrica deve essere potenziata ovunque: trasformatori, cavi, stazioni di accumulo. Hai già Grid e CleanE, ma esistono strumenti più specifici.</p>
+    </div>
+    <div class="g2">
+
+      <div class="card" style="border-color:rgba(39,201,154,.3);">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;">
+          <div>
+            <div style="font-size:16px;font-weight:700;color:var(--t1);">Global X Renewable Energy Producers</div>
+            <div style="font-size:12px;color:var(--t3);font-family:'JetBrains Mono',monospace;margin-top:2px;">RNRG — IE00BKT09032</div>
+          </div>
+          <span class="badge" style="background:rgba(39,201,154,.15);color:var(--teal);border:1px solid rgba(39,201,154,.3);">Complementare</span>
+        </div>
+        <p style="font-size:13px;color:var(--t2);line-height:1.7;margin-bottom:10px;">Produttori puri di energia rinnovabile — non costruttori, ma chi <em>vende</em> l'elettricità pulita. Diverso dal tuo INRG che punta sulle tecnologie. Copre idroelettrico, eolico, solare utility-scale. Meno volatile di INRG, più orientato ai cash flow stabili.</p>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <span style="font-size:12px;color:var(--t3);font-family:'JetBrains Mono',monospace;">TER: 0.65%</span>
+          <span style="font-size:12px;color:var(--t3);font-family:'JetBrains Mono',monospace;">·</span>
+          <span style="font-size:12px;color:var(--t3);font-family:'JetBrains Mono',monospace;">Domicilio: IE</span>
+          <span style="font-size:12px;color:var(--t3);font-family:'JetBrains Mono',monospace;">·</span>
+          <span style="font-size:12px;color:var(--teal);font-family:'JetBrains Mono',monospace;">✓ Su TR</span>
+        </div>
+      </div>
+
+      <div class="card" style="border-color:rgba(39,201,154,.3);">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;">
+          <div>
+            <div style="font-size:16px;font-weight:700;color:var(--t1);">iShares Global Infrastructure</div>
+            <div style="font-size:12px;color:var(--t3);font-family:'JetBrains Mono',monospace;margin-top:2px;">INFRA / IGLN — IE00B1FZS467</div>
+          </div>
+          <span class="badge" style="background:rgba(77,157,224,.15);color:var(--blue);border:1px solid rgba(77,157,224,.3);">Difensivo</span>
+        </div>
+        <p style="font-size:13px;color:var(--t2);line-height:1.7;margin-bottom:10px;">Infrastrutture fisiche globali: utilities, trasporti, comunicazioni, energia. In uno scenario di elettrificazione massiva è il pavimento del portafoglio — meno upside di XEGR ma molto meno volatilità. Dividendo intorno al 3%.</p>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <span style="font-size:12px;color:var(--t3);font-family:'JetBrains Mono',monospace;">TER: 0.65%</span>
+          <span style="font-size:12px;color:var(--t3);font-family:'JetBrains Mono',monospace;">·</span>
+          <span style="font-size:12px;color:var(--teal);font-family:'JetBrains Mono',monospace;">✓ Su TR</span>
+        </div>
+      </div>
+
+      <div class="card" style="border-color:rgba(39,201,154,.3);">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;">
+          <div>
+            <div style="font-size:16px;font-weight:700;color:var(--t1);">Invesco Solar Energy</div>
+            <div style="font-size:12px;color:var(--t3);font-family:'JetBrains Mono',monospace;margin-top:2px;">RAYS — IE00BM8QRZ79</div>
+          </div>
+          <span class="badge" style="background:rgba(212,168,67,.15);color:var(--gold);border:1px solid rgba(212,168,67,.3);">High conviction</span>
+        </div>
+        <p style="font-size:13px;color:var(--t2);line-height:1.7;margin-bottom:10px;">Puro solare — produttori di pannelli, installatori, inverter, tracking systems. Il solare è già la fonte più economica mai costruita dall'uomo (LCOE). In uno scenario di boom delle rinnovabili questo ETF è il beneficiario diretto. Alto rischio Cina (produzione pannelli), alta volatilità.</p>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <span style="font-size:12px;color:var(--t3);font-family:'JetBrains Mono',monospace;">TER: 0.69%</span>
+          <span style="font-size:12px;color:var(--t3);font-family:'JetBrains Mono',monospace;">·</span>
+          <span style="font-size:12px;color:var(--teal);font-family:'JetBrains Mono',monospace;">✓ Su TR</span>
+        </div>
+      </div>
+
+      <div class="card" style="border-color:rgba(39,201,154,.3);">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;">
+          <div>
+            <div style="font-size:16px;font-weight:700;color:var(--t1);">WisdomTree Battery Solutions</div>
+            <div style="font-size:12px;color:var(--t3);font-family:'JetBrains Mono',monospace;margin-top:2px;">VOLT — IE00BKLF1R75</div>
+          </div>
+          <span class="badge" style="background:rgba(39,201,154,.15);color:var(--teal);border:1px solid rgba(39,201,154,.3);">Già in portafoglio</span>
+        </div>
+        <p style="font-size:13px;color:var(--t2);line-height:1.7;margin-bottom:10px;">Già presente come Battery Value-Chain. Nella tesi energetica è il collegamento tra rinnovabili (intermittenti) e consumo costante. Con grid-scale storage in espansione e EV, la domanda di storage è strutturale. <strong style="color:var(--teal);">Considera di aumentare la posizione</strong> se credi nel macro.</p>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <span style="font-size:12px;color:var(--teal);font-family:'JetBrains Mono',monospace;">✓ Già hai BATG</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- NOTA DI PORTAFOGLIO -->
+    <div class="card" style="background:rgba(39,201,154,.05);border-color:rgba(39,201,154,.2);">
+      <p class="sec" style="color:var(--teal);">Come si inserisce nel tuo portafoglio</p>
+      <p style="font-size:14px;color:var(--t2);line-height:1.8;">Hai già XEGR (Grid) e INRG (Clean Energy) che coprono bene la tesi. L'aggiunta più sensata sarebbe <strong style="color:var(--t1);">RAYS (solare puro)</strong> come posizione satellite ad alta convinzione — diverso da INRG che è più broad. Evita di sovraccaricare ulteriormente il tema energetico: già pesa oltre il 35% del portafoglio tra Grid, CleanE, Battery e Hydrogen.</p>
+    </div>
+  </div>
+
+  <!-- ═══ PANEL: METALLI & RISERVE ═══ -->
+  <div id="sig-panel-metals" style="display:none;">
+    <div class="card" style="border-left:3px solid var(--gold2);margin-bottom:14px;">
+      <p class="sec" style="color:var(--gold2);">Perché ora</p>
+      <p style="font-size:14px;color:var(--t2);line-height:1.8;">La de-dollarizzazione è in corso: le banche centrali di Cina, Russia, India, Arabia Saudita accumulano oro ai massimi storici da decenni. Bitcoin viene sempre più considerato dai treasury aziendali (MicroStrategy, Tesla, diversi stati USA) come riserva. Rame e argento sono fisicamente necessari per ogni pannello solare, ogni motore elettrico, ogni cavo di rete. Non sono correlati alla crescita economica — sono correlati alla <em>quantità di elettricità</em> che il mondo decide di produrre.</p>
+    </div>
+    <div class="g2">
+
+      <div class="card" style="border-color:rgba(212,168,67,.3);">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;">
+          <div>
+            <div style="font-size:16px;font-weight:700;color:var(--t1);">Sprott Physical Gold & Silver Trust</div>
+            <div style="font-size:12px;color:var(--t3);font-family:'JetBrains Mono',monospace;margin-top:2px;">CEF — Toronto/NYSE</div>
+          </div>
+          <span class="badge" style="background:rgba(212,168,67,.15);color:var(--gold);border:1px solid rgba(212,168,67,.3);">Alternativa</span>
+        </div>
+        <p style="font-size:13px;color:var(--t2);line-height:1.7;margin-bottom:10px;">Fisico allocato, non sintetico. Oro e argento insieme in un unico veicolo. Non disponibile su TR (quotato in Nord America), ma da considerare per chi ha un broker multi-mercato. Alternativa: tenere separati SGLN (oro) e SSIL (argento) come già fai.</p>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <span style="font-size:12px;color:var(--amber);font-family:'JetBrains Mono',monospace;">⚠ Non su TR</span>
+        </div>
+      </div>
+
+      <div class="card" style="border-color:rgba(212,168,67,.3);">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;">
+          <div>
+            <div style="font-size:16px;font-weight:700;color:var(--t1);">WisdomTree Enhanced Commodity</div>
+            <div style="font-size:12px;color:var(--t3);font-family:'JetBrains Mono',monospace;margin-top:2px;">WCOB — IE00BYMLZY74</div>
+          </div>
+          <span class="badge" style="background:rgba(77,157,224,.15);color:var(--blue);border:1px solid rgba(77,157,224,.3);">Broad commodity</span>
+        </div>
+        <p style="font-size:13px;color:var(--t2);line-height:1.7;margin-bottom:10px;">Esposizione broad alle commodity — energia, metalli industriali, agricoltura, metalli preziosi. In uno scenario di de-dollarizzazione le commodity fisiche sono l'hedge naturale. Utile se vuoi allargare oltre rame e metalli preziosi senza comprare 10 ETC separati.</p>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <span style="font-size:12px;color:var(--t3);font-family:'JetBrains Mono',monospace;">TER: 0.39%</span>
+          <span style="font-size:12px;color:var(--teal);font-family:'JetBrains Mono',monospace;">·  ✓ Su TR</span>
+        </div>
+      </div>
+
+      <div class="card" style="border-color:rgba(247,147,26,.3);">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;">
+          <div>
+            <div style="font-size:16px;font-weight:700;color:var(--t1);">21Shares Bitcoin ETP</div>
+            <div style="font-size:12px;color:var(--t3);font-family:'JetBrains Mono',monospace;margin-top:2px;">ABTC — CH0454664001</div>
+          </div>
+          <span class="badge" style="background:rgba(247,147,26,.15);color:#F7931A;border:1px solid rgba(247,147,26,.3);">Già in portafoglio</span>
+        </div>
+        <p style="font-size:13px;color:var(--t2);line-height:1.7;margin-bottom:10px;">Hai già Bitcoin. In uno scenario di de-dollarizzazione accelerata la tesi si rafforza molto. Il nodo è la <strong style="color:var(--t1);">dimensione della posizione</strong>: con 9.890€ sei al 6.1% del portafoglio. La conviction media per un investitore tematico è 5-10%. Sei già nel range. Aumentare dipende dalla tua tolleranza al -60% in un crash.</p>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <span style="font-size:12px;color:#F7931A;font-family:'JetBrains Mono',monospace;">✓ Già hai BTC</span>
+        </div>
+      </div>
+
+      <div class="card" style="border-color:rgba(205,127,50,.3);">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;">
+          <div>
+            <div style="font-size:16px;font-weight:700;color:var(--t1);">Global X Copper Miners</div>
+            <div style="font-size:12px;color:var(--t3);font-family:'JetBrains Mono',monospace;margin-top:2px;">COPX — IE00B5M3K468</div>
+          </div>
+          <span class="badge" style="background:rgba(205,127,50,.15);color:#CD7F32;border:1px solid rgba(205,127,50,.3);">Già in portafoglio</span>
+        </div>
+        <p style="font-size:13px;color:var(--t2);line-height:1.7;margin-bottom:10px;">Già presente. Il rame è il "petrolio verde" — ogni kWh rinnovabile ne richiede 4-5× più del fossile. Goldman Sachs stima un deficit strutturale entro il 2027. Con 11.342€ sei al 7% del portafoglio — potrebbe giustificare un aumento leggero verso il 10%.</p>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <span style="font-size:12px;color:#CD7F32;font-family:'JetBrains Mono',monospace;">✓ Già hai COPA/COPX</span>
+        </div>
+      </div>
+
+    </div>
+    <div class="card" style="background:rgba(212,168,67,.05);border-color:rgba(212,168,67,.2);">
+      <p class="sec" style="color:var(--gold2);">Come si inserisce nel tuo portafoglio</p>
+      <p style="font-size:14px;color:var(--t2);line-height:1.8;">Su oro, argento, rame e Bitcoin sei già posizionato. La mossa più sensata non è aggiungere nuovi strumenti ma <strong style="color:var(--t1);">ribilanciare Silver (attualmente sottopesata, –7.25% dall'acquisto)</strong> e valutare un leggero aumento del rame. La de-dollarizzazione funziona meglio con metalli fisici allocati (SGLN, SSIL) che con ETF sintetici.</p>
+    </div>
+  </div>
+
+  <!-- ═══ PANEL: NUCLEARE ═══ -->
+  <div id="sig-panel-nuclear" style="display:none;">
+    <div class="card" style="border-left:3px solid var(--amber);margin-bottom:14px;">
+      <p class="sec" style="color:var(--amber);">Perché ora</p>
+      <p style="font-size:14px;color:var(--t2);line-height:1.8;">Il nucleare sta vivendo una rinascita bipartisan senza precedenti. Microsoft ha firmato un PPA per riavviare Three Mile Island. Google, Amazon e Meta stanno finanziando direttamente reattori SMR (Small Modular Reactor). Francia, Giappone, Corea del Sud e Polonia stanno approvando nuove centrali. L'uranio ha un ciclo lungo: una volta avviati i progetti, il consumo di combustibile è pluridecennale e anelastico. Hai già URNM ma ci sono angolazioni diverse.</p>
+    </div>
+    <div class="g2">
+
+      <div class="card" style="border-color:rgba(212,144,58,.3);">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;">
+          <div>
+            <div style="font-size:16px;font-weight:700;color:var(--t1);">VanEck Uranium & Nuclear Technologies</div>
+            <div style="font-size:12px;color:var(--t3);font-family:'JetBrains Mono',monospace;margin-top:2px;">NLR / NUCL — IE000YYE6WK6</div>
+          </div>
+          <span class="badge" style="background:rgba(212,144,58,.15);color:var(--amber);border:1px solid rgba(212,144,58,.3);">Già in portafoglio</span>
+        </div>
+        <p style="font-size:13px;color:var(--t2);line-height:1.7;margin-bottom:10px;">Hai già questo. Copre minatori di uranio + utilities nucleari + costruttori di reattori. È il modo più efficiente di giocare il ciclo completo. Con 5.479€ sei al 3.4% del portafoglio — per una tesi così forte (nucleare + AI) <strong style="color:var(--t1);">potresti portarlo al 6-8%</strong> in acquisti progressivi.</p>
+        <div style="display:flex;gap:8px;">
+          <span style="font-size:12px;color:var(--amber);font-family:'JetBrains Mono',monospace;">✓ Già hai NUCL</span>
+        </div>
+      </div>
+
+      <div class="card" style="border-color:rgba(212,144,58,.3);">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;">
+          <div>
+            <div style="font-size:16px;font-weight:700;color:var(--t1);">Sprott Uranium Miners ETF</div>
+            <div style="font-size:12px;color:var(--t3);font-family:'JetBrains Mono',monospace;margin-top:2px;">URNM — US85208D1072</div>
+          </div>
+          <span class="badge" style="background:rgba(212,144,58,.15);color:var(--amber);border:1px solid rgba(212,144,58,.3);">Puro uranio</span>
+        </div>
+        <p style="font-size:13px;color:var(--t2);line-height:1.7;margin-bottom:10px;">Solo minatori di uranio — nessuna utility. Più volatile di NUCL ma cattura meglio il re-rating del prezzo spot dell'uranio. Sprott gestisce anche fondi fisici di uranio (SPUT). Da preferire a NUCL se la tesi è sul ciclo del combustibile, non sulla tecnologia dei reattori.</p>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <span style="font-size:12px;color:var(--t3);font-family:'JetBrains Mono',monospace;">TER: 0.83%</span>
+          <span style="font-size:12px;color:var(--amber);font-family:'JetBrains Mono',monospace;">· ⚠ Quotato USA</span>
+        </div>
+      </div>
+
+      <div class="card" style="border-color:rgba(212,144,58,.3);">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;">
+          <div>
+            <div style="font-size:16px;font-weight:700;color:var(--t1);">Global X Uranium ETF (UCITS)</div>
+            <div style="font-size:12px;color:var(--t3);font-family:'JetBrains Mono',monospace;margin-top:2px;">URNU — IE0003Z83B18</div>
+          </div>
+          <span class="badge" style="background:rgba(39,201,154,.15);color:var(--teal);border:1px solid rgba(39,201,154,.3);">UCITS — Alternativa EU</span>
+        </div>
+        <p style="font-size:13px;color:var(--t2);line-height:1.7;margin-bottom:10px;">Versione UCITS di URA (Global X, lo standard USA per l'uranio). Accessibile da TR. Copre minatori, arricchitori, costruttori di combustibile. Leggermente diverso da NUCL nella composizione — sovrappeso Canada/Australia, meno utility USA. Buona alternativa o complemento.</p>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <span style="font-size:12px;color:var(--t3);font-family:'JetBrains Mono',monospace;">TER: 0.65%</span>
+          <span style="font-size:12px;color:var(--teal);font-family:'JetBrains Mono',monospace;">· ✓ Su TR</span>
+        </div>
+      </div>
+
+      <div class="card" style="border-color:rgba(212,144,58,.3);">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;">
+          <div>
+            <div style="font-size:16px;font-weight:700;color:var(--t1);">Cameco Corporation</div>
+            <div style="font-size:12px;color:var(--t3);font-family:'JetBrains Mono',monospace;margin-top:2px;">CCJ — NYSE</div>
+          </div>
+          <span class="badge" style="background:rgba(212,144,58,.15);color:var(--amber);border:1px solid rgba(212,144,58,.3);">Singolo titolo</span>
+        </div>
+        <p style="font-size:13px;color:var(--t2);line-height:1.7;margin-bottom:10px;">Il più grande produttore di uranio occidentale. Già hai esposizione indiretta attraverso NUCL. Come singolo titolo offre leva maggiore al prezzo spot dell'uranio rispetto all'ETF. Rischio concentrazione elevato — da considerare solo come posizione satellite &lt;2% se credi fortemente nel ciclo.</p>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <span style="font-size:12px;color:var(--t3);font-family:'JetBrains Mono',monospace;">Singolo titolo</span>
+          <span style="font-size:12px;color:var(--teal);font-family:'JetBrains Mono',monospace;">· ✓ Su TR</span>
+        </div>
+      </div>
+
+    </div>
+    <div class="card" style="background:rgba(212,144,58,.05);border-color:rgba(212,144,58,.2);">
+      <p class="sec" style="color:var(--amber);">Come si inserisce nel tuo portafoglio</p>
+      <p style="font-size:14px;color:var(--t2);line-height:1.8;">Il nucleare è la tua posizione più sottopesata rispetto alla conviction (personalScore 85, solo 3.4% del portafoglio). La mossa più coerente con la tua tesi è <strong style="color:var(--t1);">acquisti progressivi su NUCL verso il 6-8%</strong>, oppure affiancare URNU per diversificare tra due provider senza sovrapposizione totale. Non aggiungere CCJ prima di aver aumentato la posizione ETF.</p>
+    </div>
+  </div>
+
+  <!-- ═══ PANEL: ROBOTICA & AI ═══ -->
+  <div id="sig-panel-robotics" style="display:none;">
+    <div class="card" style="border-left:3px solid var(--purple);margin-bottom:14px;">
+      <p class="sec" style="color:var(--purple);">Perché ora</p>
+      <p style="font-size:14px;color:var(--t2);line-height:1.8;">L'AI non è solo software — richiede hardware fisico (chip, server, cavi, cooling), e la robotica industriale è il passo successivo. Nvidia, TSMC, ASML sono già a multipli altissimi. Gli ETF tematici su AI/robotica permettono di catturare l'intero stack (chip design, fab, robotica manifatturiera, automazione logistica) senza scommettere su un singolo titolo. Hai già Quantum Computing come posizione speculativa — questi strumenti sono più consolidati.</p>
+    </div>
+    <div class="g2">
+
+      <div class="card" style="border-color:rgba(139,111,255,.3);">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;">
+          <div>
+            <div style="font-size:16px;font-weight:700;color:var(--t1);">iShares Automation & Robotics</div>
+            <div style="font-size:12px;color:var(--t3);font-family:'JetBrains Mono',monospace;margin-top:2px;">RBOT — IE00BYZK4552</div>
+          </div>
+          <span class="badge" style="background:rgba(139,111,255,.15);color:var(--purple);border:1px solid rgba(139,111,255,.3);">High conviction</span>
+        </div>
+        <p style="font-size:13px;color:var(--t2);line-height:1.7;margin-bottom:10px;">250+ aziende su automazione industriale, robotica, AI applicata. Diversificato tra USA, Europa (Siemens, ABB, Keyence), Asia (Fanuc, Yaskawa). Non è un ETF speculativo su AI — è un ETF su chi costruisce le macchine che sostituiscono il lavoro umano. Tesi di lungo periodo 10-20 anni, non ciclica.</p>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <span style="font-size:12px;color:var(--t3);font-family:'JetBrains Mono',monospace;">TER: 0.40%</span>
+          <span style="font-size:12px;color:var(--teal);font-family:'JetBrains Mono',monospace;">· ✓ Su TR</span>
+        </div>
+      </div>
+
+      <div class="card" style="border-color:rgba(139,111,255,.3);">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;">
+          <div>
+            <div style="font-size:16px;font-weight:700;color:var(--t1);">WisdomTree Artificial Intelligence</div>
+            <div style="font-size:12px;color:var(--t3);font-family:'JetBrains Mono',monospace;margin-top:2px;">WTAI — IE00BDVPNG13</div>
+          </div>
+          <span class="badge" style="background:rgba(139,111,255,.15);color:var(--purple);border:1px solid rgba(139,111,255,.3);">AI puro</span>
+        </div>
+        <p style="font-size:13px;color:var(--t2);line-height:1.7;margin-bottom:10px;">Esposizione diretta all'AI: chip (Nvidia, AMD, Broadcom), cloud infrastrutture (Microsoft, Google, AWS), software AI. Più concentrato e più volatile di RBOT. Nota: già hai una sovrapposizione con QTUM. Valuta se vuoi raddoppiare la scommessa AI o diversificare.</p>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <span style="font-size:12px;color:var(--t3);font-family:'JetBrains Mono',monospace;">TER: 0.40%</span>
+          <span style="font-size:12px;color:var(--teal);font-family:'JetBrains Mono',monospace;">· ✓ Su TR</span>
+        </div>
+      </div>
+
+      <div class="card" style="border-color:rgba(139,111,255,.3);">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;">
+          <div>
+            <div style="font-size:16px;font-weight:700;color:var(--t1);">NVIDIA Corporation</div>
+            <div style="font-size:12px;color:var(--t3);font-family:'JetBrains Mono',monospace;margin-top:2px;">NVDA — US67066G1040</div>
+          </div>
+          <span class="badge" style="background:rgba(212,144,58,.15);color:var(--amber);border:1px solid rgba(212,144,58,.3);">Singolo titolo</span>
+        </div>
+        <p style="font-size:13px;color:var(--t2);line-height:1.7;margin-bottom:10px;">Il pick-and-shovel dell'AI. Ogni datacenter per AI usa GPU Nvidia — non per scelta ma per necessità (ecosistema CUDA). Il rischio è il multiplo (P/E >40x) e la concentrazione. Da considerare solo come posizione piccola (&lt;3%) se non vuoi sovrapporti troppo ai tuoi ETF tech esistenti.</p>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <span style="font-size:12px;color:var(--teal);font-family:'JetBrains Mono',monospace;">✓ Su TR</span>
+        </div>
+      </div>
+
+      <div class="card" style="border-color:rgba(60,52,137,.5);">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;">
+          <div>
+            <div style="font-size:16px;font-weight:700;color:var(--t1);">Defiance Quantum ETF</div>
+            <div style="font-size:12px;color:var(--t3);font-family:'JetBrains Mono',monospace;margin-top:2px;">QTUM — US26922A5765</div>
+          </div>
+          <span class="badge" style="background:rgba(60,52,137,.3);color:#8b9aff;border:1px solid rgba(60,52,137,.5);">Già in portafoglio</span>
+        </div>
+        <p style="font-size:13px;color:var(--t2);line-height:1.7;margin-bottom:10px;">Già presente con 10.350€ (+2.63% dall'acquisto). Il quantum computing si lega alla robotica e all'AI nella tesi del "il mondo ha bisogno di più potenza computazionale". Posizione speculativa corretta — non aumentare prima di aver consolidato le posizioni più sicure della tesi.</p>
+        <div style="display:flex;gap:8px;">
+          <span style="font-size:12px;color:#8b9aff;font-family:'JetBrains Mono',monospace;">✓ Già hai QTUM</span>
+        </div>
+      </div>
+
+    </div>
+    <div class="card" style="background:rgba(139,111,255,.05);border-color:rgba(139,111,255,.2);">
+      <p class="sec" style="color:var(--purple);">Come si inserisce nel tuo portafoglio</p>
+      <p style="font-size:14px;color:var(--t2);line-height:1.8;">Hai già QTUM (quantum/AI). L'aggiunta più complementare sarebbe <strong style="color:var(--t1);">RBOT (automazione & robotica)</strong> che non si sovrappone a QTUM — uno è speculativo/futuro, l'altro è industriale/presente. WTAI si sovrappone troppo a QTUM per giustificarne l'acquisto. NVDA come satellite solo se vuoi leva concentrata.</p>
+    </div>
+  </div>
+
+  <!-- ═══ PANEL: DA TENERE D'OCCHIO ═══ -->
+  <div id="sig-panel-watch" style="display:none;">
+    <div class="card" style="border-left:3px solid var(--blue);margin-bottom:14px;">
+      <p class="sec" style="color:var(--blue);">Idee che non compreresti oggi ma da monitorare</p>
+      <p style="font-size:14px;color:var(--t2);line-height:1.8;">Strumenti che hanno senso nella tesi ma o sono troppo speculativi, o richiedono una catalyst specifica, o duplcherebbero posizioni esistenti. Li monitori, non li compri ora.</p>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:10px;">
+
+      <div class="card" style="border-color:rgba(77,157,224,.2);padding:14px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+          <div style="font-size:15px;font-weight:700;color:var(--t1);">HANetf BATT — Battery Metal Miners</div>
+          <span class="badge" style="background:rgba(77,157,224,.1);color:var(--blue);border:1px solid rgba(77,157,224,.2);">Watchlist</span>
+        </div>
+        <p style="font-size:13px;color:var(--t2);line-height:1.7;"><strong style="color:var(--t3);">Perché non ora:</strong> troppa sovrapposizione con Battery Value-Chain (BATG) già in portafoglio. <strong style="color:var(--t3);">Quando guardarlo:</strong> se vendi BATG e vuoi un'esposizione più diretta ai minatori di litio, cobalto, nichel anziché all'intera value chain.</p>
+      </div>
+
+      <div class="card" style="border-color:rgba(77,157,224,.2);padding:14px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+          <div style="font-size:15px;font-weight:700;color:var(--t1);">Ethereum ETP (21Shares / ETC Group)</div>
+          <span class="badge" style="background:rgba(77,157,224,.1);color:var(--blue);border:1px solid rgba(77,157,224,.2);">Watchlist</span>
+        </div>
+        <p style="font-size:13px;color:var(--t2);line-height:1.7;"><strong style="color:var(--t3);">Perché non ora:</strong> con BTC già a 6.1% del portafoglio aggiungere ETH aumenta il rischio crypto complessivo oltre il livello confortevole per un portafoglio orientato al reale. <strong style="color:var(--t3);">Quando guardarlo:</strong> se la narrativa Web3/DeFi/tokenizzazione degli asset reali prende piede istituzionale concreto.</p>
+      </div>
+
+      <div class="card" style="border-color:rgba(77,157,224,.2);padding:14px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+          <div style="font-size:15px;font-weight:700;color:var(--t1);">Xtrackers MSCI World Energy Transition</div>
+          <span class="badge" style="background:rgba(77,157,224,.1);color:var(--blue);border:1px solid rgba(77,157,224,.2);">Watchlist</span>
+        </div>
+        <p style="font-size:13px;color:var(--t2);line-height:1.7;"><strong style="color:var(--t3);">Perché non ora:</strong> sovrappone Clean Energy + Grid + Battery + Hydrogen in un solo strumento più broad e meno concentrato. Interessante se vuoi <em>semplificare</em> il portafoglio in futuro — un ETF al posto di quattro. <strong style="color:var(--t3);">Quando guardarlo:</strong> alla prossima revisione strategica se il portafoglio diventa troppo frammentato.</p>
+      </div>
+
+      <div class="card" style="border-color:rgba(77,157,224,.2);padding:14px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+          <div style="font-size:15px;font-weight:700;color:var(--t1);">MSCI India ETF (Franklin / iShares)</div>
+          <span class="badge" style="background:rgba(77,157,224,.1);color:var(--blue);border:1px solid rgba(77,157,224,.2);">Watchlist</span>
+        </div>
+        <p style="font-size:13px;color:var(--t2);line-height:1.7;"><strong style="color:var(--t3);">Perché non ora:</strong> hai già EM IMI che include India al ~18%. Un ETF India dedicato significherebbe overweight su un singolo paese EM. <strong style="color:var(--t3);">Quando guardarlo:</strong> se ritieni che l'India meriti una posizione separata nella tesi energetica/infrastrutturale — è il paese che costruirà più centrali nei prossimi 20 anni dopo la Cina.</p>
+      </div>
+
+      <div class="card" style="border-color:rgba(77,157,224,.2);padding:14px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+          <div style="font-size:15px;font-weight:700;color:var(--t1);">Horizons Global Lithium Producers</div>
+          <span class="badge" style="background:rgba(77,157,224,.1);color:var(--blue);border:1px solid rgba(77,157,224,.2);">Watchlist</span>
+        </div>
+        <p style="font-size:13px;color:var(--t2);line-height:1.7;"><strong style="color:var(--t3);">Perché non ora:</strong> il litio ha avuto un crollo del prezzo del 70% dal 2023 — oversupply da produttori cileni e australiani. <strong style="color:var(--t3);">Quando guardarlo:</strong> quando la domanda di batterie supererà strutturalmente l'offerta (stimato 2026-2028 secondo BloombergNEF). Potrebbe essere il momento.</p>
+      </div>
+
+    </div>
+
+    <!-- RIEPILOGO FINALE -->
+    <div class="card" style="margin-top:6px;background:rgba(39,201,154,.05);border-color:rgba(39,201,154,.3);">
+      <p class="sec" style="color:var(--teal);">La priorità assoluta: ribilanciare prima di aggiungere</p>
+      <p style="font-size:14px;color:var(--t2);line-height:1.8;">Prima di qualsiasi nuovo acquisto, il tuo portafoglio ha tre sbilanciamenti evidenti rispetto alla tua conviction dichiarata:</p>
+      <div style="margin-top:10px;display:flex;flex-direction:column;gap:8px;">
+        <div style="display:flex;align-items:flex-start;gap:10px;">
+          <span style="color:var(--teal);font-size:16px;margin-top:1px;">↑</span>
+          <span style="font-size:13px;color:var(--t2);line-height:1.6;"><strong style="color:var(--t1);">Nucleare (NUCL): 3.4% → target 6-8%.</strong> PersonalScore 85 ma è la posizione più sottodimensionata. Acquisti progressivi mensili.</span>
+        </div>
+        <div style="display:flex;align-items:flex-start;gap:10px;">
+          <span style="color:var(--teal);font-size:16px;margin-top:1px;">↑</span>
+          <span style="font-size:13px;color:var(--t2);line-height:1.6;"><strong style="color:var(--t1);">Grid (XEGR): 3.0% → target 7-9%.</strong> PersonalScore 90 — il più alto di tutto il portafoglio. È il beneficiario principale della tua tesi. Dovrebbe essere il terzo asset per peso, non il nono.</span>
+        </div>
+        <div style="display:flex;align-items:flex-start;gap:10px;">
+          <span style="color:var(--red);font-size:16px;margin-top:1px;">↓</span>
+          <span style="font-size:13px;color:var(--t2);line-height:1.6;"><strong style="color:var(--t1);">EM IMI (EIMI): 14.2% → probabilmente troppo.</strong> PersonalScore 40. È la posizione più grande dopo Gold, ma la conviction è la più bassa del portafoglio. Valuta una riduzione progressiva quando sarà in profitto solido.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /pane-signals -->
 </div><!-- flex overflow hidden wrapper -->
 </main>
 </div><!-- layout -->
@@ -2375,24 +2786,39 @@ function showPane(id,btn){
   if(id==='autopsy'){initApTrades();return;}
   if(id==='live'){renderLivePane(liveData,null);renderStorico();return;}
   if(id==='scenario'){setTimeout(()=>{renderScenario();renderConsTable();rMacroCharts();renderPersonalScores();},80);return;}
-  if(id==='geo'){setTimeout(()=>{rGeo();},50);return;}
   refresh();
 }
 function refresh(){
-  if(curPane==='overview')rOv();
-  if(curPane==='volatility')rVol();
-  if(curPane==='geo')setTimeout(()=>{rGeo();},30);
+  if(curPane==='overview'){rOv();rVol();}
   if(curPane==='scenario'){setTimeout(()=>{renderScenario();renderConsTable();rMacroCharts();},30);}
   if(curPane==='stress')rStress();
   if(curPane==='bench')rBench();
   if(curPane==='returns')rRet();
   if(curPane==='history')rHistory();
 }
+function setOvTab(panelId, btn){
+  ['ov-panel-overview','ov-panel-vol','ov-panel-geo'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el) el.style.display = id===panelId ? 'block' : 'none';
+  });
+  document.querySelectorAll('#pane-overview > div:first-child .nt').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  if(panelId==='ov-panel-vol') rVol();
+  if(panelId==='ov-panel-geo') setTimeout(()=>{rGeo();},50);
+}
+function setSigTab(panelId, btn){
+  ['sig-panel-energy','sig-panel-metals','sig-panel-nuclear','sig-panel-robotics','sig-panel-watch'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el) el.style.display = id===panelId ? 'block' : 'none';
+  });
+  document.querySelectorAll('#pane-signals > div:nth-child(2) .nt').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+}
 function setGV(v,btn){
   geoV=v;
   document.getElementById('vgeo').style.display=v==='geo'?'block':'none';
   document.getElementById('vsec').style.display=v==='sec'?'block':'none';
-  document.querySelectorAll('#pane-geo .nt').forEach(b=>b.classList.remove('on'));
+  document.querySelectorAll('#ov-panel-geo .nt').forEach(b=>b.classList.remove('on'));
   btn.classList.add('on');
   setTimeout(()=>{rGeo();},50);
 }
@@ -2876,8 +3302,296 @@ const STRESS_PRESETS={
   dedollarization:{label:'☢ De-dollarizzazione',shocks:[.55,.25,-.30,.20,-.15,-.10,.45,.35,.20,-.20,-.35,.60]},
   aiBubble:{label:'💥 Scoppio bolla AI',shocks:[.18,-.05,-.08,-.10,-.10,-.10,.12,-.05,-.20,-.60,-.40,-.40]},
   mixCrisis:{label:'🔴 De-doll. + Bolla AI',shocks:[.65,.18,-.35,.08,-.20,-.18,.50,.25,.05,-.65,-.50,.20]},
+  // Gold Hydrogen EM  CleanE Copper Battery Silver Uranium Grid  Quantum PrivEq Bitcoin
+  dreamScenario:{label:'🌟 Il mondo dei sogni',shocks:[.80,.85,  .25,  .90,  .55,  .75,  .70,  .95,  1.10, .65,   .30,  .90]},
   reset:{label:'Reset',shocks:ORIG.map(()=>0)},
 };
+
+const STRESS_DESCRIPTIONS = {
+  '2008': {
+    emoji: '🏦',
+    titolo: 'Crisi finanziaria sistemica — stile Lehman Brothers 2008',
+    accentColor: 'rgba(232,80,74,.3)',
+    bgColor: 'rgba(232,80,74,.05)',
+    condizioni: [
+      'Collasso di una grande banca d\'investimento o istituzione finanziaria sistemica',
+      'Credit crunch globale: mercato interbancario si blocca, nessuno presta a nessuno',
+      'Deleveraging forzato: hedge fund e fondi istituzionali vendono tutto per fare cassa',
+      'Volatilità (VIX) esplode oltre 80 — livelli storici mai visti prima o dopo',
+      'Recessione globale sincronizzata, PIL USA –4%, zona euro –5%',
+    ],
+    perche: [
+      { asset: '🪙 Oro –25%', tipo: 'neg', spieg: 'Controintuitivo: in una crisi di liquidità sistemica tutti vendono tutto per fare cassa. L\'oro scende bruscamente nella fase acuta (ottobre 2008 reale: –20%), poi rimbalza forte quando arriva la risposta delle banche centrali.' },
+      { asset: '⚡ Energia pulita –40/60%', tipo: 'neg', spieg: 'In recessione crolla la domanda industriale di energia. I progetti rinnovabili si bloccano per mancanza di finanziamenti. Il credit crunch colpisce duramente le aziende capital-intensive che dipendono dal debito.' },
+      { asset: '🔵 EM –50%', tipo: 'neg', spieg: 'I mercati emergenti subiscono un doppio shock: crollo delle commodity che esportano + fuga dei capitali verso asset "sicuri" (dollaro, treasuries). In 2008 l\'MSCI EM perse –53%.' },
+      { asset: '⚛ Uranio –70%', tipo: 'neg', spieg: 'In recessione i governi bloccano i piani di investimento in nuove centrali. Il consumo di energia elettrica scende. Il prezzo spot dell\'uranio crolla per mancanza di domanda futura percepita.' },
+      { asset: '🪙 Bitcoin –75%', tipo: 'neg', spieg: 'Asset speculativo puro — in un crash sistemico i retail investor liquidano posizioni rischiose. Bitcoin non era ancora esistente nel 2008, ma la logica applicata è quella del 2022: –72% in 12 mesi.' },
+    ],
+    sintesi: 'Il tuo portafoglio è vulnerabile a questo scenario perché è fortemente tematico e growth-oriented. Non hai protezione in asset difensivi come treasury o MSCI World Quality. L\'oro ti aiuterebbe nel medio termine ma non nell\'immediato.',
+  },
+
+  covid: {
+    emoji: '🦠',
+    titolo: 'Shock pandemico globale — stile Covid marzo 2020',
+    accentColor: 'rgba(212,144,58,.3)',
+    bgColor: 'rgba(212,144,58,.05)',
+    condizioni: [
+      'Lockdown globali improvvisi: PIL mondiale –3.3% in un singolo anno',
+      'Crollo verticale della domanda in 3 settimane (velocità mai vista — S&P –34% in 23 giorni)',
+      'Interruzione catene di approvvigionamento globali, porti bloccati',
+      'Risposta straordinaria: Fed e BCE iniettano liquidità senza precedenti in poche settimane',
+      'Rimbalzo a "V" per i mercati — l\'indice S&P recupera i massimi in soli 5 mesi',
+    ],
+    perche: [
+      { asset: '🟡 Oro +10%', tipo: 'pos', spieg: 'Dopo una breve discesa iniziale (anche l\'oro viene venduto per fare liquidità), rimbalza rapidamente come safe haven. A fine 2020 l\'oro era a +25% YTD — il tuo stress applica solo l\'impatto netto del crash, non il rimbalzo successivo.' },
+      { asset: '⚡ Energia pulita –30/45%', tipo: 'neg', spieg: 'Il lockdown ferma costruzioni e installazioni. I progetti solari ed eolici si bloccano. Le aziende della supply chain subiscono disruptions catastrofiche. Però la crisi accelera anche la svolta green nei recovery package (NGEU in Europa).' },
+      { asset: '⛏ Rame –30%', tipo: 'neg', spieg: 'Le miniere in Cile, Perù e DRC si bloccano per quarantene. La domanda industriale crolla. Nel breve è un disastro, ma il rame fu il primo a recuperare quando ripartì la Cina.' },
+      { asset: '🪙 Bitcoin –55%', tipo: 'neg', spieg: 'Il 12 marzo 2020 Bitcoin perse –50% in 24 ore in un singolo giorno di panico. Fu uno dei crolli più rapidi della storia. Poi recuperò tutto entro l\'anno e andò a nuovi massimi.' },
+    ],
+    sintesi: 'Lo shock Covid è breve e violento — poi la risposta fiscale e monetaria massiccia beneficia fortemente i temi tematici (rinnovabili, tech, commodities). Il tuo portafoglio soffre nel breve ma è strutturalmente tra i più beneficiati dai recovery package post-pandemia.',
+  },
+
+  rateShock: {
+    emoji: '📈',
+    titolo: 'Shock sui tassi d\'interesse — +300 basis point in 12 mesi',
+    accentColor: 'rgba(77,157,224,.3)',
+    bgColor: 'rgba(77,157,224,.05)',
+    condizioni: [
+      'La Fed alza i tassi da 2% a 5% in un anno — accelerazione simile al 2022 reale',
+      'CPI rimane sopra il 5% nonostante i rialzi — stagflazione percepita',
+      'Rendimento 10Y Treasury USA sale al 5.5% — competizione diretta con le azioni',
+      'Dollaro si rafforza del 15% contro euro e valute EM — impatto negativo sui mercati emergenti',
+      'Il mercato immobiliare si blocca. Credito retail molto più costoso.',
+    ],
+    perche: [
+      { asset: '🟡 Oro +5%', tipo: 'pos', spieg: 'L\'oro solitamente soffre con i tassi alti (il costo opportunità di tenere oro vs bonds aumenta). Ma in stagflazione (tassi alti + inflazione persistente) l\'oro tiene perché i tassi reali rimangono bassi o negativi.' },
+      { asset: '⚡ Energia pulita –40%', tipo: 'neg', spieg: 'Le rinnovabili sono capital-intensive: ogni progetto richiede enormi finanziamenti iniziali. Con tassi al 5%+ il costo del capitale si impenna, rendendo non fattibili molti progetti. Il DCF di ogni utility crolla.' },
+      { asset: '🔬 Quantum –35%', tipo: 'neg', spieg: 'Le aziende tech growth con profitti lontani nel tempo (come il quantum computing) sono le più colpite dai rate hike. Il loro valore è quasi interamente nei flussi di cassa futuri, che vengono scontati a tassi più alti.' },
+      { asset: '⛏ Rame –15%', tipo: 'neg', spieg: 'Il dollaro forte colpisce tutte le commodity quotate in USD. I mercati EM (grandi consumatori di rame) subiscono una crisi valutaria. La crescita industriale rallenta globalmente.' },
+      { asset: '⚛ Uranio –10%', tipo: 'neg', spieg: 'Minor impatto: le utility nucleari hanno contratti pluriennali che non dipendono dai tassi a breve. Però le nuove costruzioni diventano più costose da finanziare.' },
+    ],
+    sintesi: 'Il tuo portafoglio è moderatamente esposto ai rate hike per via delle rinnovabili e del quantum computing. L\'oro e l\'uranio fungono da parziale protezione. Il vero rischio è la rivalutazione del dollaro che penalizza i tuoi asset in USD.',
+  },
+
+  commodCrash: {
+    emoji: '⛏',
+    titolo: 'Crollo generalizzato delle commodity — –30% in 6-12 mesi',
+    accentColor: 'rgba(205,127,50,.3)',
+    bgColor: 'rgba(205,127,50,.05)',
+    condizioni: [
+      'Hard landing cinese: il PIL della Cina scende al 2% — shock della domanda globale di materie prime',
+      'Oversupply strutturale: nuove miniere entrano in produzione contemporaneamente (litio, rame, nickel)',
+      'Energia fossile a basso costo torna a competere (shale USA esplode di produzione)',
+      'Dollaro forte penalizza tutte le commodity quotate in USD',
+      'Settore mining e energia: licenziamenti, progetti cancellati, M&A difensivo',
+    ],
+    perche: [
+      { asset: '🟡 Oro –30%', tipo: 'neg', spieg: 'L\'oro è una commodity — in un crollo generalizzato delle materie prime scende con le altre. La correlazione con le commodity industriali non è alta, ma il sentiment negativo trascina tutto.' },
+      { asset: '⛏ Rame –35%', tipo: 'neg', spieg: 'Il rame è il barometro dell\'economia globale. Un hard landing cinese colpisce il rame più di qualsiasi altra commodity — la Cina rappresenta il 55% della domanda globale di rame raffinato.' },
+      { asset: '🥈 Argento –30%', tipo: 'neg', spieg: 'L\'argento ha una doppia natura: metallo prezioso + industriale (elettronica, solare). In un crash commodity perde su entrambi i fronti — meno safe haven dell\'oro, più correlato al ciclo industriale.' },
+      { asset: '⚛ Uranio –40%', tipo: 'neg', spieg: 'Il prezzo spot dell\'uranio è già stato in crash tra il 2012 e il 2020 (da 70$/lb a 18$/lb). Un rallentamento della domanda asiatica di energia potrebbe replicarlo. I minatori sarebbero devastati.' },
+      { asset: '⚡ Rinnovabili e Grid –15/20%', tipo: 'neg', spieg: 'Impatto indiretto: se l\'energia fossile diventa molto economica, i sussidi alle rinnovabili vengono messi in discussione. L\'urgenza della transizione energetica appare meno immediata.' },
+    ],
+    sintesi: 'È lo scenario più diretto contro la tua tesi dei metalli. Il tuo portafoglio è fortemente esposto alle commodity (oro, argento, rame, uranio = oltre 30% del totale). Un hard landing cinese è il rischio principale per questa concentrazione.',
+  },
+
+  cryptoCrash: {
+    emoji: '₿',
+    titolo: 'Crypto winter — Bitcoin –70%, contagio ai correlati',
+    accentColor: 'rgba(247,147,26,.3)',
+    bgColor: 'rgba(247,147,26,.05)',
+    condizioni: [
+      'Evento regolatorio catastrofico: USA o EU vietano le crypto exchange o le classificano come securities',
+      'Collasso di una exchange o stablecoin sistemica (ripetizione FTX o Terra/LUNA)',
+      'Miner capitulation: hash rate crolla, mining non profittevole, vendite forzate',
+      'Sentiment retail devastato: retail investor che avevano BTC come unico investimento liquidano tutto',
+      'Contagio limitato ai mercati tradizionali — non è un evento macro, è specifico del settore',
+    ],
+    perche: [
+      { asset: '₿ Bitcoin –70%', tipo: 'neg', spieg: 'Bitcoin ha già fatto –70% tre volte: 2018, 2020, 2022. Non è uno scenario estremo — è la normalità dei crypto winter. Con 9.890€ investiti, –70% significa perdere circa 6.900€. Il portafoglio complessivo perde circa il 4.2%.' },
+      { asset: '🔬 Quantum –20%', tipo: 'neg', spieg: 'Correlazione tech speculativo: in un crypto crash il sentiment verso tutto il "tech del futuro" si deteriora. Il Quantum Computing subisce un contagio di sentiment, non fondamentale.' },
+      { asset: '🟡 Oro +2%', tipo: 'pos', spieg: 'Un crypto crash non di origine macro beneficia leggermente l\'oro — capitali che escono da Bitcoin cercano alternative come riserva di valore non governativa.' },
+      { asset: '📊 Resto del portafoglio', tipo: 'pos', spieg: 'Il bello di questo scenario: isola quasi completamente il portafoglio. Le rinnovabili, l\'uranio, il grid, il rame non hanno nulla a che fare con le crypto. L\'impatto totale sul tuo portafoglio è contenuto rispetto all\'entità del crollo.' },
+    ],
+    sintesi: 'Con Bitcoin al 6.1% del portafoglio, un –70% su BTC costa circa –4.2% al portafoglio totale. È lo scenario che fa meno paura in assoluto — la diversificazione tematica ti protegge completamente. Il vero rischio è psicologico: vedere un singolo asset perdere 7.000€ in pochi mesi.',
+  },
+
+  goldRally: {
+    emoji: '🟡',
+    titolo: 'Gold rally +40% — corsa ai beni rifugio',
+    accentColor: 'rgba(212,168,67,.3)',
+    bgColor: 'rgba(212,168,67,.05)',
+    condizioni: [
+      'Crisi geopolitica grave ma non recessiva: conflitto Middle East allargato, blocco dello Stretto di Hormuz',
+      'Le banche centrali accelerano gli acquisti di oro (Cina, India, Russia raggiungono nuovi record)',
+      'Il debito USA supera il 130% del PIL — il mercato inizia a prezzare il rischio sovereign USA',
+      'L\'inflazione riparte inaspettatamente dopo un periodo di apparente stabilizzazione',
+      'Accordi bilaterali tra paesi BRICS di non usare il dollaro nelle transazioni petrolifere',
+    ],
+    perche: [
+      { asset: '🟡 Oro +40%', tipo: 'pos', spieg: 'L\'oro va a 4.600–4.800$/oz (da ~3.300 attuale). Con 32.940€ in oro, guadagno diretto di circa 13.000€. È di gran lunga il tuo asset con il peso maggiore — questo scenario beneficia direttamente la tua posizione più grande.' },
+      { asset: '🥈 Argento +35%', tipo: 'pos', spieg: 'L\'argento tende ad amplificare i movimenti dell\'oro (beta >1). In un gold rally di questa entità, l\'argento tipicamente fa +40/60%. La tua posizione è già in perdita (–7.25% dall\'acquisto) — un gold rally potrebbe riportarla in profitto.' },
+      { asset: '⛏ Rame +10%', tipo: 'pos', spieg: 'Il rame beneficia indirettamente: la crisi geopolitica che scatena il gold rally di solito involve interruzioni nelle catene di approvvigionamento di materie prime. Più rifugio safe haven = più domanda su tutti i metalli.' },
+      { asset: '⚡ Rinnovabili +5/10%', tipo: 'pos', spieg: 'Una crisi energetica geopolitica accelera la narrativa dell\'indipendenza energetica attraverso le rinnovabili. Effetto secondario positivo, non diretto.' },
+    ],
+    sintesi: 'Questo è uno degli scenari migliori per il tuo portafoglio data la forte esposizione ai metalli preziosi. Con oro, argento e rame che insieme pesano circa il 30%, un gold rally porta un impatto molto positivo. È sostanzialmente il tuo hedge naturale.',
+  },
+
+  dedollarization: {
+    emoji: '☢',
+    titolo: 'De-dollarizzazione accelerata — dollaro non più riserva unica',
+    accentColor: 'rgba(240,201,110,.3)',
+    bgColor: 'rgba(240,201,110,.05)',
+    condizioni: [
+      'Arabia Saudita, India, Cina annunciano accordi petroliferi non in dollari (petrodollar end)',
+      'I BRICS lanciano una valuta comune o un sistema di settlement alternativo a SWIFT',
+      'Le banche centrali di EM vendono treasury USA e comprano oro a ritmi senza precedenti',
+      'Il dollaro si deprezza del 15-20% contro un basket di valute in 18 mesi',
+      'L\'inflazione USA torna sopra il 5% per via del costo delle importazioni in dollaro svalutato',
+    ],
+    perche: [
+      { asset: '🟡 Oro +55%', tipo: 'pos', spieg: 'È il beneficiario principale della de-dollarizzazione. Se le banche centrali smettono di usare i treasury USA come riserva, devono comprare qualcos\'altro — e l\'oro è l\'unica alternativa liquida e apolitica. WGC stima che ogni 10% di spostamento delle riserve EM verso oro corrisponde a +800$/oz.' },
+      { asset: '🥈 Argento +45%', tipo: 'pos', spieg: 'Stesso meccanismo dell\'oro, amplificato. L\'argento è "oro povero" — segue la narrativa con più leva. In più, la transizione energetica che accompagna questo scenario aumenta la domanda industriale di argento per i pannelli solari.' },
+      { asset: '₿ Bitcoin +60%', tipo: 'pos', spieg: 'Bitcoin è l\'unica alternativa all\'oro come riserva di valore non governativa e non replicabile. La de-dollarizzazione è esattamente la narrative che ha fatto esplodere BTC da 30k a 100k. Aumenti istituzionali di allocazione.' },
+      { asset: '🌿 Hydrogen +25%', tipo: 'pos', spieg: 'Un dollaro debole e energia costosa accelerano la corsa all\'indipendenza energetica europea e asiatica. L\'idrogeno verde, prodotto localmente, diventa strategicamente cruciale.' },
+      { asset: '🔵 EM –30%', tipo: 'neg', spieg: 'Paradossalmente, i mercati emergenti soffrono nella fase acuta: la volatilità del dollaro e il re-pricing del rischio globale colpiscono le loro borse. La de-dollarizzazione è un processo di 10-20 anni, nel breve crea instabilità.' },
+    ],
+    sintesi: 'La de-dollarizzazione è la tesi che più si sposa con la tua struttura di portafoglio. Oro, argento, rame, bitcoin insieme rappresentano oltre il 40% — tutti beneficiari diretti. L\'unica nota negativa è EM (14% del portafoglio) che soffre nel breve.',
+  },
+
+  aiBubble: {
+    emoji: '💥',
+    titolo: 'Scoppio della bolla AI — correzione delle valutazioni tech',
+    accentColor: 'rgba(139,111,255,.3)',
+    bgColor: 'rgba(139,111,255,.05)',
+    condizioni: [
+      'La crescita dei ricavi AI delude le aspettative: i modelli costano più di quanto generino',
+      'Nvidia perde il 40%+ in un trimestre dopo risultati sotto le attese — effetto domino',
+      'I datacenter cancellano ordini di GPU — le aziende cloud rivedono i capex al ribasso',
+      'Il mercato rivaluta tutti i titoli "AI-enabled" con multipli compressi drasticamente',
+      'Recessione dei capex tech: i budget IT delle aziende si contraggono del 20-30%',
+    ],
+    perche: [
+      { asset: '🔬 Quantum –60%', tipo: 'neg', spieg: 'Il quantum computing è ancora più speculativo dell\'AI classica — profitti a 10-15 anni. Se il mercato perde la pazienza con l\'AI applicata, il quantum viene percepito come irrecuperabile nel breve. Rischio di crollo multiplo.' },
+      { asset: '⚡ Grid –20%', tipo: 'neg', spieg: 'Il boom della domanda elettrica per AI era una delle narrative principali del settore. Se i datacenter AI non si costruiscono come previsto, la domanda incrementale di energia diminuisce, riducendo il premium di XEGR.' },
+      { asset: '🏢 Private Equity –40%', tipo: 'neg', spieg: 'I fondi PE hanno fatto scommesse enormi sull\'AI nell\'ultimo ciclo di investimento (2021-2024). Un crash delle valutazioni tech colpisce direttamente i portafogli PE con write-down. Liquidità ridotta.' },
+      { asset: '🟡 Oro +18%', tipo: 'pos', spieg: 'In uno scenario di disillusione tech, i capitali ruotano verso asset tangibili. L\'oro beneficia della fuga dal "tech del futuro" verso il "valore del presente".' },
+      { asset: '🥈 Argento +12%', tipo: 'pos', spieg: 'Stesso meccanismo dell\'oro, più la domanda industriale di argento (pannelli solari, elettronica) che non dipende dall\'AI rimane stabile.' },
+    ],
+    sintesi: 'Il tuo portafoglio è moderatamente resistente a questo scenario perché hai poca esposizione diretta all\'AI core (solo Quantum al 6.4%). Le rinnovabili, i metalli, il nucleare non dipendono dall\'AI per i loro fondamentali. Il danno principale è psicologico — sentiment negativo su tutto il "futuro".',
+  },
+
+  mixCrisis: {
+    emoji: '🔴',
+    titolo: 'De-dollarizzazione + Scoppio bolla AI — scenario misto',
+    accentColor: 'rgba(232,80,74,.3)',
+    bgColor: 'rgba(232,80,74,.05)',
+    condizioni: [
+      'De-dollarizzazione accelerata che destabilizza i mercati globali',
+      'Contemporaneamente: la bolla AI scoppia, Nasdaq –30%+ in 6 mesi',
+      'Stagflazione: inflazione alta (da de-dollarizzazione) + crescita bassa (da crash tech)',
+      'La Fed è bloccata: non può alzare i tassi (colpirebbe il tech) né abbassarli (colpirebbe l\'inflazione)',
+      'Fiducia nelle istituzioni finanziarie tradizionali ai minimi — scenario di sistema sotto stress',
+    ],
+    perche: [
+      { asset: '🟡 Oro +65%', tipo: 'pos', spieg: 'È l\'asset che funziona meglio in stagflazione. Già in un solo scenario faceva +55%, in stagflazione da de-dollarizzazione va oltre. È esattamente il motivo per cui oro fisico in portafoglio ha senso in uno scenario di "crisi del sistema".' },
+      { asset: '🥈 Argento +50%', tipo: 'pos', spieg: 'Stesso motivo dell\'oro, con più leva. Nonostante la componente industriale soffra per la recessione tech, la narrativa del metallo fisico come riserva prevale.' },
+      { asset: '₿ Bitcoin +20%', tipo: 'pos', spieg: 'In questo scenario misto il Bitcoin è conteso: beneficia della de-dollarizzazione (+60%) ma soffre del crash tech/sentiment (–40%). Il risultato netto è positivo moderato — la narrativa "riserva di valore alternativa" vince sul "asset speculativo".' },
+      { asset: '🔬 Quantum –65%', tipo: 'neg', spieg: 'Doppio colpo: tech crash + sentiment negativo + tassi elevati da inflazione. Il quantum computing non ha fondamentali a supporto nel breve — dipende interamente dall\'entusiasmo del mercato.' },
+      { asset: '🔵 EM –35%', tipo: 'neg', spieg: 'I mercati emergenti sono i più vulnerabili in stagflazione globale: fuga dei capitali, dollaro volatile, export in calo, debito in valuta estera più costoso da servire.' },
+    ],
+    sintesi: 'È lo scenario che ritieni più probabile. Il tuo portafoglio regge meglio di quanto sembri: la metà in metalli preziosi e crypto porta guadagni rilevanti, mentre EM e Quantum fanno da freno. Il risultato netto è negativo ma contenuto rispetto alla gravità dello scenario.',
+  },
+
+  dreamScenario: {
+    emoji: '🌟',
+    titolo: 'Il mondo dei sogni — tutti i trend si avverano simultaneamente',
+    accentColor: 'rgba(39,201,154,.3)',
+    bgColor: 'rgba(39,201,154,.05)',
+    condizioni: [
+      'La domanda globale di elettricità cresce del +40% entro il 2030: AI + veicoli elettrici + industria',
+      'Le rinnovabili raggiungono il 60% della generazione globale — un decennio prima delle previsioni',
+      'Mini-nucleare (SMR): 50+ reattori approvati globalmente entro il 2028, Microsoft e Google li finanziano',
+      'De-dollarizzazione: oro e Bitcoin diventano riserve di valore complementari riconosciute istituzionalmente',
+      'Robotica e AI accelerano la produttività del 15-20% — la più grande rivoluzione industriale dal vapore',
+    ],
+    perche: [
+      { asset: '⚡ Grid +110%', tipo: 'pos', spieg: 'XEGR è il grande vincitore: reti elettriche, trasformatori, smart grid, stoccaggio. Ogni watt di nuova energia rinnovabile o nucleare richiede nuova infrastruttura di grid. È il collo di bottiglia fisico della transizione energetica — chi lo risolve vale tutto.' },
+      { asset: '⚛ Uranio +95%', tipo: 'pos', spieg: 'Il mini-nucleare (SMR) richiede uranio altamente arricchito in quantità massicce. Se 50+ reattori vengono costruiti in parallelo, il prezzo spot dell\'uranio esplode per deficit strutturale di offerta. I minatori moltiplicano i profitti.' },
+      { asset: '⚡ Energia pulita +90%', tipo: 'pos', spieg: 'INRG è il playbook diretto del boom rinnovabili. In uno scenario di +40% domanda elettrica soddisfatta al 60% da rinnovabili, tutte le aziende della supply chain (Vestas, First Solar, SolarEdge) vanno a multipli mai visti.' },
+      { asset: '🤖 Quantum +65%', tipo: 'pos', spieg: 'L\'AI che accelera la produttività di –20% richiede potenza computazionale che solo il quantum può fornire nel lungo termine. Il mercato rivaluta tutto il settore con multipli espansi — da speculativo a strategico.' },
+      { asset: '₿ Bitcoin +90%', tipo: 'pos', spieg: 'Il riconoscimento istituzionale di Bitcoin come riserva di valore (già in corso nel 2024-2026) si completa. I treasury aziendali e le banche centrali di alcuni paesi allocano il 2-5% in BTC. Domanda strutturale che non aveva mai avuto prima.' },
+    ],
+    sintesi: 'Il tuo portafoglio è costruito esattamente per questo scenario. Ogni posizione ha un ruolo preciso nella narrativa: Grid cattura l\'infrastruttura, Uranium il nucleare, CleanE e Hydrogen le rinnovabili, Gold/Silver/BTC la de-dollarizzazione, Copper i metalli della transizione. Un portafoglio di sogno per un mondo di sogni.',
+  },
+};
+
+function renderStressDescription(key) {
+  const box = document.getElementById('stress-scenario-box');
+  if (!box) return;
+  if (!key || key === 'reset' || !STRESS_DESCRIPTIONS[key]) {
+    box.style.display = 'none';
+    box.innerHTML = '';
+    return;
+  }
+  const d = STRESS_DESCRIPTIONS[key];
+  const posItems = d.perche.filter(p => p.tipo === 'pos');
+  const negItems = d.perche.filter(p => p.tipo === 'neg');
+
+  box.style.display = 'block';
+  box.innerHTML = `
+    <div style="background:${d.bgColor};border:1px solid ${d.accentColor};border-left:3px solid ${d.accentColor.replace('.3)','.8)')};border-radius:var(--r2);padding:18px 20px;">
+
+      <div style="display:flex;align-items:baseline;gap:10px;margin-bottom:14px;">
+        <span style="font-size:20px;">${d.emoji}</span>
+        <div>
+          <div style="font-size:15px;font-weight:700;color:var(--t1);line-height:1.3;">${d.titolo}</div>
+        </div>
+      </div>
+
+      <div style="margin-bottom:16px;">
+        <div style="font-size:11px;color:var(--t3);font-family:'JetBrains Mono',monospace;letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px;">Condizioni che si verificano</div>
+        <div style="display:flex;flex-direction:column;gap:5px;">
+          ${d.condizioni.map(c => `
+            <div style="display:flex;align-items:flex-start;gap:8px;">
+              <span style="color:var(--t3);margin-top:2px;flex-shrink:0;">›</span>
+              <span style="font-size:13px;color:var(--t2);line-height:1.6;">${c}</span>
+            </div>`).join('')}
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;">
+        ${posItems.length ? `
+        <div>
+          <div style="font-size:11px;color:var(--teal);font-family:'JetBrains Mono',monospace;letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px;">↑ Impatto positivo</div>
+          <div style="display:flex;flex-direction:column;gap:8px;">
+            ${posItems.map(p => `
+              <div style="background:rgba(39,201,154,.06);border-radius:6px;padding:8px 10px;border:1px solid rgba(39,201,154,.12);">
+                <div style="font-size:12px;font-weight:600;color:var(--teal);font-family:'JetBrains Mono',monospace;margin-bottom:3px;">${p.asset}</div>
+                <div style="font-size:12px;color:var(--t2);line-height:1.6;">${p.spieg}</div>
+              </div>`).join('')}
+          </div>
+        </div>` : '<div></div>'}
+        ${negItems.length ? `
+        <div>
+          <div style="font-size:11px;color:var(--red);font-family:'JetBrains Mono',monospace;letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px;">↓ Impatto negativo</div>
+          <div style="display:flex;flex-direction:column;gap:8px;">
+            ${negItems.map(p => `
+              <div style="background:rgba(232,80,74,.06);border-radius:6px;padding:8px 10px;border:1px solid rgba(232,80,74,.12);">
+                <div style="font-size:12px;font-weight:600;color:var(--red);font-family:'JetBrains Mono',monospace;margin-bottom:3px;">${p.asset}</div>
+                <div style="font-size:12px;color:var(--t2);line-height:1.6;">${p.spieg}</div>
+              </div>`).join('')}
+          </div>
+        </div>` : '<div></div>'}
+      </div>
+
+      <div style="background:rgba(255,255,255,.04);border-radius:6px;padding:10px 14px;border-top:1px solid ${d.accentColor};">
+        <span style="font-size:11px;color:var(--t3);font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:.1em;">Il tuo portafoglio in questo scenario → </span>
+        <span style="font-size:13px;color:var(--t1);line-height:1.7;">${d.sintesi}</span>
+      </div>
+
+    </div>`;
+}
 
 function buildStressSliders(){
   const cont=document.getElementById('stress-sliders');cont.innerHTML='';
@@ -2911,6 +3625,7 @@ function applyStressPreset(key){
     if(sl){sl.value=(s*100).toFixed(0);}
     if(sv){sv.textContent=(s>=0?'+':'')+(s*100).toFixed(0)+'%';sv.style.color=s>0?'var(--teal)':s<0?'var(--red)':'var(--t3)';}
   });
+  renderStressDescription(key);
   rStress();
 }
 
