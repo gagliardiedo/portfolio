@@ -414,6 +414,7 @@ tbody tr:hover td{background:rgba(255,255,255,.015);}
       <button class="nt"    id="hbtn-nuclear"   onclick="hFilter('nuclear',this)"   style="color:#d4903a;">☢ Nucleare</button>
       <button class="nt"    id="hbtn-tech"      onclick="hFilter('tech',this)"      style="color:#8b6fff;">💻 Tech</button>
       <button class="nt"    id="hbtn-grid"      onclick="hFilter('grid',this)"      style="color:#4d9de0;">🔌 Grid</button>
+      <button class="nt"    id="hbtn-broad-em"  onclick="hFilter('broad-em',this)"  style="color:#BA7517;">🌍 EM/Broad</button>
     </div>
     <!-- Split layout: barre sx 45% | earnings dx 55% -->
     <div style="display:grid;grid-template-columns:45fr 55fr;gap:16px;align-items:start;">
@@ -427,7 +428,7 @@ tbody tr:hover td{background:rgba(255,255,255,.015);}
       </div>
     </div>
     <div style="margin-top:12px;padding:9px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r2);font-size:11px;color:var(--t3);line-height:1.6;">
-      <strong style="color:var(--t2);">Note:</strong> Stime = top holdings pubbliche ETF × capitale investito. Bloom Energy: overlap ICLN+HYDR. MSCI EM IMI escluso (~2.500 aziende). Soglia ≥ 0.4%. Dati finanziari reali Q1-Q4 2024/2025 + consensus analisti (fonti: SEC filings, stockanalysis.com).
+      <strong style="color:var(--t2);">Note:</strong> Stime = top holdings pubbliche ETF × capitale investito. Bloom Energy: overlap ICLN+HYDR. MSCI EM IMI mostrato come blocco aggregato (~2.500 titoli, impossibile disaggregare). Soglia ≥ 0.4%. Dati finanziari reali Q1-Q4 2024/2025 + consensus analisti.
     </div>
   </div>
 
@@ -5115,9 +5116,10 @@ setTimeout(fetchStorico, 1200);
     {i:0,  cat:'commodity', etf:'Diretto'},
     {i:6,  cat:'commodity', etf:'Diretto'},
     {i:11, cat:'commodity', etf:'Diretto'},
+    {i:2,  cat:'broad-em',  etf:'ETF broad', isAggregate:true},
   ];
 
-  const CAT_COLORS = {commodity:'#d4a843',energy:'#27c99a',mining:'#CD7F32',nuclear:'#d4903a',tech:'#8b6fff',grid:'#4d9de0'};
+  const CAT_COLORS = {commodity:'#d4a843',energy:'#27c99a',mining:'#CD7F32',nuclear:'#d4903a',tech:'#8b6fff',grid:'#4d9de0','broad-em':'#BA7517'};
   const CAT_LABELS = {commodity:'Commodity',energy:'Energia',mining:'Mining',nuclear:'Nucleare',tech:'Tech/Q.',grid:'Grid'};
 
   // Earnings data (last 4 quarters + trend)
@@ -5164,7 +5166,27 @@ setTimeout(fetchStorico, 1200);
     'Oro fisico (ETC)':{ticker:'SGLN',trend:'up',pe:null,rev:null,rev_yoy:33,eps:null,eps_yoy:null,fwd_rev:null,fwd_eps:null,pt:null,rating:null,note:'Gold spot $3.340/oz (giu-26). +33% YoY. Banche centrali: acquisti record 2024-25. De-dollarizzazione BRICS. Fed pivot atteso H2-26. Resistenza $3.200, target analisti medio $3.600.'},
     'Argento fisico (ETC)':{ticker:'SSIL',trend:'up',pe:null,rev:null,rev_yoy:28,eps:null,eps_yoy:null,fwd_rev:null,fwd_eps:null,pt:null,rating:null,note:'Silver spot $33/oz. Doppio driver: industria (solar 15% domanda) + safe haven. Gold/Silver ratio 100x vs media 80x = sottovalutazione relativa. Industrial demand record 2025.'},
     'Bitcoin (ETC)':{ticker:'BTC',trend:'up',pe:null,rev:null,rev_yoy:45,eps:null,eps_yoy:null,fwd_rev:null,fwd_eps:null,pt:null,rating:null,note:'BTC ~$105k (giu-26). Halving apr-24 completato. ETF spot approvati: BlackRock IBIT >$50B AUM. MicroStrategy accumulo. Catalysts: US strategic bitcoin reserve, states adoption.'},
+    'Core MSCI EM IMI':{ticker:'EIMI',trend:'flat',pe:13,rev:null,rev_yoy:15,eps:null,eps_yoy:8,fwd_rev:null,fwd_eps:null,pt:null,rating:'Hold',note:'ETF broad su ~2.500 aziende EM. Impossibile disaggregare le holdings. Composizione: 27% Cina, ~18% India, 15% Taiwan, 12% Corea. P/E aggregato indice MSCI EM ~13x. Rischio principale: escalation geopolitica USA-Cina. India e Indonesia driver di crescita strutturale. +15.5% da acquisto.'},
   };
+  function buildAllEntries(){
+    const tot = totA();
+    const map = {};
+    DIRECT_IDX.forEach(d=>{
+      const a = ORIG[d.i];if(!a)return;
+      const v = caps[d.i]||0;
+      map[a.name]={name:a.name,cat:d.cat,value:v,pct:tot>0?v/tot*100:0,etfs:[d.etf],color:a.color||CAT_COLORS[d.cat]};
+    });
+    ETF_DEF.forEach(etf=>{
+      const etfCap=caps[etf.cap_i]||0;
+      etf.holdings.forEach(h=>{
+        const v=h.pct*etfCap;
+        if(map[h.name]){map[h.name].value+=v;map[h.name].pct=tot>0?map[h.name].value/tot*100:0;if(!map[h.name].etfs.includes(etf.etf))map[h.name].etfs.push(etf.etf);}
+        else{map[h.name]={name:h.name,cat:h.cat,value:v,pct:tot>0?v/tot*100:0,etfs:[etf.etf],color:CAT_COLORS[h.cat]||'#888'};}
+      });
+    });
+    return Object.values(map).filter(e=>e.pct>0).sort((a,b)=>b.value-a.value);
+  }
+
   function buildEntries(){
     const tot = totA();
     const map = {};
@@ -5224,21 +5246,21 @@ setTimeout(fetchStorico, 1200);
       const mx=Math.max(...allRev.filter(v=>v!=null));
       const qLabels=['Q1','Q2','Q3','Q4','LTM','Q2E','Q3E','Q4E','Q1E'];
       revChart=`<div style="margin:10px 0 4px;">
-        <div style="font-size:10px;color:var(--t3);margin-bottom:5px;font-family:'JetBrains Mono',monospace;letter-spacing:.05em;">RICAVI — ACTUAL + STIME ANALISTI (B$)</div>
-        <div style="display:flex;gap:3px;align-items:flex-end;height:52px;">
+        <div style="font-size:12px;color:var(--t3);margin-bottom:5px;font-family:'JetBrains Mono',monospace;letter-spacing:.05em;font-size:12px;">RICAVI — ACTUAL + STIME ANALISTI (B$)</div>
+        <div style="display:flex;gap:3px;align-items:flex-end;height:64px;">
         ${allRev.map((v,i)=>{
           const isFwd=i>=e.rev.length;
           const h=Math.max(Math.round(v/mx*100),5);
           const col=isFwd?'rgba(77,157,224,.55)':'var(--teal)';
           const labelCol=isFwd?'var(--blue)':'var(--t3)';
           return `<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:1px;">
-            <span style="font-size:8px;color:${isFwd?'var(--blue)':'var(--t3)'};font-family:'JetBrains Mono',monospace;line-height:1;">${fmtV(v)}</span>
+            <span style="font-size:11px;color:${isFwd?'var(--blue)':'var(--t3)'};font-family:'JetBrains Mono',monospace;line-height:1;">${fmtV(v)}</span>
             <div style="width:100%;height:${h}%;background:${col};border-radius:2px 2px 0 0;min-height:4px;${isFwd?'border:1px dashed rgba(77,157,224,.4);border-bottom:none;':''}"></div>
-            <span style="font-size:8px;color:${labelCol};">${qLabels[i]||''}</span>
+            <span style="font-size:11px;color:${labelCol};">${qLabels[i]||''}</span>
           </div>`;
         }).join('')}
         </div>
-        <div style="display:flex;gap:10px;margin-top:4px;font-size:9px;color:var(--t3);">
+        <div style="display:flex;gap:10px;margin-top:4px;font-size:11px;color:var(--t3);">
           <span><span style="display:inline-block;width:8px;height:3px;background:var(--teal);border-radius:1px;vertical-align:middle;margin-right:3px;"></span>Actual</span>
           <span><span style="display:inline-block;width:8px;height:3px;background:var(--blue);border-radius:1px;vertical-align:middle;margin-right:3px;opacity:.7;"></span>Consensus E</span>
         </div>
@@ -5252,15 +5274,15 @@ setTimeout(fetchStorico, 1200);
       const absMax=Math.max(...allEps.map(Math.abs).filter(v=>v>0))||1;
       const qLabels=['Q1','Q2','Q3','Q4','LTM','Q2E','Q3E','Q4E','Q1E'];
       epsChart=`<div style="margin:8px 0 4px;">
-        <div style="font-size:10px;color:var(--t3);margin-bottom:5px;font-family:'JetBrains Mono',monospace;letter-spacing:.05em;">EPS — ACTUAL + STIME ANALISTI ($)</div>
-        <div style="display:flex;gap:3px;align-items:flex-end;height:44px;">
+        <div style="font-size:12px;color:var(--t3);margin-bottom:5px;font-family:'JetBrains Mono',monospace;letter-spacing:.05em;font-size:12px;">EPS — ACTUAL + STIME ANALISTI ($)</div>
+        <div style="display:flex;gap:3px;align-items:flex-end;height:56px;">
         ${allEps.map((v,i)=>{
           const isFwd=i>=e.eps.length;
           const h=Math.max(Math.abs(v)/absMax*100,5);
           const col=v>=0?(isFwd?'rgba(77,157,224,.7)':'var(--teal)'):'var(--red)';
           const textCol=v>=0?(isFwd?'var(--blue)':'var(--teal)'):'var(--red)';
           return `<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:1px;">
-            <span style="font-size:8px;color:${textCol};font-family:'JetBrains Mono',monospace;line-height:1;">${v>=0?'+':''}${Math.abs(v)<10?v.toFixed(2):Math.round(v)}</span>
+            <span style="font-size:11px;color:${textCol};font-family:'JetBrains Mono',monospace;line-height:1;">${v>=0?'+':''}${Math.abs(v)<10?v.toFixed(2):Math.round(v)}</span>
             <div style="width:100%;height:${h}%;background:${col};border-radius:2px 2px 0 0;min-height:4px;${isFwd?'opacity:.7;':''}"></div>
           </div>`;
         }).join('')}
@@ -5271,7 +5293,7 @@ setTimeout(fetchStorico, 1200);
     // Rating badge
     const ratingMap={'StrongBuy':'SB','Buy':'BUY','Hold':'HOLD','Sell':'SELL'};
     const ratingCol={'StrongBuy':'var(--teal)','Buy':'var(--teal)','Hold':'var(--amber)','Sell':'var(--red)'};
-    const ratingBadge=e.rating?`<span style="font-size:10px;font-weight:700;color:${ratingCol[e.rating]||'var(--t2)'};background:rgba(39,201,154,.12);border:1px solid ${ratingCol[e.rating]||'var(--border)'};border-radius:4px;padding:1px 6px;">${ratingMap[e.rating]||e.rating}</span>`:'';
+    const ratingBadge=e.rating?`<span style="font-size:12px;font-weight:700;color:${ratingCol[e.rating]||'var(--t2)'};background:rgba(39,201,154,.12);border:1px solid ${ratingCol[e.rating]||'var(--border)'};border-radius:4px;padding:1px 6px;">${ratingMap[e.rating]||e.rating}</span>`:'';
 
     ct.innerHTML=`
       <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px;gap:6px;">
@@ -5286,19 +5308,19 @@ setTimeout(fetchStorico, 1200);
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr${e.pe!=null?' 1fr':''}${e.pt!=null?' 1fr':''};gap:5px;margin-bottom:8px;">
         <div style="background:var(--bg3);border-radius:var(--r);padding:5px 7px;">
-          <div style="font-size:9px;color:var(--t3);font-family:'JetBrains Mono',monospace;">Rev YoY</div>
+          <div style="font-size:11px;color:var(--t3);font-family:'JetBrains Mono',monospace;">Rev YoY</div>
           <div style="font-size:15px;font-weight:600;color:${revYoyCol};">${e.rev_yoy>0?'+':''}${e.rev_yoy}%</div>
         </div>
         <div style="background:var(--bg3);border-radius:var(--r);padding:5px 7px;">
-          <div style="font-size:9px;color:var(--t3);font-family:'JetBrains Mono',monospace;">EPS YoY</div>
+          <div style="font-size:11px;color:var(--t3);font-family:'JetBrains Mono',monospace;">EPS YoY</div>
           <div style="font-size:15px;font-weight:600;color:${epsYoyCol};">${e.eps_yoy!=null?(e.eps_yoy>0?'+':'')+e.eps_yoy+'%':'—'}</div>
         </div>
         ${e.pe!=null?`<div style="background:var(--bg3);border-radius:var(--r);padding:5px 7px;">
-          <div style="font-size:9px;color:var(--t3);font-family:'JetBrains Mono',monospace;">P/E trail.</div>
+          <div style="font-size:11px;color:var(--t3);font-family:'JetBrains Mono',monospace;">P/E trail.</div>
           <div style="font-size:15px;font-weight:600;color:var(--t2);">${e.pe}x</div>
         </div>`:''}
         ${e.pt!=null?`<div style="background:var(--bg3);border-radius:var(--r);padding:5px 7px;">
-          <div style="font-size:9px;color:var(--t3);font-family:'JetBrains Mono',monospace;">PT analisti</div>
+          <div style="font-size:11px;color:var(--t3);font-family:'JetBrains Mono',monospace;">PT analisti</div>
           <div style="font-size:14px;font-weight:600;color:var(--blue);">${typeof e.pt==='number'&&e.pt>1000?Math.round(e.pt/1000)+'K':e.pt}</div>
         </div>`:''}
       </div>
@@ -5314,15 +5336,51 @@ setTimeout(fetchStorico, 1200);
     const panel=document.getElementById('ov-panel-hld');
     if(!panel||panel.style.display==='none')return;
     const all=buildEntries();
+    const allUnfiltered=buildAllEntries(); // all including <0.4%
     const tot=totA();
 
-    // ── HEALTH SCORE ──────────────────────────────────────────
-    const ratingScore={StrongBuy:100,Buy:75,Hold:50,Sell:20};
-    let totalWeight=0,weightedScore=0,nBuy=0,nHold=0,nSell=0;
+    // ── OVERLAP COEFFICIENT ───────────────────────────────────
+    // For each pair of ETFs, find shared companies weighted by min(pct_a, pct_b)*cap
+    // Simple metric: % of total mapped capital that appears in >1 ETF
+    const nameToEtfs={};
+    ETF_DEF.forEach(etf=>{
+      etf.holdings.forEach(h=>{
+        if(!nameToEtfs[h.name])nameToEtfs[h.name]=[];
+        nameToEtfs[h.name].push(etf.etf);
+      });
+    });
+    let overlapCap=0,totalMappedCap=0;
     all.forEach(e=>{
       if(e.cat==='commodity')return;
+      totalMappedCap+=e.value;
+      if(e.etfs.length>1)overlapCap+=e.value;
+    });
+    const overlapCoeff=totalMappedCap>0?((overlapCap/totalMappedCap)*100).toFixed(1):0;
+
+    // ── PE MEDIO PONDERATO ────────────────────────────────────
+    let peWeightSum=0,peWeightTotal=0;
+    all.forEach(e=>{
+      if(e.cat==='commodity')return;
+      const earn=EARNINGS[e.name];
+      if(earn&&earn.pe!=null){peWeightSum+=earn.pe*e.pct;peWeightTotal+=e.pct;}
+    });
+    const peAvg=peWeightTotal>0?(peWeightSum/peWeightTotal).toFixed(1):'—';
+
+    // ── HEALTH SCORE (include commodity trend) ────────────────
+    const ratingScore={StrongBuy:100,Buy:75,Hold:50,Sell:20};
+    let totalWeight=0,weightedScore=0,nBuy=0,nHold=0,nSell=0,nComm=0;
+    all.forEach(e=>{
       const earn=EARNINGS[e.name];if(!earn)return;
       const w=e.pct;
+      if(e.cat==='commodity'||e.cat==='broad-em'){
+        // commodity: score based on trend + rev_yoy direction only
+        const tS=earn.trend==='up'?100:earn.trend==='flat'?60:20;
+        const yS=earn.rev_yoy>0?100:earn.rev_yoy>-10?60:20;
+        weightedScore+=(tS*0.5+yS*0.5)*w;
+        totalWeight+=w;
+        nComm++;
+        return;
+      }
       const rS=ratingScore[earn.rating]||50;
       const tS=earn.trend==='up'?100:earn.trend==='flat'?60:20;
       const eS=earn.eps_yoy==null?60:earn.eps_yoy>0?100:earn.eps_yoy>-20?50:20;
@@ -5336,7 +5394,7 @@ setTimeout(fetchStorico, 1200);
     const hCol=hs>=70?'var(--teal)':hs>=50?'var(--amber)':'var(--red)';
     const hLabel=hs>=75?'Fondamentali solidi':hs>=60?'Fondamentali discreti':hs>=45?'Attenzione':'Deterioramento';
     const hEmoji=hs>=75?'🟢':hs>=60?'🟡':hs>=45?'🟠':'🔴';
-    const hDesc=hs>=75?'Maggioranza BUY con utili in crescita. Portafoglio in buona salute, oscilla ma i fondamentali reggono.':
+    const hDesc=hs>=75?'Maggioranza BUY con utili in crescita. I fondamentali reggono. Puoi tollerare la volatilita quotidiana con fiducia.':
                 hs>=60?'Fondamentali prevalentemente positivi. Qualche area da monitorare ma nessun segnale d\'allarme.':
                 hs>=45?'Segnali misti. Alcune holding mostrano fondamentali in peggioramento. Rivaluta la composizione.':
                 'Fondamentali in deterioramento. Revisione urgente consigliata.';
@@ -5344,39 +5402,53 @@ setTimeout(fetchStorico, 1200);
     const buyPct=Math.round(nBuy/tot2*100);
     const holdPct=Math.round(nHold/tot2*100);
     const sellPct=Math.round(nSell/tot2*100);
+    // commodity breakdown for display
+    const commLines=all.filter(e=>e.cat==='commodity'||e.cat==='broad-em').map(e=>{
+      const earn=EARNINGS[e.name]||{};
+      const tCol=earn.trend==='up'?'var(--teal)':earn.trend==='down'?'var(--red)':'var(--amber)';
+      const icon=earn.trend==='up'?'▲':earn.trend==='down'?'▼':'▶';
+      return `<span style="color:${tCol};font-size:11px;">${icon} ${e.name.replace(' (ETC)','')}: ${earn.rev_yoy!=null?(earn.rev_yoy>0?'+':'')+earn.rev_yoy+'% YoY':'—'}</span>`;
+    }).join('<br>');
+
     const hsEl=document.getElementById('hld-health-score');
     if(hsEl)hsEl.innerHTML=`
       <div style="background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r2);padding:12px 14px;">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
-          <div style="font-size:10px;color:var(--t3);font-family:'JetBrains Mono',monospace;letter-spacing:.08em;text-transform:uppercase;">Salute fondamentale portafoglio</div>
-          <div style="font-size:26px;font-weight:700;color:${hCol};line-height:1;">${hs}<span style="font-size:12px;color:var(--t3);font-weight:400;">/100</span></div>
+          <div style="font-size:12px;color:var(--t3);font-family:'JetBrains Mono',monospace;letter-spacing:.06em;text-transform:uppercase;">Salute fondamentale portafoglio</div>
+          <div style="font-size:28px;font-weight:700;color:${hCol};line-height:1;">${hs}<span style="font-size:13px;color:var(--t3);font-weight:400;">/100</span></div>
         </div>
         <div style="height:10px;background:var(--bg4);border-radius:5px;overflow:hidden;display:flex;margin-bottom:8px;">
           <div style="width:${buyPct}%;background:var(--teal);opacity:.75;transition:width .4s;"></div>
           <div style="width:${holdPct}%;background:var(--amber);opacity:.65;transition:width .4s;"></div>
           <div style="width:${sellPct}%;background:var(--red);opacity:.7;transition:width .4s;"></div>
         </div>
-        <div style="display:flex;gap:12px;margin-bottom:8px;font-size:11px;">
+        <div style="display:flex;gap:12px;margin-bottom:8px;font-size:12px;">
           <span style="color:var(--teal);">▲ BUY/SB <strong>${nBuy}</strong></span>
           <span style="color:var(--amber);">▶ HOLD <strong>${nHold}</strong></span>
           <span style="color:var(--red);">▼ SELL <strong>${nSell}</strong></span>
         </div>
-        <div style="font-size:13px;font-weight:600;color:${hCol};margin-bottom:4px;">${hEmoji} ${hLabel}</div>
-        <div style="font-size:11px;color:var(--t2);line-height:1.55;">${hDesc}</div>
+        <div style="font-size:14px;font-weight:600;color:${hCol};margin-bottom:4px;">${hEmoji} ${hLabel}</div>
+        <div style="font-size:12px;color:var(--t2);line-height:1.6;margin-bottom:8px;">${hDesc}</div>
+        <div style="border-top:1px solid var(--border);padding-top:8px;">
+          <div style="font-size:11px;color:var(--t3);margin-bottom:5px;letter-spacing:.05em;text-transform:uppercase;font-family:'JetBrains Mono',monospace;">Asset fisici (commodity)</div>
+          <div style="line-height:1.8;">${commLines}</div>
+        </div>
       </div>`;
 
-    // KPI
+    // KPI — 5 box: Totale, ≥0.4%, Overlap, Bloom overlap, P/E medio
     const kpiEl=document.getElementById('hld-kpi');
     if(kpiEl){
       const bloom=all.find(e=>e.name==='Bloom Energy');
       const bloomPct=bloom?bloom.pct.toFixed(2)+'%':'—';
       kpiEl.innerHTML=`
         <div class="kpi"><div class="kpi-l">Capitale sim.</div><div class="kpi-v go">€${fE(tot)}</div></div>
-        <div class="kpi"><div class="kpi-l">Holdings ≥0.4%</div><div class="kpi-v" style="color:var(--blue);">${all.length}</div></div>
-        <div class="kpi"><div class="kpi-l">Bloom overlap</div><div class="kpi-v am">${bloomPct}</div></div>
-        <div class="kpi"><div class="kpi-l">Health score</div><div class="kpi-v" style="color:${hCol};">${hs}/100</div></div>`;
-    }
-    const q=((document.getElementById('hld-search')||{}).value||'').toLowerCase();
+        <div class="kpi"><div class="kpi-l">Holdings totali / ≥0.4%</div><div class="kpi-v" style="color:var(--blue);">${allUnfiltered.length}<span style="font-size:12px;color:var(--t3);"> / ${all.length}</span></div></div>
+        <div class="kpi"><div class="kpi-l">Overlap coeff.</div><div class="kpi-v am" title="% del capitale mappato presente in 2+ ETF">${overlapCoeff}%</div><div class="kpi-sub">cap. in 2+ ETF</div></div>
+        <div class="kpi"><div class="kpi-l">Bloom overlap</div><div class="kpi-v am">${bloomPct}</div><div class="kpi-sub">ICLN+HYDR</div></div>
+        <div class="kpi" style="grid-column:span 1"><div class="kpi-l">P/E medio pond.</div><div class="kpi-v" style="color:var(--blue);">${peAvg}x</div><div class="kpi-sub">escl. commodity</div></div>`;
+      // Make grid 5-columns
+      kpiEl.style.gridTemplateColumns='repeat(5,1fr)';
+    }    const q=((document.getElementById('hld-search')||{}).value||'').toLowerCase();
     let data=all;
     if(hCurrentCat!=='all')data=data.filter(e=>e.cat===hCurrentCat);
     if(q.length>1)data=data.filter(e=>e.name.toLowerCase().includes(q));
@@ -5398,6 +5470,8 @@ setTimeout(fetchStorico, 1200);
       const trendIcon=earn?(earn.trend==='up'?'▲':earn.trend==='down'?'▼':'▶'):'';
       const trendCol=earn?(earn.trend==='up'?'var(--teal)':earn.trend==='down'?'var(--red)':'var(--amber)'):'var(--t3)';
       const multiTag=e.etfs.length>1?` <span style="font-size:9px;background:rgba(139,111,255,.18);color:#8b6fff;border-radius:2px;padding:1px 4px;">×${e.etfs.length}</span>`:'';
+      const isAggregate=e.cat==='broad-em';
+      const aggTag=isAggregate?` <span style="font-size:9px;background:rgba(186,117,23,.2);color:#BA7517;border-radius:2px;padding:1px 5px;">~2.500 titoli</span>`:'';
       const isSelected=e.name===prevName;
 
       const row=document.createElement('div');
@@ -5412,16 +5486,15 @@ setTimeout(fetchStorico, 1200);
         showEarnings(e.name);
       };
 
-      // Exact same structure as sidebar .hi bar:
-      // position:relative, height:32px, bg4 track, colored fill, text overlay
       row.innerHTML=`
-        <div style="position:relative;height:32px;border-radius:6px;overflow:hidden;">
+        <div style="position:relative;height:32px;border-radius:6px;overflow:hidden;${isAggregate?'border:1px dashed '+col+';':''}" >
           <div style="position:absolute;inset:0;background:var(--bg4);border-radius:6px;"></div>
-          <div style="position:absolute;top:0;left:0;width:${barW}%;height:100%;background:${col};opacity:.35;border-radius:6px;transition:width .25s ease;"></div>
+          <div style="position:absolute;top:0;left:0;width:${barW}%;height:100%;background:${col};opacity:${isAggregate?.2:.35};border-radius:6px;transition:width .25s ease;"></div>
           <div style="position:absolute;inset:0;display:flex;align-items:center;padding:0 10px;gap:6px;pointer-events:none;">
             <span style="font-size:10px;font-weight:700;color:${col};font-family:'JetBrains Mono',monospace;white-space:nowrap;min-width:20px;">${i+1}.</span>
-            <span style="font-size:11px;font-weight:600;color:var(--t1);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${e.name}${multiTag}</span>
+            <span style="font-size:11px;font-weight:600;color:var(--t1);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${e.name}${multiTag}${aggTag}</span>
             <span style="font-size:11px;color:${trendCol};font-family:'JetBrains Mono',monospace;min-width:10px;">${trendIcon}</span>
+            ${earn&&earn.pe!=null?`<span style="font-size:10px;color:var(--t3);font-family:'JetBrains Mono',monospace;white-space:nowrap;margin-right:2px;">${earn.pe}x</span>`:''}
             <span style="font-size:11px;font-weight:700;color:${col};font-family:'JetBrains Mono',monospace;white-space:nowrap;">${e.pct.toFixed(2)}%</span>
           </div>
         </div>`;
