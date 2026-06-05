@@ -5209,6 +5209,40 @@ setTimeout(fetchStorico, 1200);
         }
       });
     });
+
+    // ── FALLBACK AGGREGATO ────────────────────────────────────
+    // Se un ETF ha capitale > 0 ma nessuna holding supera 0.4%,
+    // aggiungilo come blocco aggregato (come EM IMI).
+    ETF_DEF.forEach(etf=>{
+      const etfCap = caps[etf.cap_i]||0;
+      if(etfCap<=0) return;
+      const etfPct = tot>0 ? etfCap/tot*100 : 0;
+      if(etfPct<0.4) return; // ETF stesso troppo piccolo
+      // Controlla se almeno una holding di questo ETF è visibile (≥0.4%)
+      const hasVisible = etf.holdings.some(h=>{
+        const entry = map[h.name];
+        return entry && entry.pct>=0.4;
+      });
+      if(!hasVisible){
+        // Trova il colore del tema dall'ETF
+        const firstCat = etf.holdings[0]&&etf.holdings[0].cat||'equity-theme';
+        const col = CAT_COLORS[firstCat]||'#888';
+        const aggName = etf.etf + ' (aggregato)';
+        if(!map[aggName]){
+          map[aggName]={
+            name:aggName,
+            cat:firstCat,
+            value:etfCap,
+            pct:etfPct,
+            etfs:[etf.etf],
+            color:col,
+            isAggregate:true,
+            aggLabel:`~${etf.holdings.length} holdings`
+          };
+        }
+      }
+    });
+
     return Object.values(map).filter(e=>e.pct>=0.4).sort((a,b)=>b.value-a.value);
   }
 
@@ -5223,9 +5257,40 @@ setTimeout(fetchStorico, 1200);
   window.hFilter=hFilter;
 
   function showEarnings(name){
-    const e=EARNINGS[name];
     const ph=document.getElementById('hld-earnings-placeholder');
     const ct=document.getElementById('hld-earnings-content');
+
+    // ── Blocco aggregato (nome finisce con " (aggregato)") ────
+    if(name.endsWith(' (aggregato)')){
+      const etfName=name.replace(' (aggregato)','');
+      const etfDef=ETF_DEF.find(e=>e.etf===etfName);
+      const col=etfDef&&etfDef.holdings[0]?CAT_COLORS[etfDef.holdings[0].cat]||'#888':'#888';
+      if(ph)ph.style.display='none';if(ct)ct.style.display='block';
+      const rows=etfDef?etfDef.holdings.map((h,i)=>{
+        const earn=EARNINGS[h.name];
+        const tCol=earn?(earn.trend==='up'?'var(--teal)':earn.trend==='down'?'var(--red)':'var(--amber)'):'var(--t3)';
+        const ti=earn?(earn.trend==='up'?'▲':earn.trend==='down'?'▼':'▶'):'';
+        const pe=earn&&earn.pe!=null?`<span style="font-size:10px;color:var(--t3);margin-left:4px;">${earn.pe}x</span>`:'';
+        return `<div style="display:flex;align-items:center;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border);font-size:12px;">
+          <span style="color:var(--t3);min-width:18px;font-size:10px;">${i+1}.</span>
+          <span style="flex:1;color:var(--t1);">${h.name}${pe}</span>
+          <span style="color:${tCol};margin-left:6px;">${ti} ${(h.pct*100).toFixed(1)}%</span>
+        </div>`;
+      }).join(''):'';
+      ct.innerHTML=`
+        <div style="margin-bottom:10px;">
+          <div style="font-size:13px;font-weight:600;color:var(--t1);">${etfName}</div>
+          <div style="font-size:11px;color:var(--t3);font-family:'JetBrains Mono',monospace;margin-top:2px;">Aggregato — nessuna holding supera 0.4% individualmente</div>
+        </div>
+        <div style="font-size:11px;color:var(--t3);margin-bottom:8px;padding:7px 9px;background:var(--bg3);border-radius:var(--r);border-left:2px solid ${col};">
+          Con l'allocazione corrente le singole aziende sono troppo piccole per superare la soglia 0.4%. Aumenta il capitale in questo ETF per vederle disaggregate.
+        </div>
+        <div style="font-size:11px;color:var(--t3);margin-bottom:6px;letter-spacing:.05em;text-transform:uppercase;font-family:'JetBrains Mono',monospace;">Top holdings dell'ETF</div>
+        ${rows}`;
+      return;
+    }
+
+    const e=EARNINGS[name];
     if(!e){
       if(ph)ph.style.display='block';if(ct)ct.style.display='none';
       if(ph)ph.textContent='Nessun dato disponibile per '+name;
@@ -5470,8 +5535,9 @@ setTimeout(fetchStorico, 1200);
       const trendIcon=earn?(earn.trend==='up'?'▲':earn.trend==='down'?'▼':'▶'):'';
       const trendCol=earn?(earn.trend==='up'?'var(--teal)':earn.trend==='down'?'var(--red)':'var(--amber)'):'var(--t3)';
       const multiTag=e.etfs.length>1?` <span style="font-size:9px;background:rgba(139,111,255,.18);color:#8b6fff;border-radius:2px;padding:1px 4px;">×${e.etfs.length}</span>`:'';
-      const isAggregate=e.cat==='broad-em';
-      const aggTag=isAggregate?` <span style="font-size:9px;background:rgba(186,117,23,.2);color:#BA7517;border-radius:2px;padding:1px 5px;">~2.500 titoli</span>`:'';
+      const isAggregate=e.isAggregate||e.cat==='broad-em';
+      const aggLabel=e.aggLabel||(e.cat==='broad-em'?'~2.500 titoli':null);
+      const aggTag=isAggregate&&aggLabel?` <span style="font-size:9px;background:rgba(186,117,23,.2);color:${col};border-radius:2px;padding:1px 5px;opacity:.9;">${aggLabel}</span>`:'';
       const isSelected=e.name===prevName;
 
       const row=document.createElement('div');
