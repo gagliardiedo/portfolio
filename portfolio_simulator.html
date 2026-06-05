@@ -305,7 +305,6 @@ tbody tr:hover td{background:rgba(255,255,255,.015);}
   <button class="nt" onclick="showPane('bench',this)">📊 Benchmark</button>
   <button class="nt" onclick="showPane('autopsy',this)">🔥 Autopsy</button>
   <button class="nt" onclick="showPane('signals',this)" style="color:#27c99a;">🌟 Segnalazioni</button>
-  <button class="nt" onclick="showPane('holdings',this)" style="color:#4d9de0;">🔬 Holdings</button>
 </div>
 <div style="flex:1;overflow:hidden;position:relative;min-height:0;">
 
@@ -319,6 +318,7 @@ tbody tr:hover td{background:rgba(255,255,255,.015);}
     <button class="nt on" id="ovt-overview" onclick="setOvTab('ov-panel-overview',this)">📊 Panoramica</button>
     <button class="nt"    id="ovt-vol"      onclick="setOvTab('ov-panel-vol',this)">〰 Volatilità</button>
     <button class="nt"    id="ovt-geo"      onclick="setOvTab('ov-panel-geo',this)">🌍 Geo / Settore</button>
+    <button class="nt"    id="ovt-hld"      onclick="setOvTab('ov-panel-hld',this)" style="color:#4d9de0;">🔬 Holdings</button>
   </div>
 
   <!-- PANEL: PANORAMICA -->
@@ -388,6 +388,46 @@ tbody tr:hover td{background:rgba(255,255,255,.015);}
           <div id="sec-bars"></div>
         </div>
       </div>
+    </div>
+  </div>
+
+  <!-- PANEL: HOLDINGS -->
+  <div id="ov-panel-hld" style="display:none;">
+    <!-- content injected by hRender() — same as standalone pane but embedded here -->
+    <div style="display:flex;align-items:baseline;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:12px;">
+      <div>
+        <span style="font-size:14px;font-weight:600;color:var(--t1);">🔬 Holdings disaggregate</span>
+        <span style="font-size:11px;color:var(--t3);margin-left:10px;">Live · aggiornato dalla sidebar · soglia ≥ 0.4%</span>
+      </div>
+      <div style="display:flex;gap:6px;align-items:center;">
+        <input type="text" id="hld-search" placeholder="🔍 cerca…" oninput="hRender()" style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);font-size:12px;font-family:'JetBrains Mono',monospace;color:var(--t2);padding:4px 8px;outline:none;width:130px;">
+      </div>
+    </div>
+    <!-- KPI strip -->
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px;" id="hld-kpi"></div>
+    <!-- Filtri -->
+    <div style="display:flex;gap:5px;flex-wrap:wrap;align-items:center;margin-bottom:12px;">
+      <button class="nt on" id="hbtn-all"      onclick="hFilter('all',this)">Tutto</button>
+      <button class="nt"    id="hbtn-commodity" onclick="hFilter('commodity',this)" style="color:#d4a843;">Commodity</button>
+      <button class="nt"    id="hbtn-energy"    onclick="hFilter('energy',this)"    style="color:#27c99a;">⚡ Energia</button>
+      <button class="nt"    id="hbtn-mining"    onclick="hFilter('mining',this)"    style="color:#CD7F32;">⛏ Mining</button>
+      <button class="nt"    id="hbtn-nuclear"   onclick="hFilter('nuclear',this)"   style="color:#d4903a;">☢ Nucleare</button>
+      <button class="nt"    id="hbtn-tech"      onclick="hFilter('tech',this)"      style="color:#8b6fff;">💻 Tech</button>
+      <button class="nt"    id="hbtn-grid"      onclick="hFilter('grid',this)"      style="color:#4d9de0;">🔌 Grid</button>
+    </div>
+    <!-- Split layout: barre sx 45% | earnings dx 55% -->
+    <div style="display:grid;grid-template-columns:45fr 55fr;gap:16px;align-items:start;">
+      <div id="hld-bars" style="display:flex;flex-direction:column;gap:4px;"></div>
+      <div id="hld-earnings-panel" style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:14px;position:sticky;top:0;">
+        <!-- Health score + earnings detail -->
+        <div id="hld-health-score" style="margin-bottom:12px;"></div>
+        <div style="font-size:11px;color:var(--t3);font-family:'JetBrains Mono',monospace;letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px;border-top:1px solid var(--border);padding-top:10px;">Dati azienda</div>
+        <div id="hld-earnings-placeholder" style="font-size:12px;color:var(--t3);padding:20px 0;text-align:center;">← clicca su un asset per i dati finanziari</div>
+        <div id="hld-earnings-content" style="display:none;"></div>
+      </div>
+    </div>
+    <div style="margin-top:12px;padding:9px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r2);font-size:11px;color:var(--t3);line-height:1.6;">
+      <strong style="color:var(--t2);">Note:</strong> Stime = top holdings pubbliche ETF × capitale investito. Bloom Energy: overlap ICLN+HYDR. MSCI EM IMI escluso (~2.500 aziende). Soglia ≥ 0.4%. Dati finanziari reali Q1-Q4 2024/2025 + consensus analisti (fonti: SEC filings, stockanalysis.com).
     </div>
   </div>
 
@@ -1820,54 +1860,6 @@ tbody tr:hover td{background:rgba(255,255,255,.015);}
 
 </div><!-- /pane-signals -->
 
-<!-- HOLDINGS DISAGGREGATE -->
-<div class="pane" id="pane-holdings" style="display:none;overflow-y:auto;padding:14px 18px;">
-
-<div style="display:flex;align-items:baseline;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:12px;">
-  <div>
-    <span style="font-size:15px;font-weight:600;color:var(--t1);">🔬 Holdings disaggregate</span>
-    <span style="font-size:11px;color:var(--t3);margin-left:10px;">Live · aggiornato dalla sidebar · soglia ≥ 0.4%</span>
-  </div>
-  <div style="display:flex;gap:6px;align-items:center;">
-    <input type="text" id="hld-search" placeholder="🔍 cerca…" oninput="hRender()" style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);font-size:12px;font-family:'JetBrains Mono',monospace;color:var(--t2);padding:4px 8px;outline:none;width:130px;">
-  </div>
-</div>
-
-<!-- KPI strip -->
-<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px;" id="hld-kpi"></div>
-
-<!-- Filtri -->
-<div style="display:flex;gap:5px;flex-wrap:wrap;align-items:center;margin-bottom:12px;">
-  <button class="nt on" id="hbtn-all"      onclick="hFilter('all',this)">Tutto</button>
-  <button class="nt"    id="hbtn-commodity" onclick="hFilter('commodity',this)" style="color:#d4a843;">Commodity</button>
-  <button class="nt"    id="hbtn-energy"    onclick="hFilter('energy',this)"    style="color:#27c99a;">⚡ Energia</button>
-  <button class="nt"    id="hbtn-mining"    onclick="hFilter('mining',this)"    style="color:#CD7F32;">⛏ Mining</button>
-  <button class="nt"    id="hbtn-nuclear"   onclick="hFilter('nuclear',this)"   style="color:#d4903a;">☢ Nucleare</button>
-  <button class="nt"    id="hbtn-tech"      onclick="hFilter('tech',this)"      style="color:#8b6fff;">💻 Tech</button>
-  <button class="nt"    id="hbtn-grid"      onclick="hFilter('grid',this)"      style="color:#4d9de0;">🔌 Grid</button>
-</div>
-
-<!-- Split layout: barre sx | earnings dx -->
-<div style="display:grid;grid-template-columns:1fr 340px;gap:14px;align-items:start;">
-
-  <!-- COLONNA SX: lista barre -->
-  <div id="hld-bars" style="display:flex;flex-direction:column;gap:4px;"></div>
-
-  <!-- COLONNA DX: pannello earnings -->
-  <div id="hld-earnings-panel" style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:12px;position:sticky;top:0;">
-    <div style="font-size:11px;color:var(--t3);font-family:'JetBrains Mono',monospace;letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px;">Dati finanziari</div>
-    <div id="hld-earnings-placeholder" style="font-size:12px;color:var(--t3);padding:20px 0;text-align:center;">← clicca su un'azienda</div>
-    <div id="hld-earnings-content" style="display:none;"></div>
-  </div>
-
-</div>
-
-<div style="margin-top:12px;padding:9px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r2);font-size:11px;color:var(--t3);line-height:1.6;">
-  <strong style="color:var(--t2);">Note:</strong> Stime = top holdings pubbliche ETF × capitale investito. Bloom Energy: overlap ICLN+HYDR. MSCI EM IMI escluso (~2.500 aziende). Soglia visualizzazione: ≥ 0.4% portafoglio. Dati finanziari reali Q1-Q4 2024/2025 + consensus analisti (fonti: SEC filings, stockanalysis.com).
-</div>
-
-</div><!-- /pane-holdings -->
-
 
 </div><!-- flex overflow hidden wrapper -->
 </main>
@@ -2835,7 +2827,6 @@ function showPane(id,btn){
   const pane=document.getElementById('pane-'+id);
   if(pane){pane.classList.add('on');pane.style.display='block';}
   if(id==='autopsy'){initApTrades();return;}
-  if(id==='holdings'){setTimeout(()=>{hRender();},80);return;}
   if(id==='live'){renderLivePane(liveData,null);renderStorico();return;}
   if(id==='scenario'){setTimeout(()=>{renderScenario();renderConsTable();rMacroCharts();renderPersonalScores();},80);return;}
   refresh();
@@ -2849,7 +2840,7 @@ function refresh(){
   if(curPane==='history')rHistory();
 }
 function setOvTab(panelId, btn){
-  ['ov-panel-overview','ov-panel-vol','ov-panel-geo'].forEach(id=>{
+  ['ov-panel-overview','ov-panel-vol','ov-panel-geo','ov-panel-hld'].forEach(id=>{
     const el=document.getElementById(id);
     if(el) el.style.display = id===panelId ? 'block' : 'none';
   });
@@ -2857,6 +2848,7 @@ function setOvTab(panelId, btn){
   btn.classList.add('on');
   if(panelId==='ov-panel-vol') rVol();
   if(panelId==='ov-panel-geo') setTimeout(()=>{rGeo();},50);
+  if(panelId==='ov-panel-hld') setTimeout(()=>{hRender();},50);
 }
 function setSigTab(panelId, btn){
   ['sig-panel-energy','sig-panel-metals','sig-panel-nuclear','sig-panel-robotics','sig-panel-watch'].forEach(id=>{
@@ -5319,24 +5311,71 @@ setTimeout(fetchStorico, 1200);
   window.showEarnings=showEarnings;
 
   function hRender(){
-    if(curPane!=='holdings')return;
+    const panel=document.getElementById('ov-panel-hld');
+    if(!panel||panel.style.display==='none')return;
     const all=buildEntries();
     const tot=totA();
+
+    // ── HEALTH SCORE ──────────────────────────────────────────
+    const ratingScore={StrongBuy:100,Buy:75,Hold:50,Sell:20};
+    let totalWeight=0,weightedScore=0,nBuy=0,nHold=0,nSell=0;
+    all.forEach(e=>{
+      if(e.cat==='commodity')return;
+      const earn=EARNINGS[e.name];if(!earn)return;
+      const w=e.pct;
+      const rS=ratingScore[earn.rating]||50;
+      const tS=earn.trend==='up'?100:earn.trend==='flat'?60:20;
+      const eS=earn.eps_yoy==null?60:earn.eps_yoy>0?100:earn.eps_yoy>-20?50:20;
+      weightedScore+=(rS*0.40+tS*0.35+eS*0.25)*w;
+      totalWeight+=w;
+      if(earn.rating==='StrongBuy'||earn.rating==='Buy')nBuy++;
+      else if(earn.rating==='Hold')nHold++;
+      else nSell++;
+    });
+    const hs=totalWeight>0?Math.round(weightedScore/totalWeight):50;
+    const hCol=hs>=70?'var(--teal)':hs>=50?'var(--amber)':'var(--red)';
+    const hLabel=hs>=75?'Fondamentali solidi':hs>=60?'Fondamentali discreti':hs>=45?'Attenzione':'Deterioramento';
+    const hEmoji=hs>=75?'🟢':hs>=60?'🟡':hs>=45?'🟠':'🔴';
+    const hDesc=hs>=75?'Maggioranza BUY con utili in crescita. Portafoglio in buona salute, oscilla ma i fondamentali reggono.':
+                hs>=60?'Fondamentali prevalentemente positivi. Qualche area da monitorare ma nessun segnale d\'allarme.':
+                hs>=45?'Segnali misti. Alcune holding mostrano fondamentali in peggioramento. Rivaluta la composizione.':
+                'Fondamentali in deterioramento. Revisione urgente consigliata.';
+    const tot2=nBuy+nHold+nSell||1;
+    const buyPct=Math.round(nBuy/tot2*100);
+    const holdPct=Math.round(nHold/tot2*100);
+    const sellPct=Math.round(nSell/tot2*100);
+    const hsEl=document.getElementById('hld-health-score');
+    if(hsEl)hsEl.innerHTML=`
+      <div style="background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r2);padding:12px 14px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+          <div style="font-size:10px;color:var(--t3);font-family:'JetBrains Mono',monospace;letter-spacing:.08em;text-transform:uppercase;">Salute fondamentale portafoglio</div>
+          <div style="font-size:26px;font-weight:700;color:${hCol};line-height:1;">${hs}<span style="font-size:12px;color:var(--t3);font-weight:400;">/100</span></div>
+        </div>
+        <div style="height:10px;background:var(--bg4);border-radius:5px;overflow:hidden;display:flex;margin-bottom:8px;">
+          <div style="width:${buyPct}%;background:var(--teal);opacity:.75;transition:width .4s;"></div>
+          <div style="width:${holdPct}%;background:var(--amber);opacity:.65;transition:width .4s;"></div>
+          <div style="width:${sellPct}%;background:var(--red);opacity:.7;transition:width .4s;"></div>
+        </div>
+        <div style="display:flex;gap:12px;margin-bottom:8px;font-size:11px;">
+          <span style="color:var(--teal);">▲ BUY/SB <strong>${nBuy}</strong></span>
+          <span style="color:var(--amber);">▶ HOLD <strong>${nHold}</strong></span>
+          <span style="color:var(--red);">▼ SELL <strong>${nSell}</strong></span>
+        </div>
+        <div style="font-size:13px;font-weight:600;color:${hCol};margin-bottom:4px;">${hEmoji} ${hLabel}</div>
+        <div style="font-size:11px;color:var(--t2);line-height:1.55;">${hDesc}</div>
+      </div>`;
 
     // KPI
     const kpiEl=document.getElementById('hld-kpi');
     if(kpiEl){
-      const nCo=all.filter(e=>e.cat!=='commodity').length;
       const bloom=all.find(e=>e.name==='Bloom Energy');
       const bloomPct=bloom?bloom.pct.toFixed(2)+'%':'—';
-      const nUp=Object.values(EARNINGS).filter(e=>e.trend==='up').length;
       kpiEl.innerHTML=`
         <div class="kpi"><div class="kpi-l">Capitale sim.</div><div class="kpi-v go">€${fE(tot)}</div></div>
-        <div class="kpi"><div class="kpi-l">Holdings ≥0.5%</div><div class="kpi-v" style="color:var(--blue);">${all.length}</div></div>
+        <div class="kpi"><div class="kpi-l">Holdings ≥0.4%</div><div class="kpi-v" style="color:var(--blue);">${all.length}</div></div>
         <div class="kpi"><div class="kpi-l">Bloom overlap</div><div class="kpi-v am">${bloomPct}</div></div>
-        <div class="kpi"><div class="kpi-l">Trend ↑</div><div class="kpi-v up">${nUp} / ${Object.keys(EARNINGS).length}</div></div>`;
+        <div class="kpi"><div class="kpi-l">Health score</div><div class="kpi-v" style="color:${hCol};">${hs}/100</div></div>`;
     }
-
     const q=((document.getElementById('hld-search')||{}).value||'').toLowerCase();
     let data=all;
     if(hCurrentCat!=='all')data=data.filter(e=>e.cat===hCurrentCat);
@@ -5404,10 +5443,13 @@ setTimeout(fetchStorico, 1200);
   if(!window._hldHooked){
     window._hldHooked=true;
     const _origRefresh=window.refresh;
-    window.refresh=function(){_origRefresh&&_origRefresh();if(curPane==='holdings')hRender();};
+    window.refresh=function(){_origRefresh&&_origRefresh();const p=document.getElementById('ov-panel-hld');if(p&&p.style.display!=='none')hRender();};
     document.addEventListener('input',function(ev){
       const id=ev.target&&ev.target.id||'';
-      if((id.startsWith('ci-')||id.startsWith('pi-')||id.startsWith('sl-'))&&curPane==='holdings')setTimeout(hRender,30);
+      if(id.startsWith('ci-')||id.startsWith('pi-')||id.startsWith('sl-')){
+        const p=document.getElementById('ov-panel-hld');
+        if(p&&p.style.display!=='none')setTimeout(hRender,30);
+      }
     });
   }
 })();
