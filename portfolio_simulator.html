@@ -300,12 +300,11 @@ tbody tr:hover td{background:rgba(255,255,255,.015);}
 
 <div class="nav">
   <button class="nt on"  onclick="showPane('overview',this)">Panoramica</button>
-  <button class="nt" onclick="showPane('scenario',this)">Scenario 2026</button>
+  <button class="nt" onclick="showPane('scenario',this)">📈 Previsioni</button>
   <button class="nt" onclick="showPane('stress',this)">🔥 Stress Test</button>
   <button class="nt" onclick="showPane('bench',this)">📊 Benchmark</button>
   <button class="nt" onclick="showPane('autopsy',this)">🔥 Autopsy</button>
   <button class="nt" onclick="showPane('signals',this)" style="color:#27c99a;">🌟 Segnalazioni</button>
-  <button class="nt" onclick="showPane('montecarlo',this)" style="color:#8b6fff;">🎲 Monte Carlo</button>
 </div>
 <div style="flex:1;overflow:hidden;position:relative;min-height:0;">
 
@@ -438,6 +437,15 @@ tbody tr:hover td{background:rgba(255,255,255,.015);}
 <!-- RETURNS -->
 <!-- SCENARIO -->
 <div class="pane" id="pane-scenario">
+
+  <!-- SUB-TAB NAV -->
+  <div style="display:flex;gap:5px;margin-bottom:14px;border-bottom:1px solid var(--border);padding-bottom:10px;">
+    <button class="nt on" id="prevt-scenario" onclick="setPrevTab('prev-panel-scenario',this)">📊 Scenario 2026</button>
+    <button class="nt"    id="prevt-mc"       onclick="setPrevTab('prev-panel-mc',this)" style="color:#8b6fff;">🎲 Monte Carlo</button>
+  </div>
+
+  <!-- PANEL: SCENARIO 2026 -->
+  <div id="prev-panel-scenario">
 
   <!-- HEADER -->
   <div style="margin-bottom:16px;">
@@ -969,6 +977,154 @@ tbody tr:hover td{background:rgba(255,255,255,.015);}
 
 
 </div>
+</div><!-- /prev-panel-scenario -->
+
+  <!-- PANEL: MONTE CARLO -->
+  <div id="prev-panel-mc" style="display:none;">
+
+  <!-- BOX PRINCIPALE: header + controlli + proiezioni, tutto unificato -->
+  <div class="card" style="margin-bottom:14px;border-color:rgba(139,111,255,.3);border-left:3px solid #8b6fff;">
+
+    <!-- HEADER con bottone Esegui in alto a destra -->
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;">
+      <div>
+        <p class="sec" style="margin-bottom:3px;color:#8b6fff;">🎲 Simulazione Monte Carlo — distribuzione dei percorsi futuri</p>
+        <p style="font-size:12px;color:var(--t3);font-family:'JetBrains Mono',monospace;">200 percorsi GBM su volatilità e correlazioni reali. Storia passata + ventaglio futuro.</p>
+      </div>
+      <button onclick="runMC()" style="flex-shrink:0;margin-left:16px;background:rgba(139,111,255,.2);border:1px solid rgba(139,111,255,.6);color:#8b6fff;font-family:'JetBrains Mono',monospace;font-size:13px;padding:8px 20px;border-radius:6px;cursor:pointer;font-weight:700;white-space:nowrap;">▶ Esegui</button>
+    </div>
+
+    <!-- CONTROLLI con stile barre slider coerente -->
+    <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px;">
+
+      <!-- Orizzonte anni — stile barra viola come MODEL_WEIGHTS -->
+      <div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+          <span style="font-size:11px;color:var(--purple);font-family:'JetBrains Mono',monospace;font-weight:600;text-transform:uppercase;letter-spacing:.06em;">Orizzonte simulazione</span>
+          <span style="font-size:12px;font-weight:700;color:var(--purple);font-family:'JetBrains Mono',monospace;" id="mc-years-lbl2">10 anni</span>
+        </div>
+        <div style="position:relative;height:34px;">
+          <div style="position:absolute;inset:0;background:var(--bg4);border-radius:8px;overflow:hidden;">
+            <div id="wb-mc-years" style="width:67%;height:100%;background:#8b6fff;opacity:.25;border-radius:8px;transition:width .12s;"></div>
+          </div>
+          <div style="position:absolute;inset:0;display:flex;align-items:center;padding:0 12px;pointer-events:none;">
+            <span style="font-size:13px;font-weight:700;color:#8b6fff;font-family:'JetBrains Mono',monospace;margin-right:8px;">📅</span>
+            <span style="font-size:12px;color:var(--t2);flex:1;">Anni da oggi al termine del ventaglio</span>
+            <span style="font-size:13px;font-weight:700;color:#8b6fff;font-family:'JetBrains Mono',monospace;" id="mc-years-val">10</span>
+          </div>
+          <input type="range" id="mc-years" min="1" max="15" value="10"
+            oninput="document.getElementById('mc-years-val').textContent=this.value;document.getElementById('mc-years-lbl2').textContent=this.value+' anni';document.getElementById('wb-mc-years').style.width=Math.round(this.value/15*100)+'%'"
+            style="position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;margin:0;">
+        </div>
+      </div>
+
+      <!-- Versamento annuo — stile input teal -->
+      <div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+          <span style="font-size:11px;color:var(--teal);font-family:'JetBrains Mono',monospace;font-weight:600;text-transform:uppercase;letter-spacing:.06em;">Versamento annuo</span>
+          <span style="font-size:11px;color:var(--t3);" id="proj-cap-lbl"></span>
+        </div>
+        <div style="position:relative;height:34px;">
+          <div style="position:absolute;inset:0;background:var(--bg4);border-radius:8px;overflow:hidden;">
+            <div style="width:100%;height:100%;background:var(--teal);opacity:.08;border-radius:8px;"></div>
+          </div>
+          <div style="position:absolute;inset:0;display:flex;align-items:center;padding:0 12px;">
+            <span style="font-size:13px;font-weight:700;color:var(--teal);font-family:'JetBrains Mono',monospace;margin-right:8px;">€</span>
+            <input type="number" id="mc-yearly" value="50000" min="0" step="1000"
+              oninput="updateProjections()"
+              style="background:transparent;border:none;outline:none;font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:600;color:var(--teal);flex:1;">
+            <span style="font-size:12px;color:var(--t3);">/anno</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Scenario — stile barra grigia -->
+      <div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+          <span style="font-size:11px;color:#7a8394;font-family:'JetBrains Mono',monospace;font-weight:600;text-transform:uppercase;letter-spacing:.06em;">Scenario rendimento</span>
+        </div>
+        <div style="position:relative;height:34px;">
+          <div style="position:absolute;inset:0;background:var(--bg4);border-radius:8px;overflow:hidden;">
+            <div style="width:100%;height:100%;background:#7a8394;opacity:.08;border-radius:8px;"></div>
+          </div>
+          <div style="position:absolute;inset:0;display:flex;align-items:center;padding:0 12px;">
+            <span style="font-size:13px;font-weight:700;color:#7a8394;font-family:'JetBrains Mono',monospace;margin-right:8px;">📊</span>
+            <select id="mc-scenario" style="background:transparent;border:none;outline:none;font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:600;color:var(--t1);flex:1;cursor:pointer;">
+              <option value="base">Base — rendimenti attesi ponderati</option>
+              <option value="bear">Bear — scenario avverso</option>
+              <option value="bull">Bull — scenario ottimistico</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PROIEZIONI DETERMINISTICHE 1/5/10/N anni -->
+    <div style="height:1px;background:var(--border);margin:0 0 12px 0;"></div>
+    <div style="font-size:11px;color:var(--t3);font-family:'JetBrains Mono',monospace;margin-bottom:8px;text-transform:uppercase;letter-spacing:.06em;">Proiezione lineare al tasso atteso (senza volatilità)</div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:12px;" id="sc-projections"></div>
+
+    <!-- Slider anni personalizzati -->
+    <div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+        <span style="font-size:11px;color:var(--amber);font-family:'JetBrains Mono',monospace;font-weight:600;text-transform:uppercase;letter-spacing:.06em;">Anni personalizzati</span>
+        <span style="font-size:12px;font-weight:700;color:var(--amber);font-family:'JetBrains Mono',monospace;" id="sc-years-lbl">15 anni</span>
+      </div>
+      <div style="position:relative;height:34px;">
+        <div style="position:absolute;inset:0;background:var(--bg4);border-radius:8px;overflow:hidden;">
+          <div id="wb-years" style="width:47%;height:100%;background:var(--amber);opacity:.25;border-radius:8px;transition:width .12s;"></div>
+        </div>
+        <div style="position:absolute;inset:0;display:flex;align-items:center;padding:0 12px;pointer-events:none;">
+          <span style="font-size:13px;font-weight:700;color:var(--amber);font-family:'JetBrains Mono',monospace;margin-right:8px;">🎯</span>
+          <span style="font-size:12px;color:var(--t2);flex:1;">Proiezione personalizzata</span>
+          <span style="font-size:13px;font-weight:700;color:var(--amber);font-family:'JetBrains Mono',monospace;" id="sc-years-lbl2b">15 anni</span>
+        </div>
+        <input type="range" min="1" max="30" value="15" id="sc-years-slider"
+          oninput="onYearsSlide(this.value)"
+          style="position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;margin:0;">
+      </div>
+    </div>
+  </div>
+
+  <!-- KPI RISULTATI -->
+  <div id="mc-kpi" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;"></div>
+
+  <!-- GRAFICO PERCORSI: storia + futuro -->
+  <div class="card" style="margin-bottom:10px;">
+    <p class="sec" style="margin-bottom:4px;">Portafoglio storico + ventaglio futuro</p>
+    <p style="font-size:12px;color:var(--t3);font-family:'JetBrains Mono',monospace;margin-bottom:10px;">Linea bianca = storia reale · Linea tratteggiata = soglia Oggi · Bande colorate = percentili 10/25/50/75/90 della simulazione</p>
+    <div class="cw" style="height:340px;"><canvas id="c-mc-fan" role="img" aria-label="Ventaglio percorsi Monte Carlo"></canvas></div>
+  </div>
+
+  <!-- GRAFICO DISTRIBUZIONE FINALE -->
+  <div class="g2">
+    <div class="card">
+      <p class="sec" style="margin-bottom:6px;">Distribuzione valore finale</p>
+      <p style="font-size:12px;color:var(--t3);font-family:'JetBrains Mono',monospace;margin-bottom:8px;">Istogramma dei valori finali delle 200 simulazioni.</p>
+      <div class="cw" style="height:220px;"><canvas id="c-mc-hist" role="img" aria-label="Distribuzione valore finale"></canvas></div>
+    </div>
+    <div class="card">
+      <p class="sec" style="margin-bottom:6px;">Drawdown massimo per simulazione</p>
+      <p style="font-size:12px;color:var(--t3);font-family:'JetBrains Mono',monospace;margin-bottom:8px;">Quanto puoi perdere nel percorso prima di recuperare.</p>
+      <div class="cw" style="height:220px;"><canvas id="c-mc-dd" role="img" aria-label="Distribuzione drawdown massimo"></canvas></div>
+    </div>
+  </div>
+
+  <!-- TABELLA SOGLIE PROBABILISTICHE -->
+  <div class="card" style="margin-top:10px;">
+    <p class="sec" style="margin-bottom:10px;">Soglie probabilistiche — domande chiave</p>
+    <table><thead><tr>
+      <th>Domanda</th><th>Probabilità stimata</th><th>Valore mediano scenario</th>
+    </tr></thead><tbody id="mc-prob-tbl"></tbody></table>
+  </div>
+
+  <!-- NOTA METODOLOGICA -->
+  <div class="card" style="margin-top:10px;background:rgba(139,111,255,.04);border-color:rgba(139,111,255,.2);">
+    <p class="sec" style="color:var(--purple);margin-bottom:6px;">Metodologia</p>
+    <p style="font-size:13px;color:var(--t2);line-height:1.7;">GBM con drift = rendimento scenario selezionato, volatilità da ORIG[], correlazioni da matrice CORR. Versamenti annui distribuiti proporzionalmente ai pesi attuali ogni 12 step. Il grafico mostra la storia reale da <code>STORICO_FALLBACK</code> come fase sinistra, con linea verticale "Oggi", e il ventaglio probabilistico come fase destra.</p>
+  </div>
+  </div><!-- /prev-panel-mc -->
+
 </div><!-- /pane-scenario -->
 
 <!-- STRESS TEST -->
@@ -1862,76 +2018,6 @@ tbody tr:hover td{background:rgba(255,255,255,.015);}
 
 </div><!-- /pane-signals -->
 
-<!-- MONTE CARLO -->
-<div class="pane" id="pane-montecarlo" style="display:none;">
-  <p class="sec" style="margin-bottom:4px;">Simulazione Monte Carlo — distribuzione dei percorsi futuri del portafoglio</p>
-  <p style="font-size:13px;color:var(--t2);font-family:'JetBrains Mono',monospace;margin-bottom:14px;">Basata su volatilità e correlazioni reali degli asset. Mostra il ventaglio di scenari intermedi, non solo il risultato finale.</p>
-
-  <!-- CONTROLLI -->
-  <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px;align-items:flex-end;">
-    <div class="card" style="flex:1;min-width:160px;padding:12px 14px;">
-      <div style="font-size:11px;color:var(--t3);font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;">Orizzonte (anni)</div>
-      <div style="display:flex;align-items:center;gap:8px;">
-        <input type="range" id="mc-years" min="1" max="15" value="10" style="flex:1;accent-color:var(--purple);" oninput="document.getElementById('mc-years-val').textContent=this.value">
-        <span id="mc-years-val" style="font-family:'JetBrains Mono',monospace;font-size:15px;color:var(--purple);min-width:20px;">10</span>
-      </div>
-    </div>
-    <div class="card" style="flex:1;min-width:160px;padding:12px 14px;">
-      <div style="font-size:11px;color:var(--t3);font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;">Versamento annuo (€)</div>
-      <div style="display:flex;align-items:center;gap:8px;">
-        <input type="number" id="mc-yearly" value="50000" min="0" step="1000" style="background:var(--bg3);border:1px solid var(--border2);border-radius:5px;color:var(--gold2);font-family:'JetBrains Mono',monospace;font-size:14px;padding:4px 8px;width:100%;outline:none;">
-      </div>
-    </div>
-    <div class="card" style="flex:1;min-width:160px;padding:12px 14px;">
-      <div style="font-size:11px;color:var(--t3);font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;">Scenario rendimento atteso</div>
-      <select id="mc-scenario" style="background:var(--bg3);border:1px solid var(--border2);border-radius:5px;color:var(--t1);font-family:'JetBrains Mono',monospace;font-size:13px;padding:5px 8px;width:100%;outline:none;">
-        <option value="base">Base (rendimenti base)</option>
-        <option value="bear">Bear (rendimenti bear)</option>
-        <option value="bull">Bull (rendimenti bull)</option>
-      </select>
-    </div>
-    <button onclick="runMC()" style="background:rgba(139,111,255,.15);border:1px solid rgba(139,111,255,.5);color:#8b6fff;font-family:'JetBrains Mono',monospace;font-size:13px;padding:8px 18px;border-radius:6px;cursor:pointer;white-space:nowrap;font-weight:600;">▶ Esegui simulazione</button>
-  </div>
-
-  <!-- KPI RISULTATI -->
-  <div id="mc-kpi" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;"></div>
-
-  <!-- GRAFICO PERCORSI -->
-  <div class="card" style="margin-bottom:10px;">
-    <p class="sec" style="margin-bottom:8px;">Ventaglio di percorsi — 200 simulazioni</p>
-    <p style="font-size:12px;color:var(--t3);font-family:'JetBrains Mono',monospace;margin-bottom:10px;">Ogni linea è un possibile futuro. Le bande mostrano i percentili 10–25–50–75–90.</p>
-    <div class="cw" style="height:320px;"><canvas id="c-mc-fan" role="img" aria-label="Ventaglio percorsi Monte Carlo"></canvas></div>
-  </div>
-
-  <!-- GRAFICO DISTRIBUZIONE FINALE -->
-  <div class="g2">
-    <div class="card">
-      <p class="sec" style="margin-bottom:6px;">Distribuzione valore finale</p>
-      <p style="font-size:12px;color:var(--t3);font-family:'JetBrains Mono',monospace;margin-bottom:8px;">Istogramma dei valori finali delle 200 simulazioni.</p>
-      <div class="cw" style="height:220px;"><canvas id="c-mc-hist" role="img" aria-label="Distribuzione valore finale"></canvas></div>
-    </div>
-    <div class="card">
-      <p class="sec" style="margin-bottom:6px;">Drawdown massimo per simulazione</p>
-      <p style="font-size:12px;color:var(--t3);font-family:'JetBrains Mono',monospace;margin-bottom:8px;">Quanto puoi perdere nel percorso prima di recuperare.</p>
-      <div class="cw" style="height:220px;"><canvas id="c-mc-dd" role="img" aria-label="Distribuzione drawdown massimo"></canvas></div>
-    </div>
-  </div>
-
-  <!-- TABELLA SOGLIE PROBABILISTICHE -->
-  <div class="card" style="margin-top:10px;">
-    <p class="sec" style="margin-bottom:10px;">Soglie probabilistiche — domande chiave</p>
-    <table><thead><tr>
-      <th>Domanda</th><th>Probabilità stimata</th><th>Valore mediano scenario</th>
-    </tr></thead><tbody id="mc-prob-tbl"></tbody></table>
-  </div>
-
-  <!-- NOTA METODOLOGICA -->
-  <div class="card" style="margin-top:10px;background:rgba(139,111,255,.04);border-color:rgba(139,111,255,.2);">
-    <p class="sec" style="color:var(--purple);margin-bottom:6px;">Metodologia</p>
-    <p style="font-size:13px;color:var(--t2);line-height:1.7;">Simulazione GBM (Geometric Brownian Motion) con drift = rendimento atteso scenario selezionato, volatilità annualizzata reale da ORIG[], correlazioni da matrice CORR. Il versamento annuo viene distribuito proporzionalmente ai pesi attuali e aggiunto ogni 12 step mensili. I percorsi usano numeri pseudo-casuali Box-Muller. I percentili sono calcolati sul valore del portafoglio ad ogni step temporale su 200 simulazioni.</p>
-  </div>
-</div><!-- /pane-montecarlo -->
-
 
 </div><!-- flex overflow hidden wrapper -->
 </main>
@@ -2113,9 +2199,9 @@ const MACRO_USA = {
     {m:'Mag 25',v:147},{m:'Giu 25',v:148},{m:'Lug 25',v:135},{m:'Ago 25',v:149},
     {m:'Set 25',v:135},{m:'Ott 25',v:139},{m:'Nov 25',v:143},{m:'Dic 25',v:154},
     // 2026 reali
-    {m:'Gen 26',v:130},{m:'Feb 26',v:-156},{m:'Mar 26',v:185},{m:'Apr 26',v:115},
+    {m:'Gen 26',v:130},{m:'Feb 26',v:-156},{m:'Mar 26',v:185},{m:'Apr 26',v:115},{m:'Mag 26',v:172},
     // proiezioni H2 2026
-    {m:'Mag 26',prev:80},{m:'Giu 26',prev:75},{m:'Lug 26',prev:70},
+    {m:'Giu 26',prev:75},{m:'Lug 26',prev:70},
     {m:'Ago 26',prev:65},{m:'Set 26',prev:60},{m:'Ott 26',prev:55},{m:'Nov 26',prev:60},{m:'Dic 26',prev:65},
   ],
   // CPI — inflazione USA %
@@ -2901,7 +2987,6 @@ function showPane(id,btn){
   if(id==='autopsy'){initApTrades();return;}
   if(id==='live'){renderLivePane(liveData,null);renderStorico();return;}
   if(id==='scenario'){setTimeout(()=>{renderScenario();renderConsTable();rMacroCharts();renderPersonalScores();},80);return;}
-  if(id==='montecarlo'){setTimeout(()=>{runMC();},80);return;}
   refresh();
 }
 function refresh(){
@@ -2911,7 +2996,6 @@ function refresh(){
   if(curPane==='bench')rBench();
   if(curPane==='returns')rRet();
   if(curPane==='history')rHistory();
-  if(curPane==='montecarlo')runMC();
 }
 function setOvTab(panelId, btn){
   ['ov-panel-overview','ov-panel-vol','ov-panel-geo','ov-panel-hld'].forEach(id=>{
@@ -2923,6 +3007,15 @@ function setOvTab(panelId, btn){
   if(panelId==='ov-panel-vol') rVol();
   if(panelId==='ov-panel-geo') setTimeout(()=>{rGeo();},50);
   if(panelId==='ov-panel-hld') setTimeout(()=>{hRender();},50);
+}
+function setPrevTab(panelId, btn){
+  ['prev-panel-scenario','prev-panel-mc'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el) el.style.display = id===panelId ? 'block' : 'none';
+  });
+  document.querySelectorAll('#pane-scenario > div:first-child .nt').forEach(b=>b.classList.remove('on'));
+  if(btn) btn.classList.add('on');
+  if(panelId==='prev-panel-mc') setTimeout(()=>{updateProjections();runMC();},80);
 }
 function setSigTab(panelId, btn){
   ['sig-panel-energy','sig-panel-metals','sig-panel-nuclear','sig-panel-robotics','sig-panel-watch'].forEach(id=>{
@@ -3303,63 +3396,26 @@ function renderScenario(){
   }
   if(charts['c-consensus-bubble'])charts['c-consensus-bubble'].update();
 
-  // Atteso Ponderato box
+  // Atteso Ponderato box — solo rendimento annuo, proiezioni sono in Monte Carlo
   const ccEl=document.getElementById('consensus-cards');
   if(ccEl){
-    const expPct=(br*0.35+bs*0.45+bu*0.20); // rendimento atteso ponderato (decimale, es. 0.101 = 10.1%)
+    const expPct=(br*0.35+bs*0.45+bu*0.20);
     const ec=expPct>=0?'var(--teal)':'var(--red)';
-    const yearly = (() => { const v = parseFloat(document.getElementById('sc-annual')?.value); return isNaN(v) ? 50000 : v; })();
     ccEl.innerHTML=
-    `<div style="background:var(--bg2);border:1px solid rgba(240,201,110,.3);border-radius:var(--r2);padding:20px;width:100%;box-sizing:border-box;">
-      <div style="font-size:12px;color:var(--gold2);font-family:'JetBrains Mono',monospace;font-weight:600;margin-bottom:10px;text-transform:uppercase;letter-spacing:.06em;">📊 Atteso ponderato — proiezione portafoglio</div>
-      <div style="display:flex;align-items:baseline;gap:12px;margin-bottom:4px;">
+    `<div style="background:var(--bg2);border:1px solid rgba(240,201,110,.3);border-radius:var(--r2);padding:16px 20px;width:100%;box-sizing:border-box;">
+      <div style="font-size:11px;color:var(--gold2);font-family:'JetBrains Mono',monospace;font-weight:600;margin-bottom:8px;text-transform:uppercase;letter-spacing:.06em;">📊 Rendimento atteso ponderato</div>
+      <div style="display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;">
         <div style="font-size:32px;font-weight:700;color:${ec};font-family:'JetBrains Mono',monospace;">${expPct>=0?'+':''}${(expPct*100).toFixed(1)}%</div>
         <div style="font-size:20px;font-weight:600;color:${ec};font-family:'JetBrains Mono',monospace;">${expPct>=0?'+':''}€${fE(Math.round(cap*expPct))}</div>
-        <div style="font-size:12px;color:var(--t3);">/ anno atteso · Bear×35% + Base×45% + Bull×20%</div>
+        <div style="font-size:12px;color:var(--t3);align-self:center;">/ anno atteso · Bear×35% + Base×45% + Bull×20%</div>
       </div>
-      <div style="height:1px;background:var(--border);margin:12px 0;"></div>
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
-        <span style="font-size:12px;color:var(--t3);white-space:nowrap;">Versamento annuo</span>
-        <div style="display:flex;align-items:center;gap:5px;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:6px;padding:5px 10px;">
-          <span style="font-size:13px;color:var(--t3);">€</span>
-          <input type="number" id="sc-annual" value="${yearly}" min="0" step="1000"
-            oninput="updateProjections()"
-            style="background:transparent;border:none;outline:none;font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:600;color:var(--teal);width:90px;text-align:right;">
-          <span style="font-size:12px;color:var(--t3);">/anno</span>
-        </div>
-        <span style="font-size:11px;color:var(--t3);">Capitale attuale: €${fE(Math.round(cap))}</span>
-      </div>
-      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:12px;" id="sc-projections">
-        ${buildProjections(cap, expPct, yearly)}
-      </div>
-      <div style="margin-top:4px;">
-        <div>
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
-            <span style="font-size:11px;color:var(--amber);font-family:'JetBrains Mono',monospace;font-weight:600;">Anni simulati</span>
-            <span style="font-size:12px;font-weight:700;color:var(--amber);font-family:'JetBrains Mono',monospace;" id="sc-years-lbl">15 anni</span>
-          </div>
-          <div style="position:relative;height:34px;">
-            <div style="position:absolute;inset:0;background:var(--bg4);border-radius:8px;overflow:hidden;">
-              <div id="wb-years" style="width:47%;height:100%;background:var(--amber);opacity:.25;border-radius:8px;transition:width .12s;"></div>
-            </div>
-            <div style="position:absolute;inset:0;display:flex;align-items:center;padding:0 12px;pointer-events:none;">
-              <span style="font-size:13px;font-weight:700;color:var(--amber);font-family:'JetBrains Mono',monospace;margin-right:8px;">📅</span>
-              <span style="font-size:12px;color:var(--t2);flex:1;">Proiezione personalizzata</span>
-              <span style="font-size:13px;font-weight:700;color:var(--amber);font-family:'JetBrains Mono',monospace;" id="sc-years-lbl2">15 anni</span>
-            </div>
-            <input type="range" min="1" max="30" value="15" id="sc-years-slider"
-              oninput="onYearsSlide(this.value)"
-              style="position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;margin:0;">
-          </div>
-        </div>
-      </div>
-      <div id="sc-custom-proj" style="margin-top:8px;"></div>
+      <div style="margin-top:10px;font-size:12px;color:var(--t3);">Per le proiezioni a 1, 5, 10+ anni con versamenti annui → <span onclick="setPrevTab('prev-panel-mc',document.getElementById('prevt-mc'))" style="color:var(--purple);cursor:pointer;text-decoration:underline;">apri Monte Carlo</span></div>
     </div>`;
   }
 }
 function buildProjections(cap, annualRate, annualInput){
   const yearly = annualInput !== undefined && !isNaN(annualInput) ? annualInput :
-    (() => { const v = parseFloat(document.getElementById('sc-annual')?.value); return isNaN(v) ? 50000 : v; })();
+    (() => { const v = parseFloat(document.getElementById('mc-yearly')?.value); return isNaN(v) ? 50000 : v; })();
   const rate = annualRate;
   const customY = parseInt(document.getElementById('sc-years-slider')?.value) || 15;
   return [1, 5, 10, customY].map(y => {
@@ -3387,7 +3443,7 @@ function buildProjections(cap, annualRate, annualInput){
 function onYearsSlide(val){
   const v = parseInt(val);
   const lbl  = document.getElementById('sc-years-lbl');
-  const lbl2 = document.getElementById('sc-years-lbl2');
+  const lbl2 = document.getElementById('sc-years-lbl2b');
   const bar  = document.getElementById('wb-years');
   if(lbl)  lbl.textContent  = v + ' anni';
   if(lbl2) lbl2.textContent = v + ' anni';
@@ -3403,9 +3459,11 @@ function updateProjections(){
   const br = ORIG.reduce((s,a,i)=>s+nw[i]*a.bear,0);
   const bs = ORIG.reduce((s,a,i)=>s+nw[i]*a.base,0);
   const bu = ORIG.reduce((s,a,i)=>s+nw[i]*a.bull,0);
-  const expPct = br*0.35 + bs*0.45 + bu*0.20; // frazioni corrette
-  const yearly = (() => { const v = parseFloat(document.getElementById('sc-annual')?.value); return isNaN(v) ? 50000 : v; })();
+  const expPct = br*0.35 + bs*0.45 + bu*0.20;
+  const yearly = (() => { const v = parseFloat(document.getElementById('mc-yearly')?.value); return isNaN(v) ? 50000 : v; })();
   el.innerHTML = buildProjections(cap, expPct, yearly);
+  const lbl = document.getElementById('proj-cap-lbl');
+  if(lbl) lbl.textContent = 'Capitale attuale: €'+fE(Math.round(cap));
 }
 
 
@@ -5818,80 +5876,68 @@ Usa null per campi non disponibili. Rev e EPS in unita native (B per grandi azie
 
 // ═══════════════ MONTE CARLO ═══════════════
 function runMC(){
-  const pane=document.getElementById('pane-montecarlo');
-  if(!pane||pane.style.display==='none')return;
+  const panel=document.getElementById('prev-panel-mc');
+  if(!panel||panel.style.display==='none')return;
 
-  // Parametri
+  // ── Parametri ──
   const years=parseInt(document.getElementById('mc-years').value)||10;
   const yearly=parseInt(document.getElementById('mc-yearly').value);
   const annualYearly=isNaN(yearly)?50000:yearly;
   const scen=document.getElementById('mc-scenario').value||'base';
-  const N=200; // simulazioni
-  const steps=years*12; // step mensili
+  const N=200;
+  const steps=years*12;
 
-  // Drift mensile per asset secondo scenario
+  // ── Aggiorna proiezioni deterministiche ──
+  updateProjections();
+
+  // ── Storia reale da STORICO_FALLBACK ──
+  const hist = (storicoData && storicoData.length>0 ? storicoData : STORICO_FALLBACK);
+  const histLabels = hist.map(h=>{
+    const d=new Date(h.data);
+    return d.toLocaleDateString('it-IT',{month:'short',year:'2-digit'});
+  });
+  const histVals = hist.map(h=>h.valore);
+  const nHist = hist.length; // numero di punti storici (incluso "oggi")
+
+  // ── GBM setup ──
   const drifts=ORIG.map(a=>{
     const ann=scen==='bear'?a.bear:scen==='bull'?a.bull:a.base;
     return ann/12;
   });
-
-  // Volatilità mensile per asset
   const vols=ORIG.map(a=>a.vol/Math.sqrt(12));
-
-  // Matrice correlazioni (Cholesky semplificata — correlazione per categoria)
-  // Usiamo la funzione co() esistente per la matrice di corr
   const n=ORIG.length;
 
-  // Box-Muller: genera n numeri normali correlati tramite correlazione per categoria
   function randn(){
     let u=0,v=0;
     while(u===0)u=Math.random();
     while(v===0)v=Math.random();
     return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);
   }
-
-  // Genera vettore di shock correlati usando decomposizione semplificata
-  // Approccio: componente comune per categoria + componente idiosincratica
   function correlatedShocks(){
-    // Fattori comuni per categoria
     const catFactors={};
     ['commodity','equity-broad','equity-theme','alternative','crypto'].forEach(c=>{catFactors[c]=randn();});
-    return ORIG.map((a,i)=>{
-      const rho=co(a.cat,a.cat); // sempre 1 per stessa cat
-      // Usa correlazione media della categoria come peso del fattore comune
+    return ORIG.map(a=>{
       let avgCorr=0;let cnt=0;
-      ORIG.forEach((b,j)=>{if(i!==j){avgCorr+=co(a.cat,b.cat);cnt++;}});
+      ORIG.forEach(b=>{if(a!==b){avgCorr+=co(a.cat,b.cat);cnt++;}});
       avgCorr=cnt>0?avgCorr/cnt:0;
-      const sqrtRho=Math.sqrt(Math.max(0,avgCorr));
-      const sqrtIdi=Math.sqrt(Math.max(0,1-avgCorr));
-      return sqrtRho*catFactors[a.cat]+sqrtIdi*randn();
+      return Math.sqrt(Math.max(0,avgCorr))*catFactors[a.cat]+Math.sqrt(Math.max(0,1-avgCorr))*randn();
     });
   }
 
-  // Pesi attuali (normalizzati)
   const nw=nW();
-
-  // Esegui N simulazioni
-  const allPaths=[]; // [sim][step] = valore portafoglio
-  const allDrawdowns=[]; // [sim] = max drawdown
+  const startVal=caps.reduce((a,b)=>a+b,0);
+  const allPaths=[];
+  const allDrawdowns=[];
 
   for(let s=0;s<N;s++){
-    const simCaps=caps.map(c=>c); // copia caps attuali
-    const path=[simCaps.reduce((a,b)=>a+b,0)];
-    let peak=path[0];
+    const simCaps=caps.map(c=>c);
+    const path=[startVal];
+    let peak=startVal;
     let maxDD=0;
-
     for(let t=0;t<steps;t++){
       const shocks=correlatedShocks();
-      for(let i=0;i<n;i++){
-        const ret=drifts[i]+vols[i]*shocks[i];
-        simCaps[i]=simCaps[i]*Math.exp(ret);
-      }
-      // Versamento annuo ogni 12 mesi (proporzionale ai pesi)
-      if((t+1)%12===0 && annualYearly>0){
-        const monthlyPay=annualYearly;
-        for(let i=0;i<n;i++) simCaps[i]+=monthlyPay*nw[i];
-      }
+      for(let i=0;i<n;i++) simCaps[i]=simCaps[i]*Math.exp(drifts[i]+vols[i]*shocks[i]);
+      if((t+1)%12===0 && annualYearly>0) for(let i=0;i<n;i++) simCaps[i]+=annualYearly*nw[i];
       const tot=simCaps.reduce((a,b)=>a+b,0);
       path.push(tot);
       if(tot>peak)peak=tot;
@@ -5902,81 +5948,90 @@ function runMC(){
     allDrawdowns.push(maxDD);
   }
 
-  // Calcola percentili per ogni step
   function pct(arr,p){
     const sorted=[...arr].sort((a,b)=>a-b);
-    const idx=Math.floor(p/100*(sorted.length-1));
-    return sorted[idx];
+    return sorted[Math.floor(p/100*(sorted.length-1))];
   }
 
-  const labels=[];
-  for(let t=0;t<=steps;t++){
-    if(t===0)labels.push('Oggi');
-    else if(t%12===0)labels.push('Anno '+(t/12));
-    else labels.push('');
-  }
-
-  // Percentili per grafico fan
-  const p10=[],p25=[],p50=[],p75=[],p90=[];
+  // Percentili futuri (steps+1 punti, da "oggi")
+  const p10f=[],p25f=[],p50f=[],p75f=[],p90f=[];
   for(let t=0;t<=steps;t++){
     const vals=allPaths.map(p=>p[t]);
-    p10.push(pct(vals,10));
-    p25.push(pct(vals,25));
-    p50.push(pct(vals,50));
-    p75.push(pct(vals,75));
-    p90.push(pct(vals,90));
+    p10f.push(pct(vals,10));
+    p25f.push(pct(vals,25));
+    p50f.push(pct(vals,50));
+    p75f.push(pct(vals,75));
+    p90f.push(pct(vals,90));
   }
 
-  const startVal=caps.reduce((a,b)=>a+b,0);
   const finalVals=allPaths.map(p=>p[steps]);
   const medFinal=pct(finalVals,50);
   const p10Final=pct(finalVals,10);
   const p90Final=pct(finalVals,90);
-
-  // KPI
   const probPositive=finalVals.filter(v=>v>startVal).length/N*100;
   const probDouble=finalVals.filter(v=>v>startVal*2).length/N*100;
   const medDD=pct(allDrawdowns,50)*100;
   const worstDD=pct(allDrawdowns,90)*100;
   const cagr=(Math.pow(medFinal/startVal,1/years)-1)*100;
 
+  // ── KPI ──
   document.getElementById('mc-kpi').innerHTML=`
     <div class="kpi"><div class="kpi-l">Valore mediano finale</div><div class="kpi-v go">€${fE(medFinal)}</div><div class="kpi-sub">CAGR mediano ${cagr.toFixed(1)}%/anno</div></div>
     <div class="kpi"><div class="kpi-l">Range 10°–90° percentile</div><div class="kpi-v" style="color:var(--t2);font-size:16px;">€${fE(p10Final)} – €${fE(p90Final)}</div><div class="kpi-sub">80% dei percorsi cade qui</div></div>
-    <div class="kpi"><div class="kpi-l">Prob. rendimento positivo</div><div class="kpi-v" style="color:${probPositive>60?'var(--teal)':'var(--amber)'};">${probPositive.toFixed(0)}%</div><div class="kpi-sub">vs valore attuale €${fE(startVal)}</div></div>
-    <div class="kpi"><div class="kpi-l">Prob. raddoppio capitale</div><div class="kpi-v" style="color:var(--purple);">${probDouble.toFixed(0)}%</div><div class="kpi-sub">in ${years} anni con €${fE(annualYearly)}/anno</div></div>
-    <div class="kpi"><div class="kpi-l">Drawdown mediano</div><div class="kpi-v gr">−${medDD.toFixed(1)}%</div><div class="kpi-sub">Max atteso (90° pct): −${worstDD.toFixed(1)}%</div></div>
+    <div class="kpi"><div class="kpi-l">Prob. rendimento positivo</div><div class="kpi-v" style="color:${probPositive>60?'var(--teal)':'var(--amber)'};">${probPositive.toFixed(0)}%</div><div class="kpi-sub">vs oggi €${fE(startVal)}</div></div>
+    <div class="kpi"><div class="kpi-l">Prob. raddoppio capitale</div><div class="kpi-v" style="color:var(--purple);">${probDouble.toFixed(0)}%</div><div class="kpi-sub">in ${years} anni · €${fE(annualYearly)}/anno</div></div>
+    <div class="kpi"><div class="kpi-l">Drawdown mediano percorso</div><div class="kpi-v gr">−${medDD.toFixed(1)}%</div><div class="kpi-sub">90° pct: −${worstDD.toFixed(1)}%</div></div>
   `;
 
-  // Grafico fan — bande percentili + 20 traiettorie campione come sfondo decorativo
-  const NAMED_LABELS=new Set(['90° pct','75° pct','Mediana','25° pct','10° pct','Valore attuale']);
-  const samplePaths=[];
-  for(let s=0;s<20;s++){
-    const idx=Math.floor(Math.random()*N);
-    samplePaths.push({
-      label:'_path',  // prefisso _ = escluso da legenda e tooltip
-      data:allPaths[idx],
-      borderColor:'rgba(139,111,255,0.07)',
-      borderWidth:1,
-      pointRadius:0,
-      fill:false,
-      tension:0.3,
-    });
+  // ── GRAFICO UNIFICATO: storico + ventaglio ──
+  // Labels: storia (mensili) + futuro (mensili, solo anni interi mostrati)
+  const futureLabels=[];
+  for(let t=0;t<=steps;t++){
+    if(t===0) futureLabels.push('Oggi');
+    else if(t%12===0) futureLabels.push('+'+(t/12)+'a');
+    else futureLabels.push('');
   }
-  const startValArr=Array(steps+1).fill(startVal);
+  const allLabels=[...histLabels.slice(0,-1), ...futureLabels]; // evita duplicare "oggi"
+  const histOffset=nHist-1; // indice in allLabels dove cade "oggi"
+
+  // Dataset storia: valori reali nelle prime nHist posizioni, null dopo
+  const histDs=Array(allLabels.length).fill(null);
+  histVals.forEach((v,i)=>{ histDs[i]=v; });
+
+  // Dataset percentili: null nelle prime (nHist-1) posizioni, poi i valori futuri
+  function futurePad(arr){
+    return [...Array(histOffset).fill(null), ...arr];
+  }
+
+  // Linea verticale "Oggi" via annotation plugin — usiamo invece un dataset verticale dummy
+  // Chart.js v3 nativo: usiamo un dataset puntuale sull'indice histOffset
+  const todayLine=Array(allLabels.length).fill(null);
+  todayLine[histOffset]=0;
+
+  const NAMED=new Set(['90° pct','75° pct','Mediana','25° pct','10° pct','Storia reale']);
 
   mk('c-mc-fan',{
     type:'line',
     data:{
-      labels,
+      labels:allLabels,
       datasets:[
-        ...samplePaths,
-        {label:'90° pct',data:p90,borderColor:'rgba(39,201,154,0.3)',borderWidth:1,pointRadius:0,fill:'+1',backgroundColor:'rgba(39,201,154,0.05)',tension:0.3},
-        {label:'75° pct',data:p75,borderColor:'rgba(39,201,154,0.55)',borderWidth:1,pointRadius:0,fill:'+1',backgroundColor:'rgba(39,201,154,0.10)',tension:0.3},
-        {label:'Mediana',data:p50,borderColor:'#8b6fff',borderWidth:2.5,pointRadius:0,fill:false,tension:0.3},
-        {label:'25° pct',data:p25,borderColor:'rgba(232,80,74,0.55)',borderWidth:1,pointRadius:0,fill:'+1',backgroundColor:'rgba(232,80,74,0.10)',tension:0.3},
-        {label:'10° pct',data:p10,borderColor:'rgba(232,80,74,0.3)',borderWidth:1,pointRadius:0,fill:false,tension:0.3},
-        {label:'Valore attuale',data:startValArr,borderColor:'rgba(212,168,67,0.5)',borderWidth:1.5,borderDash:[5,5],pointRadius:0,fill:false},
+        // Storia reale
+        {
+          label:'Storia reale',
+          data:histDs,
+          borderColor:'rgba(255,255,255,0.75)',
+          borderWidth:2,
+          pointRadius:0,
+          fill:false,
+          tension:0.3,
+          spanGaps:false,
+        },
+        // Bande percentili futuri
+        {label:'90° pct',data:futurePad(p90f),borderColor:'rgba(39,201,154,0.3)',borderWidth:1,pointRadius:0,fill:'+1',backgroundColor:'rgba(39,201,154,0.06)',tension:0.3,spanGaps:false},
+        {label:'75° pct',data:futurePad(p75f),borderColor:'rgba(39,201,154,0.6)',borderWidth:1,pointRadius:0,fill:'+1',backgroundColor:'rgba(39,201,154,0.12)',tension:0.3,spanGaps:false},
+        {label:'Mediana',data:futurePad(p50f),borderColor:'#8b6fff',borderWidth:2.5,pointRadius:0,fill:false,tension:0.3,spanGaps:false},
+        {label:'25° pct',data:futurePad(p25f),borderColor:'rgba(232,80,74,0.6)',borderWidth:1,pointRadius:0,fill:'+1',backgroundColor:'rgba(232,80,74,0.12)',tension:0.3,spanGaps:false},
+        {label:'10° pct',data:futurePad(p10f),borderColor:'rgba(232,80,74,0.3)',borderWidth:1,pointRadius:0,fill:false,tension:0.3,spanGaps:false},
       ]
     },
     options:{
@@ -5985,45 +6040,84 @@ function runMC(){
       plugins:{
         legend:{
           position:'top',
-          labels:{
-            color:'#9aa3b2',boxWidth:12,font:{size:11},padding:16,
-            filter: item => !item.datasetIndex || NAMED_LABELS.has(item.text)
-          }
+          labels:{color:'#9aa3b2',boxWidth:12,font:{size:11},padding:14,
+            filter:item=>NAMED.has(item.text)}
         },
         tooltip:{
           callbacks:{
+            title:ctx=>{
+              const i=ctx[0].dataIndex;
+              return i<histOffset ? histLabels[i] : (i===histOffset?'Oggi':futureLabels[i-histOffset]);
+            },
             label:ctx=>{
-              if(!NAMED_LABELS.has(ctx.dataset.label))return null;
-              if(ctx.dataset.label==='Valore attuale')return ' Capitale attuale: €'+fE(ctx.raw);
+              if(!NAMED.has(ctx.dataset.label))return null;
+              if(ctx.raw===null)return null;
               return ' '+ctx.dataset.label+': €'+fE(ctx.raw);
             }
           },
-          filter: item => NAMED_LABELS.has(item.dataset.label)
-        }
+          filter:item=>NAMED.has(item.dataset.label)&&item.raw!==null
+        },
+        // Linea verticale "Oggi" via afterDraw custom
+        afterDataLimits:{id:'todayLine'}
       },
       scales:{
-        x:{ticks:{color:'#3e4452',font:{size:10},maxTicksLimit:years+1,callback:(v,i)=>labels[i]||null},grid:{color:'rgba(255,255,255,.03)'}},
-        y:{ticks:{color:'#3e4452',font:{size:10},callback:v=>'€'+Math.round(v/1000)+'k'},grid:{color:'rgba(255,255,255,.04)'}}
+        x:{
+          ticks:{
+            color:'#3e4452',font:{size:9},maxTicksLimit:nHist+years+2,
+            callback:(v,i)=>{
+              if(i<histOffset) return histLabels[i]||null;
+              if(i===histOffset) return '📍 Oggi';
+              return futureLabels[i-histOffset]||null;
+            }
+          },
+          grid:{color:'rgba(255,255,255,.03)'}
+        },
+        y:{
+          ticks:{color:'#3e4452',font:{size:10},callback:v=>'€'+Math.round(v/1000)+'k'},
+          grid:{color:'rgba(255,255,255,.04)'}
+        }
       }
-    }
+    },
+    plugins:[{
+      id:'todayLine',
+      afterDraw(chart){
+        const idx=histOffset;
+        const meta=chart.getDatasetMeta(0);
+        if(!meta.data[idx])return;
+        const x=meta.data[idx].x;
+        const {ctx,chartArea:{top,bottom}}=chart;
+        ctx.save();
+        ctx.beginPath();
+        ctx.moveTo(x,top);
+        ctx.lineTo(x,bottom);
+        ctx.strokeStyle='rgba(212,168,67,0.5)';
+        ctx.lineWidth=1.5;
+        ctx.setLineDash([4,4]);
+        ctx.stroke();
+        ctx.fillStyle='rgba(212,168,67,0.8)';
+        ctx.font='bold 10px JetBrains Mono, monospace';
+        ctx.textAlign='center';
+        ctx.fillText('Oggi',x,top+12);
+        ctx.restore();
+      }
+    }]
   });
 
-  // Istogramma distribuzione finale
+  // ── Istogramma distribuzione finale ──
   const minV=Math.min(...finalVals),maxV=Math.max(...finalVals);
   const bins=20;const binW=(maxV-minV)/bins;
   const histCounts=Array(bins).fill(0);
   finalVals.forEach(v=>{const b=Math.min(bins-1,Math.floor((v-minV)/binW));histCounts[b]++;});
-  const histLabels=Array.from({length:bins},(_,i)=>'€'+Math.round((minV+i*binW)/1000)+'k');
+  const histLabelsD=Array.from({length:bins},(_,i)=>'€'+Math.round((minV+i*binW)/1000)+'k');
   const histColors=histCounts.map((_,i)=>{
     const mid=minV+(i+0.5)*binW;
     if(mid<startVal)return 'rgba(232,80,74,0.6)';
     if(mid<startVal*1.5)return 'rgba(212,168,67,0.6)';
     return 'rgba(39,201,154,0.6)';
   });
-
   mk('c-mc-hist',{
     type:'bar',
-    data:{labels:histLabels,datasets:[{data:histCounts,backgroundColor:histColors,borderWidth:0,borderRadius:2}]},
+    data:{labels:histLabelsD,datasets:[{data:histCounts,backgroundColor:histColors,borderWidth:0,borderRadius:2}]},
     options:{
       responsive:true,maintainAspectRatio:false,
       plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>`${ctx.raw} simulazioni`}}},
@@ -6034,23 +6128,22 @@ function runMC(){
     }
   });
 
-  // Istogramma drawdown
+  // ── Istogramma drawdown ──
   const ddPcts=allDrawdowns.map(d=>d*100);
   const ddBins=15;const ddMax=Math.min(80,Math.max(...ddPcts));
   const ddBinW=ddMax/ddBins;
   const ddCounts=Array(ddBins).fill(0);
   ddPcts.forEach(v=>{const b=Math.min(ddBins-1,Math.floor(v/ddBinW));ddCounts[b]++;});
-  const ddLabels=Array.from({length:ddBins},(_,i)=>`−${Math.round((i+0.5)*ddBinW)}%`);
+  const ddLbls=Array.from({length:ddBins},(_,i)=>`−${Math.round((i+0.5)*ddBinW)}%`);
   const ddColors=ddCounts.map((_,i)=>{
     const mid=(i+0.5)*ddBinW;
     if(mid<15)return 'rgba(39,201,154,0.6)';
     if(mid<30)return 'rgba(212,168,67,0.6)';
     return 'rgba(232,80,74,0.6)';
   });
-
   mk('c-mc-dd',{
     type:'bar',
-    data:{labels:ddLabels,datasets:[{data:ddCounts,backgroundColor:ddColors,borderWidth:0,borderRadius:2}]},
+    data:{labels:ddLbls,datasets:[{data:ddCounts,backgroundColor:ddColors,borderWidth:0,borderRadius:2}]},
     options:{
       responsive:true,maintainAspectRatio:false,
       plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>`${ctx.raw} simulazioni`}}},
@@ -6061,24 +6154,21 @@ function runMC(){
     }
   });
 
-  // Tabella soglie probabilistiche
+  // ── Tabella soglie probabilistiche ──
   const probLoss10=finalVals.filter(v=>v<startVal*0.9).length/N*100;
   const probLoss20=finalVals.filter(v=>v<startVal*0.8).length/N*100;
   const probGain50=finalVals.filter(v=>v>startVal*1.5).length/N*100;
   const probGain100=finalVals.filter(v=>v>startVal*2.0).length/N*100;
   const probGain200=finalVals.filter(v=>v>startVal*3.0).length/N*100;
-  const medDDfmt=`${medDD.toFixed(1)}% drawdown mediano`;
-
   const rows=[
-    {q:`Perdere più del 10% del capitale in ${years} anni`,p:probLoss10,note:'Scenario avverso cumulativo',col:probLoss10<20?'var(--teal)':'var(--red)'},
+    {q:`Perdere più del 10% del capitale in ${years} anni`,p:probLoss10,note:'Cumulativo',col:probLoss10<20?'var(--teal)':'var(--red)'},
     {q:`Perdere più del 20% del capitale in ${years} anni`,p:probLoss20,note:'Scenario severo',col:probLoss20<10?'var(--teal)':'var(--red)'},
     {q:`Guadagnare almeno +50% in ${years} anni`,p:probGain50,note:`Mediana: €${fE(medFinal)}`,col:probGain50>50?'var(--teal)':'var(--amber)'},
-    {q:`Raddoppiare il capitale in ${years} anni`,p:probGain100,note:'Inclusivo versamenti annui',col:probGain100>30?'var(--teal)':'var(--amber)'},
+    {q:`Raddoppiare il capitale in ${years} anni`,p:probGain100,note:'Incl. versamenti annui',col:probGain100>30?'var(--teal)':'var(--amber)'},
     {q:`Triplicare il capitale in ${years} anni`,p:probGain200,note:'Scenario ottimistico',col:'var(--purple)'},
-    {q:`Subire drawdown >20% durante il percorso`,p:allDrawdowns.filter(d=>d>0.2).length/N*100,note:medDDfmt,col:'var(--amber)'},
-    {q:`Subire drawdown >40% durante il percorso`,p:allDrawdowns.filter(d=>d>0.4).length/N*100,note:'Scenario stress estremo',col:'var(--red)'},
+    {q:`Subire drawdown >20% nel percorso`,p:allDrawdowns.filter(d=>d>0.2).length/N*100,note:`Mediano: −${medDD.toFixed(1)}%`,col:'var(--amber)'},
+    {q:`Subire drawdown >40% nel percorso`,p:allDrawdowns.filter(d=>d>0.4).length/N*100,note:'Stress estremo',col:'var(--red)'},
   ];
-
   document.getElementById('mc-prob-tbl').innerHTML=rows.map(r=>`
     <tr>
       <td style="font-size:13px;">${r.q}</td>
