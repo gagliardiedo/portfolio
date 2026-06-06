@@ -305,6 +305,7 @@ tbody tr:hover td{background:rgba(255,255,255,.015);}
   <button class="nt" onclick="showPane('bench',this)">📊 Benchmark</button>
   <button class="nt" onclick="showPane('autopsy',this)">🔥 Autopsy</button>
   <button class="nt" onclick="showPane('signals',this)" style="color:#27c99a;">🌟 Segnalazioni</button>
+  <button class="nt" onclick="showPane('montecarlo',this)" style="color:#8b6fff;">🎲 Monte Carlo</button>
 </div>
 <div style="flex:1;overflow:hidden;position:relative;min-height:0;">
 
@@ -1861,6 +1862,76 @@ tbody tr:hover td{background:rgba(255,255,255,.015);}
 
 </div><!-- /pane-signals -->
 
+<!-- MONTE CARLO -->
+<div class="pane" id="pane-montecarlo" style="display:none;">
+  <p class="sec" style="margin-bottom:4px;">Simulazione Monte Carlo — distribuzione dei percorsi futuri del portafoglio</p>
+  <p style="font-size:13px;color:var(--t2);font-family:'JetBrains Mono',monospace;margin-bottom:14px;">Basata su volatilità e correlazioni reali degli asset. Mostra il ventaglio di scenari intermedi, non solo il risultato finale.</p>
+
+  <!-- CONTROLLI -->
+  <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px;align-items:flex-end;">
+    <div class="card" style="flex:1;min-width:160px;padding:12px 14px;">
+      <div style="font-size:11px;color:var(--t3);font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;">Orizzonte (anni)</div>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <input type="range" id="mc-years" min="1" max="15" value="10" style="flex:1;accent-color:var(--purple);" oninput="document.getElementById('mc-years-val').textContent=this.value">
+        <span id="mc-years-val" style="font-family:'JetBrains Mono',monospace;font-size:15px;color:var(--purple);min-width:20px;">10</span>
+      </div>
+    </div>
+    <div class="card" style="flex:1;min-width:160px;padding:12px 14px;">
+      <div style="font-size:11px;color:var(--t3);font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;">Versamento annuo (€)</div>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <input type="number" id="mc-yearly" value="50000" min="0" step="1000" style="background:var(--bg3);border:1px solid var(--border2);border-radius:5px;color:var(--gold2);font-family:'JetBrains Mono',monospace;font-size:14px;padding:4px 8px;width:100%;outline:none;">
+      </div>
+    </div>
+    <div class="card" style="flex:1;min-width:160px;padding:12px 14px;">
+      <div style="font-size:11px;color:var(--t3);font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;">Scenario rendimento atteso</div>
+      <select id="mc-scenario" style="background:var(--bg3);border:1px solid var(--border2);border-radius:5px;color:var(--t1);font-family:'JetBrains Mono',monospace;font-size:13px;padding:5px 8px;width:100%;outline:none;">
+        <option value="base">Base (rendimenti base)</option>
+        <option value="bear">Bear (rendimenti bear)</option>
+        <option value="bull">Bull (rendimenti bull)</option>
+      </select>
+    </div>
+    <button onclick="runMC()" style="background:rgba(139,111,255,.15);border:1px solid rgba(139,111,255,.5);color:#8b6fff;font-family:'JetBrains Mono',monospace;font-size:13px;padding:8px 18px;border-radius:6px;cursor:pointer;white-space:nowrap;font-weight:600;">▶ Esegui simulazione</button>
+  </div>
+
+  <!-- KPI RISULTATI -->
+  <div id="mc-kpi" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;"></div>
+
+  <!-- GRAFICO PERCORSI -->
+  <div class="card" style="margin-bottom:10px;">
+    <p class="sec" style="margin-bottom:8px;">Ventaglio di percorsi — 200 simulazioni</p>
+    <p style="font-size:12px;color:var(--t3);font-family:'JetBrains Mono',monospace;margin-bottom:10px;">Ogni linea è un possibile futuro. Le bande mostrano i percentili 10–25–50–75–90.</p>
+    <div class="cw" style="height:320px;"><canvas id="c-mc-fan" role="img" aria-label="Ventaglio percorsi Monte Carlo"></canvas></div>
+  </div>
+
+  <!-- GRAFICO DISTRIBUZIONE FINALE -->
+  <div class="g2">
+    <div class="card">
+      <p class="sec" style="margin-bottom:6px;">Distribuzione valore finale</p>
+      <p style="font-size:12px;color:var(--t3);font-family:'JetBrains Mono',monospace;margin-bottom:8px;">Istogramma dei valori finali delle 200 simulazioni.</p>
+      <div class="cw" style="height:220px;"><canvas id="c-mc-hist" role="img" aria-label="Distribuzione valore finale"></canvas></div>
+    </div>
+    <div class="card">
+      <p class="sec" style="margin-bottom:6px;">Drawdown massimo per simulazione</p>
+      <p style="font-size:12px;color:var(--t3);font-family:'JetBrains Mono',monospace;margin-bottom:8px;">Quanto puoi perdere nel percorso prima di recuperare.</p>
+      <div class="cw" style="height:220px;"><canvas id="c-mc-dd" role="img" aria-label="Distribuzione drawdown massimo"></canvas></div>
+    </div>
+  </div>
+
+  <!-- TABELLA SOGLIE PROBABILISTICHE -->
+  <div class="card" style="margin-top:10px;">
+    <p class="sec" style="margin-bottom:10px;">Soglie probabilistiche — domande chiave</p>
+    <table><thead><tr>
+      <th>Domanda</th><th>Probabilità stimata</th><th>Valore mediano scenario</th>
+    </tr></thead><tbody id="mc-prob-tbl"></tbody></table>
+  </div>
+
+  <!-- NOTA METODOLOGICA -->
+  <div class="card" style="margin-top:10px;background:rgba(139,111,255,.04);border-color:rgba(139,111,255,.2);">
+    <p class="sec" style="color:var(--purple);margin-bottom:6px;">Metodologia</p>
+    <p style="font-size:13px;color:var(--t2);line-height:1.7;">Simulazione GBM (Geometric Brownian Motion) con drift = rendimento atteso scenario selezionato, volatilità annualizzata reale da ORIG[], correlazioni da matrice CORR. Il versamento annuo viene distribuito proporzionalmente ai pesi attuali e aggiunto ogni 12 step mensili. I percorsi usano numeri pseudo-casuali Box-Muller. I percentili sono calcolati sul valore del portafoglio ad ogni step temporale su 200 simulazioni.</p>
+  </div>
+</div><!-- /pane-montecarlo -->
+
 
 </div><!-- flex overflow hidden wrapper -->
 </main>
@@ -2830,6 +2901,7 @@ function showPane(id,btn){
   if(id==='autopsy'){initApTrades();return;}
   if(id==='live'){renderLivePane(liveData,null);renderStorico();return;}
   if(id==='scenario'){setTimeout(()=>{renderScenario();renderConsTable();rMacroCharts();renderPersonalScores();},80);return;}
+  if(id==='montecarlo'){setTimeout(()=>{runMC();},80);return;}
   refresh();
 }
 function refresh(){
@@ -2839,6 +2911,7 @@ function refresh(){
   if(curPane==='bench')rBench();
   if(curPane==='returns')rRet();
   if(curPane==='history')rHistory();
+  if(curPane==='montecarlo')runMC();
 }
 function setOvTab(panelId, btn){
   ['ov-panel-overview','ov-panel-vol','ov-panel-geo','ov-panel-hld'].forEach(id=>{
@@ -5742,6 +5815,278 @@ Usa null per campi non disponibili. Rev e EPS in unita native (B per grandi azie
     });
   }
 })();
+
+// ═══════════════ MONTE CARLO ═══════════════
+function runMC(){
+  const pane=document.getElementById('pane-montecarlo');
+  if(!pane||pane.style.display==='none')return;
+
+  // Parametri
+  const years=parseInt(document.getElementById('mc-years').value)||10;
+  const yearly=parseInt(document.getElementById('mc-yearly').value);
+  const annualYearly=isNaN(yearly)?50000:yearly;
+  const scen=document.getElementById('mc-scenario').value||'base';
+  const N=200; // simulazioni
+  const steps=years*12; // step mensili
+
+  // Drift mensile per asset secondo scenario
+  const drifts=ORIG.map(a=>{
+    const ann=scen==='bear'?a.bear:scen==='bull'?a.bull:a.base;
+    return ann/12;
+  });
+
+  // Volatilità mensile per asset
+  const vols=ORIG.map(a=>a.vol/Math.sqrt(12));
+
+  // Matrice correlazioni (Cholesky semplificata — correlazione per categoria)
+  // Usiamo la funzione co() esistente per la matrice di corr
+  const n=ORIG.length;
+
+  // Box-Muller: genera n numeri normali correlati tramite correlazione per categoria
+  function randn(){
+    let u=0,v=0;
+    while(u===0)u=Math.random();
+    while(v===0)v=Math.random();
+    return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);
+  }
+
+  // Genera vettore di shock correlati usando decomposizione semplificata
+  // Approccio: componente comune per categoria + componente idiosincratica
+  function correlatedShocks(){
+    // Fattori comuni per categoria
+    const catFactors={};
+    ['commodity','equity-broad','equity-theme','alternative','crypto'].forEach(c=>{catFactors[c]=randn();});
+    return ORIG.map((a,i)=>{
+      const rho=co(a.cat,a.cat); // sempre 1 per stessa cat
+      // Usa correlazione media della categoria come peso del fattore comune
+      let avgCorr=0;let cnt=0;
+      ORIG.forEach((b,j)=>{if(i!==j){avgCorr+=co(a.cat,b.cat);cnt++;}});
+      avgCorr=cnt>0?avgCorr/cnt:0;
+      const sqrtRho=Math.sqrt(Math.max(0,avgCorr));
+      const sqrtIdi=Math.sqrt(Math.max(0,1-avgCorr));
+      return sqrtRho*catFactors[a.cat]+sqrtIdi*randn();
+    });
+  }
+
+  // Pesi attuali (normalizzati)
+  const nw=nW();
+
+  // Esegui N simulazioni
+  const allPaths=[]; // [sim][step] = valore portafoglio
+  const allDrawdowns=[]; // [sim] = max drawdown
+
+  for(let s=0;s<N;s++){
+    const simCaps=caps.map(c=>c); // copia caps attuali
+    const path=[simCaps.reduce((a,b)=>a+b,0)];
+    let peak=path[0];
+    let maxDD=0;
+
+    for(let t=0;t<steps;t++){
+      const shocks=correlatedShocks();
+      for(let i=0;i<n;i++){
+        const ret=drifts[i]+vols[i]*shocks[i];
+        simCaps[i]=simCaps[i]*Math.exp(ret);
+      }
+      // Versamento annuo ogni 12 mesi (proporzionale ai pesi)
+      if((t+1)%12===0 && annualYearly>0){
+        const monthlyPay=annualYearly;
+        for(let i=0;i<n;i++) simCaps[i]+=monthlyPay*nw[i];
+      }
+      const tot=simCaps.reduce((a,b)=>a+b,0);
+      path.push(tot);
+      if(tot>peak)peak=tot;
+      const dd=(peak-tot)/peak;
+      if(dd>maxDD)maxDD=dd;
+    }
+    allPaths.push(path);
+    allDrawdowns.push(maxDD);
+  }
+
+  // Calcola percentili per ogni step
+  function pct(arr,p){
+    const sorted=[...arr].sort((a,b)=>a-b);
+    const idx=Math.floor(p/100*(sorted.length-1));
+    return sorted[idx];
+  }
+
+  const labels=[];
+  for(let t=0;t<=steps;t++){
+    if(t===0)labels.push('Oggi');
+    else if(t%12===0)labels.push('Anno '+(t/12));
+    else labels.push('');
+  }
+
+  // Percentili per grafico fan
+  const p10=[],p25=[],p50=[],p75=[],p90=[];
+  for(let t=0;t<=steps;t++){
+    const vals=allPaths.map(p=>p[t]);
+    p10.push(pct(vals,10));
+    p25.push(pct(vals,25));
+    p50.push(pct(vals,50));
+    p75.push(pct(vals,75));
+    p90.push(pct(vals,90));
+  }
+
+  const startVal=caps.reduce((a,b)=>a+b,0);
+  const finalVals=allPaths.map(p=>p[steps]);
+  const medFinal=pct(finalVals,50);
+  const p10Final=pct(finalVals,10);
+  const p90Final=pct(finalVals,90);
+
+  // KPI
+  const probPositive=finalVals.filter(v=>v>startVal).length/N*100;
+  const probDouble=finalVals.filter(v=>v>startVal*2).length/N*100;
+  const medDD=pct(allDrawdowns,50)*100;
+  const worstDD=pct(allDrawdowns,90)*100;
+  const cagr=(Math.pow(medFinal/startVal,1/years)-1)*100;
+
+  document.getElementById('mc-kpi').innerHTML=`
+    <div class="kpi"><div class="kpi-l">Valore mediano finale</div><div class="kpi-v go">€${fE(medFinal)}</div><div class="kpi-sub">CAGR mediano ${cagr.toFixed(1)}%/anno</div></div>
+    <div class="kpi"><div class="kpi-l">Range 10°–90° percentile</div><div class="kpi-v" style="color:var(--t2);font-size:16px;">€${fE(p10Final)} – €${fE(p90Final)}</div><div class="kpi-sub">80% dei percorsi cade qui</div></div>
+    <div class="kpi"><div class="kpi-l">Prob. rendimento positivo</div><div class="kpi-v" style="color:${probPositive>60?'var(--teal)':'var(--amber)'};">${probPositive.toFixed(0)}%</div><div class="kpi-sub">vs valore attuale €${fE(startVal)}</div></div>
+    <div class="kpi"><div class="kpi-l">Prob. raddoppio capitale</div><div class="kpi-v" style="color:var(--purple);">${probDouble.toFixed(0)}%</div><div class="kpi-sub">in ${years} anni con €${fE(annualYearly)}/anno</div></div>
+    <div class="kpi"><div class="kpi-l">Drawdown mediano</div><div class="kpi-v gr">−${medDD.toFixed(1)}%</div><div class="kpi-sub">Max atteso (90° pct): −${worstDD.toFixed(1)}%</div></div>
+  `;
+
+  // Grafico fan — bande percentili + 20 traiettorie campione come sfondo decorativo
+  const NAMED_LABELS=new Set(['90° pct','75° pct','Mediana','25° pct','10° pct','Valore attuale']);
+  const samplePaths=[];
+  for(let s=0;s<20;s++){
+    const idx=Math.floor(Math.random()*N);
+    samplePaths.push({
+      label:'_path',  // prefisso _ = escluso da legenda e tooltip
+      data:allPaths[idx],
+      borderColor:'rgba(139,111,255,0.07)',
+      borderWidth:1,
+      pointRadius:0,
+      fill:false,
+      tension:0.3,
+    });
+  }
+  const startValArr=Array(steps+1).fill(startVal);
+
+  mk('c-mc-fan',{
+    type:'line',
+    data:{
+      labels,
+      datasets:[
+        ...samplePaths,
+        {label:'90° pct',data:p90,borderColor:'rgba(39,201,154,0.3)',borderWidth:1,pointRadius:0,fill:'+1',backgroundColor:'rgba(39,201,154,0.05)',tension:0.3},
+        {label:'75° pct',data:p75,borderColor:'rgba(39,201,154,0.55)',borderWidth:1,pointRadius:0,fill:'+1',backgroundColor:'rgba(39,201,154,0.10)',tension:0.3},
+        {label:'Mediana',data:p50,borderColor:'#8b6fff',borderWidth:2.5,pointRadius:0,fill:false,tension:0.3},
+        {label:'25° pct',data:p25,borderColor:'rgba(232,80,74,0.55)',borderWidth:1,pointRadius:0,fill:'+1',backgroundColor:'rgba(232,80,74,0.10)',tension:0.3},
+        {label:'10° pct',data:p10,borderColor:'rgba(232,80,74,0.3)',borderWidth:1,pointRadius:0,fill:false,tension:0.3},
+        {label:'Valore attuale',data:startValArr,borderColor:'rgba(212,168,67,0.5)',borderWidth:1.5,borderDash:[5,5],pointRadius:0,fill:false},
+      ]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      interaction:{mode:'index',intersect:false},
+      plugins:{
+        legend:{
+          position:'top',
+          labels:{
+            color:'#9aa3b2',boxWidth:12,font:{size:11},padding:16,
+            filter: item => !item.datasetIndex || NAMED_LABELS.has(item.text)
+          }
+        },
+        tooltip:{
+          callbacks:{
+            label:ctx=>{
+              if(!NAMED_LABELS.has(ctx.dataset.label))return null;
+              if(ctx.dataset.label==='Valore attuale')return ' Capitale attuale: €'+fE(ctx.raw);
+              return ' '+ctx.dataset.label+': €'+fE(ctx.raw);
+            }
+          },
+          filter: item => NAMED_LABELS.has(item.dataset.label)
+        }
+      },
+      scales:{
+        x:{ticks:{color:'#3e4452',font:{size:10},maxTicksLimit:years+1,callback:(v,i)=>labels[i]||null},grid:{color:'rgba(255,255,255,.03)'}},
+        y:{ticks:{color:'#3e4452',font:{size:10},callback:v=>'€'+Math.round(v/1000)+'k'},grid:{color:'rgba(255,255,255,.04)'}}
+      }
+    }
+  });
+
+  // Istogramma distribuzione finale
+  const minV=Math.min(...finalVals),maxV=Math.max(...finalVals);
+  const bins=20;const binW=(maxV-minV)/bins;
+  const histCounts=Array(bins).fill(0);
+  finalVals.forEach(v=>{const b=Math.min(bins-1,Math.floor((v-minV)/binW));histCounts[b]++;});
+  const histLabels=Array.from({length:bins},(_,i)=>'€'+Math.round((minV+i*binW)/1000)+'k');
+  const histColors=histCounts.map((_,i)=>{
+    const mid=minV+(i+0.5)*binW;
+    if(mid<startVal)return 'rgba(232,80,74,0.6)';
+    if(mid<startVal*1.5)return 'rgba(212,168,67,0.6)';
+    return 'rgba(39,201,154,0.6)';
+  });
+
+  mk('c-mc-hist',{
+    type:'bar',
+    data:{labels:histLabels,datasets:[{data:histCounts,backgroundColor:histColors,borderWidth:0,borderRadius:2}]},
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>`${ctx.raw} simulazioni`}}},
+      scales:{
+        x:{ticks:{color:'#3e4452',font:{size:9},maxTicksLimit:8},grid:{display:false}},
+        y:{ticks:{color:'#3e4452',font:{size:10}},grid:{color:'rgba(255,255,255,.04)'}}
+      }
+    }
+  });
+
+  // Istogramma drawdown
+  const ddPcts=allDrawdowns.map(d=>d*100);
+  const ddBins=15;const ddMax=Math.min(80,Math.max(...ddPcts));
+  const ddBinW=ddMax/ddBins;
+  const ddCounts=Array(ddBins).fill(0);
+  ddPcts.forEach(v=>{const b=Math.min(ddBins-1,Math.floor(v/ddBinW));ddCounts[b]++;});
+  const ddLabels=Array.from({length:ddBins},(_,i)=>`−${Math.round((i+0.5)*ddBinW)}%`);
+  const ddColors=ddCounts.map((_,i)=>{
+    const mid=(i+0.5)*ddBinW;
+    if(mid<15)return 'rgba(39,201,154,0.6)';
+    if(mid<30)return 'rgba(212,168,67,0.6)';
+    return 'rgba(232,80,74,0.6)';
+  });
+
+  mk('c-mc-dd',{
+    type:'bar',
+    data:{labels:ddLabels,datasets:[{data:ddCounts,backgroundColor:ddColors,borderWidth:0,borderRadius:2}]},
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>`${ctx.raw} simulazioni`}}},
+      scales:{
+        x:{ticks:{color:'#3e4452',font:{size:9}},grid:{display:false}},
+        y:{ticks:{color:'#3e4452',font:{size:10}},grid:{color:'rgba(255,255,255,.04)'}}
+      }
+    }
+  });
+
+  // Tabella soglie probabilistiche
+  const probLoss10=finalVals.filter(v=>v<startVal*0.9).length/N*100;
+  const probLoss20=finalVals.filter(v=>v<startVal*0.8).length/N*100;
+  const probGain50=finalVals.filter(v=>v>startVal*1.5).length/N*100;
+  const probGain100=finalVals.filter(v=>v>startVal*2.0).length/N*100;
+  const probGain200=finalVals.filter(v=>v>startVal*3.0).length/N*100;
+  const medDDfmt=`${medDD.toFixed(1)}% drawdown mediano`;
+
+  const rows=[
+    {q:`Perdere più del 10% del capitale in ${years} anni`,p:probLoss10,note:'Scenario avverso cumulativo',col:probLoss10<20?'var(--teal)':'var(--red)'},
+    {q:`Perdere più del 20% del capitale in ${years} anni`,p:probLoss20,note:'Scenario severo',col:probLoss20<10?'var(--teal)':'var(--red)'},
+    {q:`Guadagnare almeno +50% in ${years} anni`,p:probGain50,note:`Mediana: €${fE(medFinal)}`,col:probGain50>50?'var(--teal)':'var(--amber)'},
+    {q:`Raddoppiare il capitale in ${years} anni`,p:probGain100,note:'Inclusivo versamenti annui',col:probGain100>30?'var(--teal)':'var(--amber)'},
+    {q:`Triplicare il capitale in ${years} anni`,p:probGain200,note:'Scenario ottimistico',col:'var(--purple)'},
+    {q:`Subire drawdown >20% durante il percorso`,p:allDrawdowns.filter(d=>d>0.2).length/N*100,note:medDDfmt,col:'var(--amber)'},
+    {q:`Subire drawdown >40% durante il percorso`,p:allDrawdowns.filter(d=>d>0.4).length/N*100,note:'Scenario stress estremo',col:'var(--red)'},
+  ];
+
+  document.getElementById('mc-prob-tbl').innerHTML=rows.map(r=>`
+    <tr>
+      <td style="font-size:13px;">${r.q}</td>
+      <td style="font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:600;color:${r.col};text-align:center;">${r.p.toFixed(0)}%</td>
+      <td style="font-size:12px;color:var(--t3);">${r.note}</td>
+    </tr>
+  `).join('');
+}
 
 </script>
 </body>
